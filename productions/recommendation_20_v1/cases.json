@@ -1,0 +1,366 @@
+{
+  "schema": "visualagent.recommendations.v1",
+  "max_first_attempt_credits": 92,
+  "cases": [
+    {
+      "id": "morning-coffee",
+      "title": "把清晨冲慢一点",
+      "category": "餐饮",
+      "aspect": "16:9",
+      "product": "一杯手冲咖啡",
+      "scene": "晨光厨房，手冲水流的细节到窗边陶杯升腾的热气",
+      "captions": [
+        "清晨，慢一点",
+        "把香气留给自己"
+      ],
+      "provider": "kling",
+      "model": "kling-video-v2_5",
+      "duration": 10,
+      "approved_credits": 4,
+      "attempt": 1,
+      "training_eligible": false
+    },
+    {
+      "id": "bakery",
+      "title": "刚好出炉",
+      "category": "餐饮",
+      "aspect": "9:16",
+      "product": "手作可颂",
+      "scene": "黄油金色层次，烘焙台上热气，牛皮纸与亚麻的层次",
+      "captions": [
+        "层层酥香",
+        "今天，趁热相见"
+      ],
+      "provider": "kling",
+      "model": "kling-video-v2_5",
+      "duration": 10,
+      "approved_credits": 4,
+      "attempt": 1,
+      "training_eligible": false
+    },
+    {
+      "id": "tea",
+      "title": "一盏山色",
+      "category": "餐饮",
+      "aspect": "16:9",
+      "product": "清茶",
+      "scene": "青瓷杯，雨后竹影，温水唤醒茶叶，窗边安静收束",
+      "captions": [
+        "泡开一盏山色",
+        "留一刻清闲"
+      ],
+      "provider": "kling",
+      "model": "kling-video-v2_5",
+      "duration": 10,
+      "approved_credits": 4,
+      "attempt": 1,
+      "training_eligible": false
+    },
+    {
+      "id": "sparkling",
+      "title": "给午后一点气泡",
+      "category": "餐饮",
+      "aspect": "9:16",
+      "product": "青柠气泡水",
+      "scene": "无标玻璃杯，青柠片和冰块，露台阳光，气泡特写",
+      "captions": [
+        "让午后醒来",
+        "清爽，刚刚好"
+      ],
+      "provider": "kling",
+      "model": "kling-video-v2_5",
+      "duration": 10,
+      "approved_credits": 4,
+      "attempt": 1,
+      "training_eligible": false
+    },
+    {
+      "id": "perfume",
+      "title": "气息有了形状",
+      "category": "美妆",
+      "aspect": "9:16",
+      "product": "无品牌透明方形香水瓶",
+      "scene": "琥珀色液体，棱镜光，深色石台，橙花与薄纱前景",
+      "captions": [
+        "不必说太多",
+        "让气息替你表达"
+      ],
+      "provider": "kling",
+      "model": "kling-video-v2_5",
+      "duration": 10,
+      "approved_credits": 4,
+      "attempt": 1,
+      "training_eligible": false
+    },
+    {
+      "id": "ceramic",
+      "title": "把日常捧在手里",
+      "category": "家居",
+      "aspect": "1:1",
+      "product": "米白手工陶杯",
+      "scene": "温润釉面，木桌，书页，窗影，双手轻轻捧起杯子",
+      "captions": [
+        "日常，也值得珍藏",
+        "一杯温柔的时间"
+      ],
+      "provider": "kling",
+      "model": "kling-video-v2_5",
+      "duration": 10,
+      "approved_credits": 4,
+      "attempt": 1,
+      "training_eligible": false
+    },
+    {
+      "id": "skincare",
+      "title": "留给自己的一分钟",
+      "category": "美妆",
+      "aspect": "9:16",
+      "product": "无标签磨砂绿色护肤罐",
+      "scene": "水珠、湿润石面、叶影，开盖展示乳霜纹理，不做功效宣称",
+      "captions": [
+        "把忙碌放一放",
+        "留一分钟给自己"
+      ],
+      "provider": "kling",
+      "model": "kling-video-v2_5",
+      "duration": 10,
+      "approved_credits": 4,
+      "attempt": 1,
+      "training_eligible": false
+    },
+    {
+      "id": "linen",
+      "title": "让房间呼吸",
+      "category": "家居",
+      "aspect": "16:9",
+      "product": "亚麻床品",
+      "scene": "奶油白房间，晨光、风吹窗帘、褶皱织物，安静自然",
+      "captions": [
+        "让房间轻一点",
+        "让休息深一点"
+      ],
+      "provider": "kling",
+      "model": "kling-video-v2_5",
+      "duration": 10,
+      "approved_credits": 4,
+      "attempt": 1,
+      "training_eligible": false
+    },
+    {
+      "id": "headphones",
+      "title": "进入自己的节奏",
+      "category": "数码",
+      "aspect": "9:16",
+      "product": "哑光黑色头戴耳机",
+      "scene": "深灰工作桌，唱片纹理，柔和轮廓光，平稳环绕展示",
+      "captions": [
+        "世界很忙",
+        "此刻，听自己的"
+      ],
+      "provider": "kling",
+      "model": "kling-video-v2_5",
+      "duration": 10,
+      "approved_credits": 4,
+      "attempt": 1,
+      "training_eligible": false
+    },
+    {
+      "id": "bag",
+      "title": "轻装出门",
+      "category": "穿戴",
+      "aspect": "9:16",
+      "product": "焦糖棕色帆布托特包",
+      "scene": "雨后城市咖啡店外，肩上包的织物与缝线，慢步走过石墙",
+      "captions": [
+        "装下日常",
+        "轻装，去生活"
+      ],
+      "provider": "kling",
+      "model": "kling-video-v2_5",
+      "duration": 10,
+      "approved_credits": 4,
+      "attempt": 1,
+      "training_eligible": false
+    },
+    {
+      "id": "candle",
+      "title": "夜晚的温度",
+      "category": "家居",
+      "aspect": "1:1",
+      "product": "琥珀玻璃香氛蜡烛",
+      "scene": "黄昏客厅，火苗、暖光、书本与织物，烛光微动",
+      "captions": [
+        "把夜晚调暖",
+        "让自己慢下来"
+      ],
+      "provider": "kling",
+      "model": "kling-video-v2_5",
+      "duration": 10,
+      "approved_credits": 4,
+      "attempt": 1,
+      "training_eligible": false
+    },
+    {
+      "id": "plant",
+      "title": "桌边的小森林",
+      "category": "家居",
+      "aspect": "9:16",
+      "product": "盆栽龟背竹",
+      "scene": "白色陶盆、叶片露珠、柔和日光、桌面前后景与自然叶影",
+      "captions": [
+        "给日常一点绿",
+        "让心情慢慢生长"
+      ],
+      "provider": "kling",
+      "model": "kling-video-v2_5",
+      "duration": 10,
+      "approved_credits": 4,
+      "attempt": 1,
+      "training_eligible": false
+    },
+    {
+      "id": "watch",
+      "title": "时间留给重要的事",
+      "category": "穿戴",
+      "aspect": "16:9",
+      "product": "银色圆盘皮表带腕表",
+      "scene": "深棕皮革、金属侧缘、早晨木桌，镜头避开可读数字与品牌",
+      "captions": [
+        "忙碌之间",
+        "留一刻给自己"
+      ],
+      "provider": "kling",
+      "model": "kling-video-v3_0",
+      "duration": 10,
+      "approved_credits": 6,
+      "attempt": 1,
+      "training_eligible": false
+    },
+    {
+      "id": "sneakers",
+      "title": "下一步，去哪里",
+      "category": "穿戴",
+      "aspect": "9:16",
+      "product": "白色橙色细节运动鞋",
+      "scene": "城市台阶，鞋底与网布纹理，成年人的自然行走，黄昏光",
+      "captions": [
+        "下一步",
+        "走向喜欢的生活"
+      ],
+      "provider": "kling",
+      "model": "kling-video-v3_0",
+      "duration": 10,
+      "approved_credits": 6,
+      "attempt": 1,
+      "training_eligible": false
+    },
+    {
+      "id": "camping",
+      "title": "把周末交给山野",
+      "category": "出行",
+      "aspect": "16:9",
+      "product": "浅沙色露营帐篷",
+      "scene": "林间空地、远山、松针前景、晚霞与帐篷暖灯，缓慢推近",
+      "captions": [
+        "把周末交给山野",
+        "在风里，停一会儿"
+      ],
+      "provider": "kling",
+      "model": "kling-video-v3_0",
+      "duration": 10,
+      "approved_credits": 6,
+      "attempt": 1,
+      "training_eligible": false
+    },
+    {
+      "id": "speaker",
+      "title": "让音乐住进房间",
+      "category": "数码",
+      "aspect": "1:1",
+      "product": "深灰织物圆柱音箱",
+      "scene": "胡桃木矮柜、阳光、绿植、黑胶唱片，网布微距到客厅全景",
+      "captions": [
+        "一段旋律",
+        "让房间有了心情"
+      ],
+      "provider": "kling",
+      "model": "kling-video-v3_0",
+      "duration": 10,
+      "approved_credits": 6,
+      "attempt": 1,
+      "training_eligible": false
+    },
+    {
+      "id": "jewelry",
+      "title": "一点光，刚刚好",
+      "category": "穿戴",
+      "aspect": "9:16",
+      "product": "无品牌银色曲线耳饰",
+      "scene": "黑色石面、流动水纹倒影、丝绸前景，精致静物电影摄影",
+      "captions": [
+        "不必耀眼",
+        "一点光，刚刚好"
+      ],
+      "provider": "kling",
+      "model": "kling-video-v3_0_omni",
+      "duration": 10,
+      "approved_credits": 8,
+      "attempt": 1,
+      "training_eligible": false
+    },
+    {
+      "id": "electric-car",
+      "title": "驶向更开阔的日常",
+      "category": "出行",
+      "aspect": "16:9",
+      "product": "无品牌银色概念轿车",
+      "scene": "清晨海岸公路，优雅车身反射、远景平稳行驶，不含品牌、文字、车牌特写",
+      "captions": [
+        "把日常开阔一点",
+        "出发，向着喜欢的风景"
+      ],
+      "provider": "kling",
+      "model": "kling-video-v3_0_omni",
+      "duration": 10,
+      "approved_credits": 8,
+      "attempt": 1,
+      "training_eligible": false
+    },
+    {
+      "id": "rain-window",
+      "title": "雨天也有好心情",
+      "category": "家居",
+      "aspect": "16:9",
+      "product": "暖白阅读台灯",
+      "scene": "长条灯头与细直立柱固定，雨滴窗户、书本和陶杯，灯光渐暖",
+      "captions": [
+        "窗外是雨",
+        "这里是你的晴天"
+      ],
+      "provider": "minimax-h3",
+      "model": "MiniMax-H3",
+      "duration": 10,
+      "approved_credits": 2,
+      "attempt": 1,
+      "training_eligible": false
+    },
+    {
+      "id": "breakfast",
+      "title": "早餐的小仪式",
+      "category": "餐饮",
+      "aspect": "16:9",
+      "product": "草莓酸奶早餐碗",
+      "scene": "自然酸奶，草莓、燕麦、木勺、亚麻桌布与晨光，食物质感特写",
+      "captions": [
+        "认真吃一顿早餐",
+        "把今天，温柔开启"
+      ],
+      "provider": "minimax-h3",
+      "model": "MiniMax-H3",
+      "duration": 10,
+      "approved_credits": 2,
+      "attempt": 1,
+      "training_eligible": false
+    }
+  ]
+}

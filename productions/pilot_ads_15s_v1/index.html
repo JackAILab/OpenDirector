@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="zh-CN" data-composition-variables='[{"id":"caseId","label":"Case","type":"string","default":"gpu"},{"id":"plate","label":"Camera plate","type":"string","default":"assets/plates/gpu-host-v1.png"},{"id":"room","label":"Room","type":"string","default":"VisualAgent 硬件实验室"},{"id":"eyebrow","label":"Eyebrow","type":"string","default":"旗舰硬件 · 15 秒看懂"},{"id":"title","label":"Title","type":"string","default":"性能很强，\n装机更要先看兼容"},{"id":"factA","label":"Fact A","type":"string","default":"双风扇结构清晰可见"},{"id":"factB","label":"Fact B","type":"string","default":"电源、散热、空间一起核对"},{"id":"cta","label":"CTA","type":"string","default":"查看装机清单"},{"id":"accent","label":"Accent","type":"color","default":"#b7f52a"},{"id":"accent2","label":"Accent 2","type":"color","default":"#4de6c1"}]'>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <title>VisualAgent 15 秒广告样片</title>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      @font-face { font-family:"VisualAgent Chinese"; src:url("assets/fonts/chinese-ui.ttf") format("truetype"); font-weight:100 900; font-style:normal; }
+      :root { --accent:#b7f52a; --accent-2:#4de6c1; --paper:#f6f7f3; --ink:#090b0a; }
+      * { box-sizing:border-box; }
+      html, body { width:1080px; height:1920px; margin:0; overflow:hidden; background:#070908; }
+      body { color:var(--paper); font-family:"VisualAgent Chinese",Inter,system-ui,sans-serif; }
+      #ad-root { position:relative; width:1080px; height:1920px; overflow:hidden; isolation:isolate; background:#070908; }
+      .clip { position:absolute; inset:0; }
+      .camera-window { position:absolute; inset:0; overflow:hidden; z-index:-5; background:#0a0d0c; }
+      .camera-motion { position:absolute; inset:-70px; will-change:transform; }
+      .camera-motion img { width:100%; height:100%; object-fit:cover; object-position:center; display:block; }
+      .grade { position:absolute; inset:0; z-index:-4; background:linear-gradient(180deg,rgba(4,6,5,.58) 0%,rgba(4,6,5,.08) 25%,rgba(4,6,5,.04) 58%,rgba(4,6,5,.78) 100%),radial-gradient(circle at 52% 40%,transparent 35%,rgba(0,0,0,.3) 100%); }
+      .grid { position:absolute; inset:0; z-index:-3; opacity:.14; background-image:linear-gradient(rgba(255,255,255,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.08) 1px,transparent 1px); background-size:72px 72px; mask-image:linear-gradient(180deg,transparent 0%,black 45%,black 100%); }
+      .topbar { position:absolute; top:44px; left:42px; right:42px; height:118px; display:flex; align-items:center; justify-content:space-between; z-index:10; }
+      .identity { display:flex; align-items:center; gap:16px; padding:14px 20px 14px 14px; background:rgba(7,9,8,.76); border:1px solid rgba(255,255,255,.19); border-radius:28px 12px 28px 28px; backdrop-filter:blur(24px); box-shadow:0 22px 70px rgba(0,0,0,.28); }
+      .avatar { width:66px; height:66px; border-radius:22px 10px 22px 22px; display:grid; place-items:center; background:linear-gradient(145deg,var(--accent),var(--accent-2)); color:#07100b; font-size:21px; font-weight:900; }
+      .identity b { display:block; font-size:25px; line-height:1.1; }
+      .identity span { display:block; margin-top:6px; color:#c7ccc8; font-size:16px; letter-spacing:.08em; }
+      .live { display:flex; align-items:center; gap:10px; padding:18px 22px; border-radius:14px 28px 28px 28px; background:rgba(7,9,8,.74); border:1px solid rgba(255,255,255,.17); backdrop-filter:blur(22px); font:700 17px ui-monospace,monospace; letter-spacing:.12em; }
+      .live i { width:11px; height:11px; border-radius:50%; background:#ff5468; box-shadow:0 0 0 7px rgba(255,84,104,.18); }
+      .disclosure { position:absolute; top:180px; left:42px; z-index:9; display:flex; align-items:center; gap:10px; padding:10px 16px 10px 10px; background:rgba(7,9,8,.7); border:1px solid color-mix(in srgb,var(--accent) 45%,transparent); border-radius:10px 20px 20px 10px; backdrop-filter:blur(18px); font-size:16px; }
+      .disclosure b { display:grid; place-items:center; width:30px; height:30px; border-radius:8px; background:var(--accent); color:#07100b; font:800 13px ui-monospace,monospace; }
+      .hero { position:absolute; left:42px; top:310px; width:820px; z-index:8; }
+      .eyebrow { display:inline-flex; padding:10px 14px; border:1px solid rgba(255,255,255,.18); border-radius:9px 18px 18px 9px; background:rgba(7,9,8,.76); backdrop-filter:blur(18px); color:var(--accent); font-family:"VisualAgent Chinese",ui-monospace,monospace; font-size:18px; font-weight:700; letter-spacing:.08em; }
+      .hero h1 { margin:20px 0 0; max-width:780px; font-size:76px; line-height:1.05; letter-spacing:-.045em; text-shadow:0 5px 28px rgba(0,0,0,.72); white-space:pre-line; }
+      .rule { margin-top:24px; width:220px; height:8px; border-radius:8px; background:linear-gradient(90deg,var(--accent),var(--accent-2)); box-shadow:0 0 28px color-mix(in srgb,var(--accent) 40%,transparent); transform-origin:left center; }
+      .signal { position:absolute; right:42px; top:565px; width:86px; height:520px; z-index:7; display:flex; flex-direction:column; align-items:center; gap:24px; }
+      .signal-line { width:1px; flex:1; background:linear-gradient(180deg,transparent,var(--accent),transparent); opacity:.8; }
+      .signal-index { writing-mode:vertical-rl; color:#eef2ee; font:700 14px ui-monospace,monospace; letter-spacing:.16em; }
+      .comments { position:absolute; left:42px; bottom:370px; width:640px; z-index:12; display:flex; flex-direction:column; gap:12px; }
+      .comment { width:max-content; max-width:620px; display:flex; align-items:center; gap:14px; padding:14px 19px 14px 12px; background:rgba(7,9,8,.72); border:1px solid rgba(255,255,255,.15); backdrop-filter:blur(22px); box-shadow:0 18px 48px rgba(0,0,0,.26); }
+      .comment:nth-child(1) { border-radius:24px 10px 24px 24px; }
+      .comment:nth-child(2) { margin-left:28px; border-radius:12px 24px 24px 24px; border-color:color-mix(in srgb,var(--accent) 46%,transparent); }
+      .comment i { width:44px; height:44px; border-radius:15px 7px 15px 15px; background:linear-gradient(145deg,var(--accent),var(--accent-2)); }
+      .comment small { display:block; color:var(--accent); font:600 13px ui-monospace,monospace; }
+      .comment strong { display:block; margin-top:3px; font-size:21px; }
+      .fact-card { position:absolute; right:42px; bottom:398px; width:490px; min-height:176px; z-index:13; padding:24px 26px; background:linear-gradient(120deg,rgba(10,13,11,.95),rgba(22,27,23,.88)); border:1px solid rgba(255,255,255,.2); border-radius:30px 12px 30px 30px; box-shadow:0 30px 84px rgba(0,0,0,.38); backdrop-filter:blur(28px); }
+      .fact-card small { color:var(--accent); font:700 14px ui-monospace,monospace; letter-spacing:.11em; }
+      .fact-card h2 { margin:12px 0 0; font-size:31px; line-height:1.22; letter-spacing:-.025em; }
+      .fact-card p { margin:11px 0 0; color:#cbd0cb; font-size:17px; line-height:1.4; }
+      .drawer { position:absolute; left:42px; right:42px; bottom:44px; height:270px; z-index:14; display:grid; grid-template-columns:138px 1fr auto; align-items:center; gap:24px; padding:26px; background:linear-gradient(118deg,rgba(9,12,10,.97),rgba(19,24,20,.91)); border:1px solid rgba(255,255,255,.2); border-radius:38px 16px 38px 38px; box-shadow:0 32px 90px rgba(0,0,0,.44); backdrop-filter:blur(30px); }
+      .thumb { width:138px; height:180px; border-radius:28px 12px 28px 28px; overflow:hidden; border:1px solid rgba(255,255,255,.14); background-position:center; background-size:cover; }
+      .drawer small { color:var(--accent); font:700 14px ui-monospace,monospace; letter-spacing:.1em; }
+      .drawer strong { display:block; margin-top:10px; max-width:420px; font-size:32px; line-height:1.18; }
+      .drawer p { margin:10px 0 0; color:#bfc5bf; font-size:17px; }
+      .cta { min-width:188px; padding:22px 26px; border:1px solid rgba(255,255,255,.34); border-radius:16px 28px 28px 28px; background:var(--accent); color:#050705; font-family:"VisualAgent Chinese",sans-serif; font-size:20px; font-weight:900; }
+      .progress { position:absolute; left:42px; right:42px; bottom:20px; height:5px; background:rgba(255,255,255,.14); border-radius:8px; overflow:hidden; z-index:16; }
+      .progress i { display:block; width:100%; height:100%; background:linear-gradient(90deg,var(--accent),var(--accent-2)); transform-origin:left center; }
+      .corner { position:absolute; right:44px; bottom:332px; color:rgba(255,255,255,.52); font:600 13px ui-monospace,monospace; letter-spacing:.1em; z-index:16; }
+    </style>
+  </head>
+  <body>
+    <main id="ad-root" data-composition-id="visualagent-pilot-ad-15s" data-width="1080" data-height="1920" data-start="0" data-duration="15" data-fps="30">
+      <section id="pilot-ad-scene" class="clip">
+        <div class="camera-window"><div class="camera-motion" data-layout-allow-overflow><img id="plate" src="assets/plates/gpu-host-v1.png" alt="AI generated physical camera plate" /></div></div>
+        <div class="grade" aria-hidden="true"></div><div class="grid" aria-hidden="true"></div>
+        <header class="topbar"><div class="identity"><div class="avatar">VA</div><div><b id="room"></b><span>SYNTHETIC PRODUCT DEMO</span></div></div><div class="live"><i></i>LIVE · 15S</div></header>
+        <div class="disclosure"><b>AI</b><span>人物与商品画面为合成内容 · 可读界面由代码生成</span></div>
+        <section class="hero"><div id="eyebrow" class="eyebrow"></div><h1 id="title"></h1><div class="rule"></div></section>
+        <aside class="signal"><div class="signal-line"></div><div id="signal-index" class="signal-index"></div><div class="signal-line"></div></aside>
+        <section class="comments"><article class="comment"><i></i><div><small>gear_lab</small><strong>细节终于看清了</strong></div></article><article class="comment"><i></i><div><small>ask_visualagent</small><strong>先把关键条件讲明白</strong></div></article></section>
+        <article id="fact-card" class="fact-card"><small>KEY FACT / 01</small><h2 id="fact-a"></h2><p id="fact-b"></p></article>
+        <footer class="drawer" data-layout-allow-overflow><div id="thumb-plate" class="thumb" aria-hidden="true"></div><div><small>VISUALAGENT · PILOT FILM</small><strong id="drawer-title"></strong><p>15 秒信息密度测试 · 未经人工批准不得进入训练集</p></div><button id="cta" class="cta"></button></footer>
+        <div class="corner">training_eligible=false</div><div class="progress"><i></i></div>
+      </section>
+    </main>
+    <script>
+      const defaults = {caseId:"gpu",plate:"assets/plates/gpu-host-v1.png",room:"VisualAgent 硬件实验室",eyebrow:"旗舰硬件 · 15 秒看懂",title:"性能很强，\n装机更要先看兼容",factA:"双风扇结构清晰可见",factB:"电源、散热、空间一起核对",cta:"查看装机清单",accent:"#b7f52a",accent2:"#4de6c1"};
+      const v = window.__hyperframes?.getVariables?.() || defaults;
+      const cfg = {...defaults,...v};
+      document.documentElement.style.setProperty("--accent", cfg.accent);
+      document.documentElement.style.setProperty("--accent-2", cfg.accent2);
+      document.getElementById("plate").src = cfg.plate;
+      document.getElementById("thumb-plate").style.backgroundImage = `url("${cfg.plate}")`;
+      document.getElementById("room").textContent = cfg.room;
+      document.getElementById("eyebrow").textContent = cfg.eyebrow;
+      document.getElementById("title").textContent = cfg.title;
+      document.getElementById("fact-a").textContent = cfg.factA;
+      document.getElementById("fact-b").textContent = cfg.factB;
+      document.getElementById("drawer-title").textContent = cfg.title.replace("\n"," ");
+      document.getElementById("cta").textContent = cfg.cta;
+      document.getElementById("signal-index").textContent = `CASE / ${cfg.caseId.toUpperCase()} / 001`;
+      const tl = gsap.timeline({paused:true});
+      tl.fromTo(".camera-motion",{scale:1.04,xPercent:-1.5,yPercent:0},{scale:1.13,xPercent:1.8,yPercent:-1.5,duration:15,ease:"none"},0)
+        .from(".topbar",{y:-34,opacity:0,duration:.65,ease:"power3.out"},.08)
+        .from(".disclosure",{x:-30,opacity:0,duration:.5,ease:"power2.out"},.35)
+        .from(".eyebrow",{x:-34,opacity:0,duration:.55,ease:"power3.out"},.45)
+        .from(".hero h1",{y:42,opacity:0,duration:.8,ease:"power3.out"},.65)
+        .from(".rule",{scaleX:0,duration:.7,ease:"power3.out"},1.05)
+        .from(".signal",{opacity:0,duration:.7,ease:"power2.out"},1.2)
+        .from(".comment",{x:-42,opacity:0,duration:.58,stagger:.24,ease:"power3.out"},3.55)
+        .from(".fact-card",{x:60,opacity:0,duration:.72,ease:"power3.out"},7.2)
+        .from(".drawer",{y:110,opacity:0,duration:.86,ease:"power3.out"},10.75)
+        .from(".corner",{opacity:0,duration:.4},11.45)
+        .fromTo(".progress i",{scaleX:0},{scaleX:1,duration:15,ease:"none"},0)
+        .to(".live i",{scale:1.45,duration:.48,yoyo:true,repeat:14,ease:"sine.inOut"},0);
+      window.__timelines["visualagent-pilot-ad-15s"] = tl;
+    </script>
+  </body>
+</html>

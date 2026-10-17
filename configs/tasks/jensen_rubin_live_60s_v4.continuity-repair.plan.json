@@ -1,0 +1,85 @@
+{
+  "schema": "visualagent.continuity-repair-plan.v1",
+  "id": "jensen-rubin-live-60s-v4-continuity-repair",
+  "task": "repair failed 7.5-second joins and confirmed within-segment object pops without changing Code-owned readable UI",
+  "execution_status": "pending_explicit_paid_generation_authorization",
+  "paid_call_executed": false,
+  "required_capability": {
+    "input_mode": "hard_first_and_tail_frame",
+    "must_enforce_first_frame": true,
+    "must_enforce_tail_frame": true,
+    "semantic_multi_image_reference_is_not_accepted_as_endpoint_proof": true
+  },
+  "repairs": [
+    {
+      "boundary_seconds": 7.5,
+      "segment_to_regenerate": "seg_075_150_continuity_v1",
+      "execute_if": "continuity-audit-v2 status is fail after independent semantic confirmation",
+      "first_frame": "outputs/artifacts/jensen_rubin_live_60s_v1/review/continuity-audit-v2/boundary-0075-before.png",
+      "tail_frame": "outputs/artifacts/jensen_rtx5090_live_v2_20260820/camera_references/state-150-dynamic-v2.png",
+      "output": "outputs/artifacts/jensen_rubin_live_60s_v4/camera_segments/seg_075_150_continuity_v1.source-8s.mp4"
+    },
+    {
+      "boundary_seconds": 15.0,
+      "segment_to_regenerate": "seg_150_225_continuity_v1",
+      "execute_if": "continuity-audit-v2 status is fail after independent semantic confirmation",
+      "first_frame": "outputs/artifacts/jensen_rubin_live_60s_v1/review/continuity-audit-v2/boundary-0150-before.png",
+      "tail_frame": "outputs/artifacts/jensen_rtx5090_live_v2_20260820/camera_references/state-225-dynamic-v2.png",
+      "output": "outputs/artifacts/jensen_rubin_live_60s_v4/camera_segments/seg_150_225_continuity_v1.source-8s.mp4"
+    },
+    {
+      "boundary_seconds": 22.5,
+      "segment_to_regenerate": "seg_225_300_continuity_v1",
+      "execute_if": "continuity-audit-v2 status is fail after independent semantic confirmation",
+      "first_frame": "outputs/artifacts/jensen_rubin_live_60s_v1/review/continuity-audit-v2/boundary-0225-before.png",
+      "tail_frame": "outputs/artifacts/jensen_rtx5090_live_v2_20260820/camera_references/state-300-dynamic-v2.png",
+      "output": "outputs/artifacts/jensen_rubin_live_60s_v4/camera_segments/seg_225_300_continuity_v1.source-8s.mp4"
+    },
+    {
+      "boundary_seconds": 30.0,
+      "segment_to_regenerate": "seg_300_375_continuity_v1",
+      "execute_if": "boundary failure or the 30-34s semantic review confirms a new desk mat, chassis, or other physical-set object pop",
+      "first_frame": "outputs/artifacts/jensen_rubin_live_60s_v1/review/continuity-audit-v2/boundary-0300-before.png",
+      "tail_frame": "outputs/artifacts/jensen_rubin_live_60s_v1/camera_references/state-375-cable-v1-technical-v2.png",
+      "output": "outputs/artifacts/jensen_rubin_live_60s_v4/camera_segments/seg_300_375_continuity_v1.source-8s.mp4"
+    },
+    {
+      "boundary_seconds": 37.5,
+      "segment_to_regenerate": "seg_375_450_continuity_v1",
+      "execute_if": "continuity-audit-v2 status is fail after independent semantic confirmation",
+      "first_frame": "outputs/artifacts/jensen_rubin_live_60s_v1/review/continuity-audit-v2/boundary-0375-before.png",
+      "tail_frame": "outputs/artifacts/jensen_rubin_live_60s_v1/camera_references/state-450-airflow-v1-technical-v2.png",
+      "output": "outputs/artifacts/jensen_rubin_live_60s_v4/camera_segments/seg_375_450_continuity_v1.source-8s.mp4"
+    },
+    {
+      "boundary_seconds": 45.0,
+      "segment_to_regenerate": "seg_450_525_continuity_v1",
+      "execute_if": "continuity-audit-v2 status is fail after independent semantic confirmation",
+      "first_frame": "outputs/artifacts/jensen_rubin_live_60s_v1/review/continuity-audit-v2/boundary-0450-before.png",
+      "tail_frame": "outputs/artifacts/jensen_rubin_live_60s_v1/camera_references/state-525-clearance-v1-technical-v2.png",
+      "output": "outputs/artifacts/jensen_rubin_live_60s_v4/camera_segments/seg_450_525_continuity_v1.source-8s.mp4"
+    },
+    {
+      "boundary_seconds": 52.5,
+      "segment_to_regenerate": "seg_525_600_continuity_v1",
+      "execute_if": "continuity-audit-v2 status is fail after independent semantic confirmation",
+      "first_frame": "outputs/artifacts/jensen_rubin_live_60s_v1/review/continuity-audit-v2/boundary-0525-before.png",
+      "tail_frame": "outputs/artifacts/jensen_rubin_live_60s_v1/camera_references/state-600-summary-v1-technical-v2.png",
+      "output": "outputs/artifacts/jensen_rubin_live_60s_v4/camera_segments/seg_525_600_continuity_v1.source-8s.mp4"
+    }
+  ],
+  "execution_guards": {
+    "explicit_authorization_required": true,
+    "non_overwriting": true,
+    "silent_retry_forbidden": true,
+    "silent_model_substitution_forbidden": true,
+    "provider_raw_payload_forbidden": true,
+    "credentials_forbidden": true
+  },
+  "evaluation": {
+    "technical": ["duration", "dimensions", "fps", "decode", "boundary_frame_similarity", "intrasegment_frame_delta_scan"],
+    "independent_semantic_visual": ["subject_identity", "product_geometry", "hand_contact", "set_continuity", "motion_continuity", "desk_mat_persistence", "chassis_persistence", "no_object_pop"],
+    "human": "required"
+  },
+  "training_eligible": false
+}

@@ -1,0 +1,65 @@
+{
+  "schema": "visualagent.omni-seam-repair-plan.v1",
+  "id": "cybercab-live-60s-v2-omni-seam-repair",
+  "case_id": "cybercab_live_60s_v2",
+  "objective": "Replace three abrupt camera-position jumps with bounded five-second continuous Omni camera moves using actual adjacent source frames as hard endpoints.",
+  "status": "generated_pending_assembly_and_review",
+  "model": "kling-video-v3_0_omni",
+  "input_mode": "hard_first_and_last_frames",
+  "parameters": {
+    "duration_seconds_per_segment": 5,
+    "aspect_ratio": "9:16",
+    "resolution": "1080p",
+    "enable_audio": true,
+    "prefer_multi_shots": false
+  },
+  "assembled_duration_seconds": 5,
+  "audio_contract": {
+    "native_audio_required": true,
+    "speech_language": "none",
+    "content": "continuous showroom or cabin room tone only",
+    "external_tts_replacement_allowed": false
+  },
+  "segments": [
+    {
+      "id": "seam-15-omni-v1",
+      "start": 12.5,
+      "end": 17.5,
+      "first_frame": "outputs/artifacts/cybercab_live_60s_v2/transition_references/seam-15-from.png",
+      "last_frame": "outputs/artifacts/cybercab_live_60s_v2/transition_references/seam-15-to.png",
+      "prompt": "单一连续真实手机直播镜头，严格从给定首帧平滑移动到给定尾帧。保持同一金色双座自动驾驶车、同一虚构亚洲男性科技主播、同一展厅、车辆比例、灯光和色彩。摄影机以缓慢稳定的手持侧移完成机位变化，人物与车辆自然连续，不切镜、不闪变、不溶解、不瞬移、不新增或删除物体。主播此时停顿，不说话，只保留连续轻微展厅环境声。画面内禁止文字、Logo、UI、字幕、价格和礼物特效。",
+      "output": "outputs/artifacts/cybercab_live_60s_v2/camera_transitions/seam-15-omni-v1.source-5s.mp4"
+    },
+    {
+      "id": "seam-30-omni-v1",
+      "start": 27.5,
+      "end": 32.5,
+      "first_frame": "outputs/artifacts/cybercab_live_60s_v2/transition_references/seam-30-from.png",
+      "last_frame": "outputs/artifacts/cybercab_live_60s_v2/transition_references/seam-30-to.png",
+      "prompt": "单一连续真实手机直播镜头，严格从给定首帧平滑移动到给定尾帧。保持同一金色双座自动驾驶车、同一虚构亚洲男性科技主播、同一展厅和座舱、衣着、灯光与色彩。摄影机从车外乘客门附近自然缓慢靠近并进入座舱视角，像现场摄影师连续走位；人物上车动作和车辆结构连续。禁止切镜、闪变、溶解、瞬移、物体凭空出现或消失。主播停顿不说话，只保留连续展厅环境声。画面内禁止文字、Logo、UI、字幕、价格和礼物特效。",
+      "output": "outputs/artifacts/cybercab_live_60s_v2/camera_transitions/seam-30-omni-v1.source-5s.mp4"
+    },
+    {
+      "id": "seam-45-omni-v1",
+      "start": 42.5,
+      "end": 47.5,
+      "first_frame": "outputs/artifacts/cybercab_live_60s_v2/transition_references/seam-45-from.png",
+      "last_frame": "outputs/artifacts/cybercab_live_60s_v2/transition_references/seam-45-to.png",
+      "prompt": "单一连续真实手机直播镜头，严格从给定首帧平滑移动到给定尾帧。保持同一金色双座自动驾驶车、同一虚构亚洲男性科技主播、相同座舱、座椅、安全带、衣着、展厅灯光和色彩。摄影机在座舱内以缓慢稳定的手持后移和转向完成机位变化，人物自然坐稳，车辆结构连续。禁止切镜、闪变、溶解、瞬移、人物或物体凭空出现消失。主播停顿不说话，只保留连续轻微座舱环境声。画面内禁止文字、Logo、UI、字幕、价格和礼物特效。",
+      "output": "outputs/artifacts/cybercab_live_60s_v2/camera_transitions/seam-45-omni-v1.source-5s.mp4"
+    }
+  ],
+  "paid_generation_budget": {
+    "max_calls_without_confirmation": 3,
+    "used": 3,
+    "automatic_retry": false,
+    "model_substitution": false
+  },
+  "promotion_gates": [
+    "all three transition clips contain video and native audio streams",
+    "assembled joins pass deterministic continuity audit",
+    "independent semantic and visual review",
+    "explicit human approval"
+  ],
+  "training_eligible": false
+}

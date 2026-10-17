@@ -1,0 +1,74 @@
+{
+  "schema": "visualagent.benchmark-acceptance.v1",
+  "required_cases": 10,
+  "required_videos": 10,
+  "required_inputs": [
+    "brief",
+    "subject",
+    "reference_images",
+    "generation_parameters"
+  ],
+  "acceptance": {
+    "technical": [
+      "full_video_decode",
+      "duration_15_seconds_tolerance_025",
+      "resolution_1920x1080",
+      "audio_stream_present"
+    ],
+    "semantic": [
+      "product_identity_and_geometry",
+      "visible_planned_actions",
+      "coherent_physics",
+      "three_shot_narrative",
+      "no_readable_model_generated_UI"
+    ],
+    "audio": [
+      "synchronized_environmental_effects",
+      "no_unrequested_voice_or_music"
+    ]
+  },
+  "comparison_protocol": {
+    "send_to_other_frameworks": [
+      "prompt.txt",
+      "input.json",
+      "references/*"
+    ],
+    "exclude": [
+      "VisualAgent generated videos",
+      "VisualAgent evaluation results"
+    ],
+    "fixed": [
+      "same original brief",
+      "same reference image bytes",
+      "15 seconds",
+      "16:9",
+      "1080p",
+      "native environmental audio"
+    ],
+    "record": [
+      "framework name and version",
+      "model",
+      "actual elapsed time",
+      "paid attempts",
+      "cost if disclosed",
+      "all outputs including failures"
+    ],
+    "rubric": {
+      "brief_adherence": 25,
+      "product_consistency": 25,
+      "motion_and_physics": 20,
+      "commercial_image_quality": 20,
+      "audio_synchronization": 10
+    }
+  },
+  "training_eligible": false,
+  "current_evidence": {
+    "input_json_count": 10,
+    "reference_image_count": 10,
+    "video_count": 5,
+    "semantic_reviews_complete": false,
+    "semantic_review_count": 5
+  },
+  "complete": false,
+  "blocker": "insufficient_kling_credits"
+}

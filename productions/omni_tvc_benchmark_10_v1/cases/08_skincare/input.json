@@ -1,0 +1,47 @@
+{
+  "case_id": "08_skincare",
+  "title": "精华液｜光穿过一滴",
+  "brief": "制作一条原创高质感商业TVC，15秒，16:9横屏，目标1920×1080。真实摄影质感、丰富物理场景、明确产品焦点。使用参考图固定商品外观与人物身份，但不得把参考图作为拼贴画播放。按时序完成三个镜头，动作连续且符合物理。原生环境音和与动作同步的音效；无配乐、无旁白。画面不出现可读文字、品牌标识、字幕、价格、界面卡片或水印。屏幕只显示抽象色彩，无功能或性能承诺。\n商品主体：frosted pale aqua serum bottle with rounded rectangular body, glossy white dropper cap, clear glass pipette and translucent serum。\n人物主体：adult hands only with natural unpolished nails。\n场景：pale travertine beauty set, shallow clear water, soft moving caustics。\n镜头计划：0–4s：微距一滴透明精华悬在玻璃滴管末端，背后为浅青色磨砂瓶。4–10s：精华滴落手背并自然展开，镜头慢移，真实皮肤纹理保留。10–15s：滴管回入瓶口，产品在浅水旁稳立，流动光纹滑过石材和玻璃。\n连续性约束：不表现瞬间美白或皱纹消失；滴管和瓶口对齐；液滴真实落下，不倒流。\n图片1固定商品外观、材质与人物身份；参考图中的前景放大是摄影透视，商品在人物使用时须为正常实物大小。",
+  "subject": {
+    "product": "frosted pale aqua serum bottle with rounded rectangular body, glossy white dropper cap, clear glass pipette and translucent serum",
+    "person": "adult hands only with natural unpolished nails",
+    "scene": "pale travertine beauty set, shallow clear water, soft moving caustics",
+    "element_id": null,
+    "binding": "portable reference image plus textual subject description; no provider-specific Element created"
+  },
+  "reference_generation": {
+    "provider": "codebuddy",
+    "model": "hunyuan-image-v3.0",
+    "prompt": "Create one premium commercial photography reference photograph, landscape 16:9. Main product: frosted pale aqua serum bottle with rounded rectangular body, glossy white dropper cap, clear glass pipette and translucent serum. Subject: adult hands only with natural unpolished nails. Location: pale travertine beauty set, shallow clear water, soft moving caustics. The product is clearly visible in foreground at about one third of the frame; if a person is specified, show that person naturally behind or beside it so both product geometry and human identity can be referenced. Rich layered physical set, realistic materials and coherent lighting, cinematic art direction, no collage, no split screen, no graphic layout. No readable text, no logos, no watermarks, no numbers; any screen shows abstract color only. This is a fictional product and fictional adult person.",
+    "size": "1024x1024",
+    "n": 1,
+    "automatic_retry": false,
+    "attempts_used": 1
+  },
+  "references": [
+    {
+      "path": "references/codebuddy-2026-09-25T17-10-20-018Z-1.png",
+      "sha256": "8b8ad71f6ce8980af978cc0c9a64623a244ff5abfe912aff711df84267f91ca4",
+      "role": "product_subject_and_scene_reference"
+    }
+  ],
+  "generation": {
+    "model": "kling-video-v3_0_omni",
+    "duration_seconds": 15,
+    "aspect_ratio": "16:9",
+    "resolution": "1080p",
+    "enable_audio": true,
+    "prefer_multi_shots": true,
+    "image_count": 1,
+    "input_mode": "omni_single_reference"
+  },
+  "review_criteria": [
+    "不表现瞬间美白或皱纹消失；滴管和瓶口对齐；液滴真实落下，不倒流。",
+    "产品身份与几何稳定",
+    "三个镜头有实质动作，不是静态缩放",
+    "视频可完整解码，时长和尺寸正确",
+    "音效与动作对应，无额外说话或音乐"
+  ],
+  "training_eligible": false,
+  "status": "reference_ready"
+}

@@ -1,0 +1,72 @@
+{
+  "schema": "visualagent.live-fx-style.v1",
+  "id": "tiktok_live_v1",
+  "canvas": {"width": 1080, "height": 1920, "orientation": "vertical"},
+  "visual_language": {
+    "surface": "thin translucent pill, not a large dashboard card",
+    "palette": ["#ff4f86", "#ffb257", "#55e8ff", "#fff4dc"],
+    "hierarchy": "one hero asset, one readable code overlay, supporting light trails and no competing chrome"
+  },
+  "assets": [
+    {
+      "id": "sports_car_premium_v1",
+      "path": "outputs/artifacts/jensen_rubin_live_60s_v2/live_fx/sports-car-premium-v1.png",
+      "owner": "gpt-image-2",
+      "contains_readable_text": false
+    },
+    {
+      "id": "rocket_premium_v1",
+      "path": "outputs/artifacts/jensen_rubin_live_60s_v2/live_fx/rocket-premium-v1.png",
+      "owner": "gpt-image-2",
+      "contains_readable_text": false
+    },
+    {
+      "id": "crystal_gift_box_v1",
+      "path": "outputs/artifacts/jensen_rubin_live_60s_v2/live_fx/crystal-gift-box-v1.png",
+      "owner": "gpt-image-2",
+      "contains_readable_text": false
+    }
+  ],
+  "motion_recipes": [
+    {
+      "id": "anticipate-impact-glide-settle",
+      "rules": ["spring-pop-entrance", "motion-blur-streak", "particle-burst", "ambient-glow-bloom"],
+      "phases": [
+        {"name": "anticipate", "duration": 0.14},
+        {"name": "burst", "duration": 0.24},
+        {"name": "hero", "duration": 0.82},
+        {"name": "settle", "duration": 0.78},
+        {"name": "dissipate", "duration": 0.34}
+      ]
+    },
+    {
+      "id": "charge-launch-orbit-resolve",
+      "rules": ["spring-pop-entrance", "motion-blur-streak", "particle-burst", "svg-path-draw"],
+      "phases": [
+        {"name": "anticipate", "duration": 0.16},
+        {"name": "burst", "duration": 0.22},
+        {"name": "hero", "duration": 0.9},
+        {"name": "settle", "duration": 0.72},
+        {"name": "dissipate", "duration": 0.34}
+      ]
+    }
+  ],
+  "sfx_palette": {
+    "gift_charge": "short tonal rise",
+    "hero_pass": "soft filtered whoosh",
+    "impact_sparkle": "three-note glass sparkle",
+    "ui_confirm": "quiet rounded confirmation ping"
+  },
+  "routing": {
+    "code_overlay": "HyperFrames owns all readable UI and deterministic gift motion",
+    "neural_plate": "Kling owns only a bounded, text-free physical reaction segment"
+  },
+  "qa": {
+    "max_simultaneous_hero_gifts": 1,
+    "forbid_face_center_occlusion_seconds": 0.4,
+    "forbid_product_occlusion_ratio": 0.35,
+    "require_readable_overlay_owner": "code",
+    "require_deterministic_seed": true
+  },
+  "training_eligible": false
+}

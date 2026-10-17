@@ -1,0 +1,15 @@
+{
+  "adapter": "openai_image",
+  "expected_model": "gp2/gpt-image-2",
+  "environment": {
+    "base_url": "OPENAI_BASE_URL",
+    "api_key": "OPENAI_API_KEY",
+    "model": "OPENAI_IMAGE_MODEL"
+  },
+  "defaults": {"size": "1024x1824", "quality": "high"},
+  "security": {
+    "store_credential_values": false,
+    "store_base_url": false,
+    "store_temporary_urls": false
+  }
+}

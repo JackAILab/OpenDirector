@@ -1,0 +1,11 @@
+.git
+.env
+secrets
+assets
+outputs
+**/node_modules
+**/__pycache__
+**/*.sqlite*
+**/*.mp4
+**/*.mov
+**/*.zip

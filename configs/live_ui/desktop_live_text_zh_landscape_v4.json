@@ -1,0 +1,23 @@
+{
+  "schema": "visualagent.live-text-style.v1",
+  "id": "desktop-live-text-zh-landscape-v4",
+  "owner": "code_hyperframes",
+  "locale": "zh-CN",
+  "canvas": {"width": 1920, "height": 1080, "orientation": "landscape"},
+  "research_basis": {"scope": "user-supplied desktop live-room screenshot and Chinese mobile examples", "principles_only": true, "copied_brand_assets": false},
+  "hierarchy": {"fixed_order": ["host_identity", "viewer_count", "video_stage", "comment_queue", "composer"], "event_order": ["commerce_card", "gift_notice"], "max_simultaneous_priority_surfaces": 1, "ordinary_comments_yield_to_priority_surface": true},
+  "safe_areas": {"top_px": 28, "right_rail_width_px": 480, "comment_left_px": 1460, "comment_bottom_px": 96, "composer_bottom_px": 20, "protected_subject_zone": {"x": 416, "y": 0, "width": 608, "height": 1080}},
+  "text_roles": [
+    {"id": "host_name", "font_size_px": 23, "weight": 800, "line_height": 1.1, "max_lines": 1},
+    {"id": "viewer_count", "font_size_px": 13, "weight": 700, "line_height": 1.0},
+    {"id": "comment_author", "font_size_px": 16, "weight": 800, "line_height": 1.25},
+    {"id": "comment_body", "font_size_px": 18, "weight": 520, "line_height": 1.34, "max_lines": 2},
+    {"id": "commerce_title", "font_size_px": 25, "weight": 900, "line_height": 1.08, "max_lines": 1},
+    {"id": "composer_hint", "font_size_px": 17, "weight": 500, "line_height": 1.1, "max_lines": 1}
+  ],
+  "comment_queue": {"max_visible": 6, "slot_height_px": 78, "avatar_size_px": 38, "regular_surface": "transparent", "priority_surface": "localized_glass", "presentation": "discussion_rail", "author_and_body_flow": "stacked", "motion_recipe": "waterfall-entry+nudge-curve", "entry_seconds": 0.24, "shift_seconds": 0.22, "exit_seconds": 0.18},
+  "commerce": {"mode": "stage_pin", "width_px": 500, "height_px": 142, "forbid": ["invented_price", "stock_claim", "countdown", "purchase_cta"]},
+  "qa": {"require_cjk_font": true, "forbid_repeated_full_comment_cards": true, "forbid_face_or_product_occlusion": true},
+  "training_eligible": false,
+  "human_review": "pending"
+}

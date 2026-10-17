@@ -1,0 +1,8 @@
+{
+  "name": "visualagent-iphone18-concept-live-60s-v1",
+  "private": true,
+  "scripts": {
+    "lint": "hyperframes lint index.html",
+    "inspect": "hyperframes inspect index.html --json"
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "attempt": 2,
+  "retry_of_attempt": 1,
+  "model": "hunyuan-image-v3.0",
+  "size": "1024x1024",
+  "training_eligible": false
+}

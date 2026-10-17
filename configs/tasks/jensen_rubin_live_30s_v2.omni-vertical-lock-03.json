@@ -1,0 +1,30 @@
+{
+  "schema": "visualagent.camera-segment-batch.v1",
+  "case_id": "jensen_rubin_live_30s_v2",
+  "timeline": "data/tasks/jensen_rubin_live_30s_v2.timeline.json",
+  "model": "kling-video-v3_0_omni",
+  "source_duration_seconds": 8,
+  "assembled_duration_seconds": 7.5,
+  "aspect_ratio": "9:16",
+  "resolution": "1080p",
+  "format_contract": {
+    "orientation": "portrait",
+    "aspect_ratio": "9:16",
+    "expected_width": 1080,
+    "expected_height": 1920,
+    "preview_fit": "contain"
+  },
+  "enable_audio": true,
+  "prefer_multi_shots": false,
+  "segments": [
+    {
+      "id": "seg_000_075_omni_vertical_lock_03",
+      "attempt": 3,
+      "retry_of_run": "9b1e7aec03ac46268c2b14b7a158a739",
+      "start": 0.0,
+      "end": 7.5,
+      "first": "outputs/artifacts/jensen_rtx5090_live_v2_20260820/camera_references/first-v2.png",
+      "prompt": "全片必须保持9:16竖屏中景，画布与机位不变，不得改成横屏、横向裁切或上下裁切。图像中的男性主播穿着同一件黑色皮夹克，在同一间丰富的石墨色PC硬件直播棚，手持同一张双风扇旗舰显卡。显卡从第一帧到最后一帧必须始终竖直持握：显卡长边始终与画面竖轴平行，两枚风扇上下排列；禁止旋转成横向、横置、倾倒或改变风扇数量。人物先双手稳定竖持显卡并直视镜头自然口播；最后两秒注意到左下观众功耗提问，视线和上半身自然转向左下约25度，左手继续稳定托住竖直显卡，右手释放后举起做开放掌回应。动作连贯清楚，脸部、五指、手腕和商品几何稳定。使用普通成熟中文男声，不模仿任何真实人物，清楚说：今天用一场AI合成概念演示，聊聊旗舰显卡的整机供电和散热。连续单镜头，无切镜、无新人物。左上、右侧、下方安全区保持平静，不生成任何文字、数字、按钮、弹幕、礼物、购物车、墨镜、价格、logo或水印。"
+    }
+  ]
+}

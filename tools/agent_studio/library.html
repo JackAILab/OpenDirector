@@ -1,0 +1,250 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>广告参考库 · VisualAgent</title>
+<style>
+@font-face{font-family:Studio;src:url(/creative/font.woff2)}:root{color-scheme:dark;--bg:#0c1012;--panel:#151b1d;--line:#293237;--text:#ecf0e9;--sub:#98a49d;--accent:#c7f28b}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:14px Studio,system-ui,sans-serif}button,input,select,textarea{font:inherit;color:inherit}button,a{cursor:pointer}a{color:var(--accent);text-decoration:none}button,input,select,textarea{border:1px solid var(--line);border-radius:8px;background:var(--panel);padding:10px}button:hover{border-color:var(--accent)}button:disabled{opacity:.45;cursor:default}header{height:66px;padding:0 28px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:24px}header strong{letter-spacing:.05em}header nav{margin-left:auto;display:flex;gap:18px}main{max-width:1700px;margin:auto;padding:28px}.eyebrow{color:var(--accent);font-size:11px;letter-spacing:.16em}h1{font-size:32px;font-weight:550;margin:12px 0}p{line-height:1.7;color:var(--sub)}.toolbar{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0}.toolbar input{flex:1;min-width:180px}.toolbar select{max-width:100%;min-width:0;text-overflow:ellipsis}.workspace{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:22px}.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;align-content:start}.card{border:1px solid var(--line);border-radius:12px;background:var(--panel);overflow:hidden;text-align:left;padding:0}.card img,.poster{aspect-ratio:16/9;width:100%;object-fit:cover;background:#202b26}.card .copy{padding:14px}.card h3{margin:8px 0;font-size:16px}.card small{color:var(--sub)}.pill{display:inline-block;padding:4px 7px;border:1px solid var(--line);border-radius:6px;color:var(--accent);font-size:11px}.inspector{border:1px solid var(--line);border-radius:12px;padding:20px;background:var(--panel);position:sticky;top:18px;align-self:start;max-height:calc(100vh - 36px);overflow:auto}.inspector h2{font-size:21px}.inspector label{display:block;margin:15px 0 7px;color:var(--sub);font-size:12px}.inspector textarea,.inspector input{width:100%}.ratings{display:grid;grid-template-columns:1fr 1fr;gap:8px}.rating{display:flex;align-items:center;justify-content:space-between;font-size:12px}.rating select{padding:6px}.choices{display:flex;flex-wrap:wrap;gap:7px}.chosen,.primary{background:var(--accent);color:#142014;border-color:var(--accent)}.empty{padding:60px 20px;text-align:center;color:var(--sub);grid-column:1/-1}.status{font-size:12px;line-height:1.7;color:var(--sub);white-space:pre-wrap}.error{color:#ffbf8d}.hidden{display:none!important}#gate{max-width:420px;margin:100px auto;padding:25px;border:1px solid var(--line);border-radius:14px}#gate input{width:100%;margin:12px 0}.pager{display:flex;justify-content:center;gap:20px;margin:24px}.summary{font-size:13px;white-space:pre-wrap}.toolbar button.active{border-color:var(--accent);color:var(--accent)}@media(max-width:1150px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.workspace{grid-template-columns:minmax(0,1fr) 320px}}@media(max-width:760px){header{padding:0 14px;gap:10px}header nav{gap:10px;font-size:12px}main{padding:18px}.workspace{display:block}.inspector{position:static;max-height:none;margin-top:20px}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}h1{font-size:27px}}
+#screen{border:1px solid var(--line);border-radius:12px;padding:18px;background:var(--panel)}#screen video{width:100%;max-height:580px;background:#000;border-radius:8px}#screen iframe{display:block;width:100%;aspect-ratio:16/9;min-height:200px;max-height:580px;border:0;border-radius:8px;background:#000}#screen img{width:100%;max-height:500px;object-fit:contain;background:#080a0b}#screen h2{font-size:20px}body.reviewing #grid,body.reviewing .pager{display:none}.inspector details{margin:16px 0}.inspector summary{cursor:pointer;color:var(--sub);font-size:12px}.inspector details p{font-size:12px}dialog{width:min(540px,calc(100% - 32px));border:1px solid var(--line);border-radius:14px;background:var(--panel);color:var(--text);padding:24px}dialog::backdrop{background:#000a}dialog textarea{width:100%;margin:10px 0;resize:vertical}dialog .actions{display:flex;justify-content:flex-end;gap:10px}#playableCount{font-size:11px;color:var(--sub);margin-top:6px}.metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:16px 0}.metric{border:1px solid var(--line);border-radius:10px;background:var(--panel);padding:12px}.metric strong{display:block;font-size:20px;color:var(--accent);font-weight:600}.metric span{display:block;margin-top:5px;color:var(--sub);font-size:11px;line-height:1.4}@media(max-width:900px){.metrics{grid-template-columns:repeat(3,minmax(0,1fr))}}@media(max-width:520px){.metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.metric{padding:10px}.metric strong{font-size:18px}}.toolbar label{display:flex;align-items:center;gap:6px}.toolbar label input{min-width:0;flex:none}.history-entry{border-top:1px solid var(--line);padding:10px 0}.history-entry p{white-space:pre-wrap;overflow-wrap:anywhere}.rating-guide section{padding:8px 0;border-bottom:1px solid var(--line)}.rating-guide section strong{font-size:12px;color:var(--text)}.rating-guide section p{margin:5px 0;overflow-wrap:anywhere}.rating-guide summary{color:var(--accent)}.rating{flex-wrap:wrap;gap:6px}.rating select{max-width:100%}.review-actions{display:flex;flex-wrap:wrap;gap:7px;margin:12px 0}.review-actions button{flex:1;min-width:120px;font-size:12px}.review-actions .primary{background:var(--accent);color:#142014;border-color:var(--accent)}
+.case-actions{display:flex;flex-wrap:wrap;gap:8px}#screen .case-share-url{display:block;width:100%;margin-top:12px}#loadFailure{max-width:1644px;margin:20px auto;padding:18px;border:1px solid var(--line);border-radius:12px;background:var(--panel)}#loadFailure p{margin-top:0}@media(max-width:1700px){#loadFailure{margin:20px 18px}}
+
+.review-starters{border:1px solid var(--line);border-radius:12px;padding:16px;margin:20px 0}.review-starters>summary{cursor:pointer;font-size:15px;font-weight:550}.starter-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:14px}.starter-card{display:flex;flex-direction:column;gap:9px;padding:16px;border:1px solid var(--line);border-radius:10px;background:var(--panel);color:var(--text)}.starter-card:hover{border-color:var(--accent)}.starter-card strong{color:var(--accent);font-size:13px}.starter-card h3,.starter-card p{margin:0}.starter-card h3{font-size:16px;overflow-wrap:anywhere}.starter-card small{color:var(--sub);font-size:11px}.starter-card .starter-cta{margin-top:auto;color:var(--accent);font-size:12px}body.reviewing .review-starters{display:none}@media(max-width:900px){.starter-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:520px){.starter-grid{grid-template-columns:1fr}}
+</style>
+<header><strong>VisualAgent <span style="color:var(--accent)">/ 参考库</span></strong><nav><a href="/creative/library">广告素材库</a><a href="/creative">创作台</a><a href="/account">账户</a></nav></header>
+<form id="gate" class="hidden"><h2>进入广告参考库</h2><p>使用项目访问密码浏览；登录账户后可保存个人偏好。</p><input type="password" id="password" placeholder="访问密码" required><button class="primary">进入看板</button><p id="gateError"></p></form>
+<section id="loadFailure" class="hidden" role="alert"><p id="loadFailureMessage"></p><button id="retryLoad" type="button">重新加载参考库</button></section>
+<main id="app"><div class="eyebrow">REFERENCE LIBRARY / HUMAN PREFERENCE</div><h1>看懂好广告，建立自己的判断。</h1><p>从真实商业作品出发，按行业、参考类型和实际片长筛选，标记值得借鉴的画面、叙事与声音。来源证据与个人偏好分别保留。</p>
+<div class="library-intro"><p class="status">按行业、片长和参考类型浏览来源案例。观看后记录你的判断，再带入创作台。</p></div><details id="reviewStarters" class="review-starters"><summary>第一次来？从几支短片开始，比较不同广告表达</summary><p>先看完整视频，再回答每张卡上的问题。按商品作用、叙事、情绪与声音逐项比较，找出你愿意借鉴的做法。</p><p class="status">这些是根据来源与采样画面整理的待审候选，作品身份、声音和完整运动仍需观看确认；奖项类别以官方来源为准。观看不会自动标为精选。</p><div id="starterStatus" class="status" role="status">展开后读取当前可用候选。</div><div id="starterGrid" class="starter-grid"></div></details><div class="metrics" id="metrics" aria-label="参考库概览"><div class="metric"><strong id="metricTotal">—</strong><span>来源记录</span></div><div class="metric"><strong id="metricPlayable">—</strong><span>可播放来源记录</span></div><div class="metric"><strong id="metricDistinctPlayable">—</strong><span>不同视频文件</span></div><div class="metric"><strong id="metricSource">—</strong><span>官方来源待核验</span></div><div class="metric"><strong id="metricReviewed">—</strong><span>我的已标注</span></div><div class="metric"><strong id="metricSelected">—</strong><span>我的精选</span></div><div class="metric"><strong id="metricAnalysisPending">—</strong><span>结构待分析</span></div><div class="metric"><strong id="metricSemanticPending">—</strong><span>声音/运动待审</span></div></div>
+<div class="toolbar"><input id="search" placeholder="搜索品牌、作品或创意"><select id="industry"><option value="">全部行业</option></select><select id="adType" aria-label="按参考类型筛选"><option value="">全部参考类型</option></select><select id="durationBand" aria-label="按实际片长筛选"><option value="">全部片长</option><option value="short">30 秒以内</option><option value="standard">超过 30 秒至 1 分钟</option><option value="extended">超过 1 至 3 分钟</option><option value="long">超过 3 分钟</option><option value="unknown">片长待核验</option></select><select id="state"><option value="">全部状态</option><option value="pending">待筛选</option><option value="selected">我的精选</option><option value="revisit">待完善</option><option value="rejected">不符合偏好</option></select><label><input type="checkbox" id="localOnly" checked aria-describedby="mediaScopeHint">可直接播放</label><label><input type="checkbox" id="uniqueMedia" aria-describedby="uniqueMediaNote">合并相同视频</label><button id="refresh">刷新</button></div>
+<p id="mediaScopeHint" class="status">当前展示已缓存的视频，可取消“可直接播放”查看全部来源。</p>
+<p id="uniqueMediaNote" class="status hidden">相同视频文件合并展示，来源和个人标注分别保留。不同剪辑或编码版本不会合并。</p><div id="notice" class="status" role="status"></div><div id="operations" class="status" role="status"></div><div class="workspace"><section><div id="screen" class="hidden"></div><div id="grid" class="grid"></div><div class="pager"><button id="previous">上一页</button><span id="pageInfo"></span><button id="next">下一页</button></div></section><aside class="inspector" id="inspector"><h2>选择一支广告</h2><p>查看来源与入库依据，记录你喜欢或不喜欢的具体原因。</p><p>精选代表个人偏好，不自动赋予素材使用权或训练资格。</p></aside></div></main>
+<dialog id="useDialog"><form id="useForm"><div class="eyebrow">从参考开始新创作</div><h2>这次要为哪款商品拍广告？</h2><p>会带入案例来源、你的偏好和可用采样画面。已有已发布 Skill 的案例还会带入完整方法与固定版本。导演先补齐商品信息，再规划15秒有声整片；生成前由你确认。</p><label for="productGoal">你的商品与广告目标</label><textarea id="productGoal" rows="5" minlength="2" maxlength="1000" required placeholder="例如：便携台灯，面向夜间阅读的人；希望突出柔和光线和安静氛围。"></textarea><p id="useStatus" role="status"></p><div class="actions"><button type="button" id="cancelUse">取消</button><button class="primary" id="confirmUse">带入导演工作室</button></div><p class="status">此步骤只创建草稿，不提交付费生成。原案例的品牌、台词与商品事实不会作为新商品信息。</p></form></dialog>
+<script>
+const $=id=>document.getElementById(id),key=sessionStorage.getItem('h3_api_key'),labels={pending:'待筛选',selected:'我的精选',revisit:'待完善',rejected:'不符合偏好'},dims={hook:'注意力入口',message:'卖点清晰',product:'商品呈现',story:'叙事节奏',craft:'画面工艺',sound:'声音设计',action:'行动目标'};let offset=0,current=null,canReview=false,dirty=false,loadEpoch=0,useItem=null,visibleItems=[],advanceAfterSave=false,groupedTypes=false;
+function el(tag,text,cls){const e=document.createElement(tag);if(text!==undefined)e.textContent=text;if(cls)e.className=cls;return e}
+let pendingLinkedItem=new URL(location.href).searchParams.get('item')||'',linkedItemLoading=false,selectionEpoch=0;
+function caseLink(identity){
+ if(!/^[a-f0-9]{24}$/.test(identity||''))return null;
+ const link=new URL('/creative/library',location.origin);link.searchParams.set('item',identity);return link.href;
+}
+function clearCaseLink(){
+ selectionEpoch++;pendingLinkedItem='';history.replaceState(null,'','/creative/library');
+}
+function shareCaseButton(item,screen){
+ const link=caseLink(item.id);if(!link)return null;
+ const button=el('button','复制案例链接');button.type='button';button.className='copy-case-link';
+ button.onclick=async()=>{
+  try{await navigator.clipboard.writeText(link);button.textContent='链接已复制'}
+  catch{
+   if(current?.id!==item.id||!button.isConnected)return;
+   let field=screen.querySelector('.case-share-url');
+   if(!field){field=el('input');field.className='case-share-url';field.readOnly=true;field.setAttribute('aria-label','案例链接');screen.append(field)}
+   field.value=link;field.focus();field.select();button.textContent='请复制下方链接';
+  }
+ };
+ return button;
+}
+async function restoreLinkedItem(){
+ if(!pendingLinkedItem||linkedItemLoading)return;
+ const identity=pendingLinkedItem,epoch=selectionEpoch;pendingLinkedItem='';
+ if(!caseLink(identity)){fail(Error('案例链接无效，请从列表重新选择。'));return}
+ linkedItemLoading=true;
+ try{
+  const item=await api('/'+identity);
+  if(epoch===selectionEpoch)open(item);
+ }catch(error){
+  if(epoch===selectionEpoch){
+   if(!$('gate').classList.contains('hidden'))pendingLinkedItem=identity;
+   fail(error);
+  }
+ }finally{linkedItemLoading=false}
+}
+function renderEmpty(total){
+ const box=el('div',undefined,'empty'),action=el('button');action.type='button';
+ if(total){
+  box.append(el('p','当前页没有案例。'));action.textContent='回到第一页';
+  action.onclick=()=>{offset=0;load()};
+ }else if($('localOnly').checked){
+  box.append(el('p','没有符合当前筛选的已缓存视频，可查看全部来源或调整筛选条件。'));
+  action.textContent='查看全部来源';action.onclick=()=>{$('localOnly').checked=false;offset=0;load()};
+ }else{
+  box.append(el('p','暂无匹配来源，请调整筛选条件。'));action.textContent='清空筛选条件';
+  action.onclick=()=>{for(const id of ['search','industry','adType','durationBand','state'])$(id).value='';offset=0;load()};
+ }
+ box.append(action);$('grid').append(box);
+}
+function ratingGuide(){
+ const guide=el('details',undefined,'rating-guide');guide.append(el('summary','如何判断 1、3、5 分？'));
+ guide.append(el('p','先确认观看的是原广告还是案例说明片，再按你想借鉴的用途判断。奖项是来源依据，最终选择由你决定。2、4 分介于相邻描述之间；未观看或不适用的维度留空。'));
+ const anchors={
+  hook:['开场没有给我继续看的理由','有明确的视觉或情节入口','开场迅速引起好奇，让我愿意继续看'],
+  message:['看完说不清表达什么','能复述一个明确主张','主张清楚、有辨识度，画面和台词共同强化它'],
+  product:['商品或品牌与内容关系模糊','能看清商品及其在故事中的作用','外观、使用场景与价值呈现一致，让我记住商品'],
+  story:['段落跳跃，难理解前后关系','有完整的发展与收束','每个段落推动同一主张，节奏和转折有理由'],
+  craft:['构图、光线或转场妨碍观看','画面稳定，拍摄细节服务内容','构图、运镜、光影、材质与连续性共同增强表达'],
+  sound:['声音难听清，或妨碍理解','声音清楚，与画面基本配合','旁白、音乐和音效层次清楚，节奏强化情绪与主张'],
+  action:['结尾没有支持我想达到的目标','有明确收束或行动提示','结尾让我记住主张，或愿意采取与目标一致的行动']
+ };
+ for(const [dim,values] of Object.entries(anchors)){
+  const section=el('section');section.append(el('strong',dims[dim]));
+  for(let i=0;i<values.length;i++)section.append(el('p',`${[1,3,5][i]} 分 · ${values[i]}`));guide.append(section);
+ }
+ guide.append(el('p','选择原因可以写时间证据，例如：0–3 秒的反差吸引我，8 秒商品特写对应卖点，结尾音乐与主张配合。没有听过声音时不评声音。'));
+ return guide;
+}
+async function api(path,method='GET',body){
+ let r;
+ try{r=await fetch('/creative/api/library'+path,{method,headers:{...(sessionStorage.getItem('h3_api_key')?{Authorization:'Bearer '+sessionStorage.getItem('h3_api_key')}:{}),...(body?{'Content-Type':'application/json'}:{})},body:body?JSON.stringify(body):undefined,signal:AbortSignal.timeout(path.endsWith('/use')?120000:25000)})}
+ catch(e){throw Error(method==='GET'?'连接暂时中断或超时，请重新加载。':'连接暂时中断，无法确认是否保存成功。请保留填写内容，连接恢复后核对标注历史。')}
+ if(r.status===403){$('gate').classList.remove('hidden');$('app').classList.add('hidden');$('loadFailure').classList.add('hidden');throw Object.assign(Error('请先输入访问密码'),{status:403})}
+ let x;try{x=await r.json()}catch{throw Object.assign(Error('服务暂时未能返回资料，请稍后重试。'),{status:r.status})}
+ if(!r.ok)throw Object.assign(Error(typeof x.detail==='string'?x.detail:'暂时无法读取，请重试'),{status:r.status});return x;
+}
+let startersLoaded=false,startersLoading=false;
+async function loadReviewStarters(){
+ if(startersLoaded||startersLoading)return;startersLoading=true;$('starterStatus').textContent='正在核对素材与分析…';
+ try{
+  const result=await api('/review-starters');
+  if(result.state!=='ready')throw Error('候选暂时不可读取');
+  $('starterGrid').replaceChildren();
+  for(const item of result.items||[]){
+   const link=caseLink(item.id);if(!link)continue;
+   const card=el('a',undefined,'starter-card');card.href=link;
+   card.append(el('strong',item.focus),el('h3',item.title),el('small',(item.brand?item.brand+' · ':'')+Math.round(item.duration)+' 秒'),el('p',item.question),el('small','来源依据：'+item.source_evidence),el('span','观看并记录我的判断 →','starter-cta'));
+   $('starterGrid').append(card);
+  }
+  startersLoaded=true;
+  $('starterStatus').textContent=$('starterGrid').children.length?'当前可用 '+$('starterGrid').children.length+' 支 · 登录账户后可保存个人标注。':'当前没有符合条件的起步候选，可继续浏览下方素材库。';
+ }catch(e){$('starterStatus').textContent='候选暂时不可读取，收起后展开可重试；下方素材库仍可使用。'}
+ finally{startersLoading=false}
+}
+$('reviewStarters').ontoggle=()=>{if($('reviewStarters').open)void loadReviewStarters()};
+const backupLabels={preparing:'正在准备备份',uploading:'正在上传',verifying:'正在回读校验',verified:'备份校验通过',failed:'备份失败',interrupted:'备份已中断'};
+function fail(e){$('notice').textContent=e.message;$('notice').classList.add('error')}
+let operationsEpoch=0;
+const metricIds=['metricTotal','metricPlayable','metricDistinctPlayable','metricSource','metricReviewed','metricSelected','metricAnalysisPending','metricSemanticPending'];
+function countLabel(value){return typeof value==='number'&&Number.isSafeInteger(value)&&value>=0?value.toLocaleString():'—'}
+function dateLabel(value){return typeof value==='number'&&Number.isFinite(value)&&value>0?new Date(value*1000).toLocaleString():'时间待确认'}
+function backupSummary(backup){const scope={metadata:'案例与标注','metadata+learning':'案例、标注与学习证据',full:'案例、学习证据与原始媒体'}[backup.scope]||'范围待确认';const count=countLabel(backup.items);return `${backupLabels[backup.state]||'状态待确认'} · ${scope}${count==='—'?'':` · ${count} 条来源记录`} · 快照时间 ${dateLabel(backup.created)}`}
+function backupProgress(backup){
+ const p=backup.progress;if(!p)return '';
+ const parts=[];
+ if(backup.state==='preparing'){
+  const phases={metadata:'冻结案例与标注',assets:'整理备份文件',learning_database:'冻结分析记录',learning_evidence:'复制采样证据',learning_bundle:'打包采样证据',learning_snapshot_ready:'采样证据已备妥'};
+  if(phases[p.phase])parts.push(phases[p.phase]);
+  if(countLabel(p.processed_analysis_versions)!=='—'&&countLabel(p.total_analysis_versions)!=='—')parts.push(`已整理 ${countLabel(p.processed_analysis_versions)} / ${countLabel(p.total_analysis_versions)} 条分析版本`);
+  if(countLabel(p.copied_learning_files)!=='—')parts.push(`${countLabel(p.copied_learning_files)} 个学习文件`);
+  if(parts.length)parts.push('尚未完成远端校验');
+ }else if(backup.state==='verifying'){
+  if(countLabel(p.verified_files)!=='—'&&countLabel(p.total_files)!=='—')parts.push(`已回读校验 ${countLabel(p.verified_files)} / ${countLabel(p.total_files)} 个文件`);
+  if(countLabel(p.verified_learning_files)!=='—'&&countLabel(p.total_learning_files)!=='—')parts.push(`已核验 ${countLabel(p.verified_learning_files)} / ${countLabel(p.total_learning_files)} 个学习包内文件`);
+ }
+ if(!parts.length)return '';
+ parts.push(`最近上报 ${dateLabel(p.observed_at)}${p.stale?' · 等待下一次进度上报':''}`);
+ return parts.join(' · ');
+}
+function renderOperations(data){
+ const values=[data.total,data.playable,data.distinct_playable,data.source_link,data.reviewed,data.selected,data.review_queue?.analysis_pending,data.review_queue?.semantic_review_pending];
+ metricIds.forEach((id,n)=>{$(id).textContent=countLabel(values[n])});
+ const media=data.media_cache,runs=(data.runs||[]).filter(r=>!media||r.id!==media.id);
+ const lines=[],run=runs.find(r=>r.state==='running')||runs[0],backup=data.backups?.[0],active=data.active_backup,queue=data.review_queue;
+ const labels={running:'处理中',completed:'本批完成',partial:'部分完成',failed:'失败',interrupted:'已中断'};
+ if(run){
+  lines.push(`最近采集：${run.source||'来源待确认'} · ${labels[run.state]||'状态待确认'} · 发现 ${countLabel(run.discovered)} · 入库 ${countLabel(run.inserted)}`);
+ }
+ if(media){
+  const failed=countLabel(media.failed);
+  lines.push(`视频缓存：${labels[media.state]||'状态待确认'} · 已缓存 ${countLabel(media.inserted)} / ${countLabel(media.discovered)}${failed==='—'?'':` · 已失败 ${failed}`}`);
+ }
+ if(active){lines.push('进行中的备份：'+backupSummary(active));const progress=backupProgress(active);if(progress)lines.push('备份进度：'+progress)}
+ if(backup&&(!active||backup.id!==active.id))lines.push('最近创建的备份：'+backupSummary(backup));
+ else if(!active&&!backup)lines.push('最近备份：暂未有运行记录。');
+ const queueTime=dateLabel(queue?.observed_at);
+ lines.push(queue?.state==='ready'?`待处理审阅：${countLabel(queue.total_pending)} · ${queueTime==='时间待确认'?'统计时间待确认':'统计时间 '+queueTime}`:'审阅队列暂不可读取');
+ $('operations').textContent=lines.join('\n');
+ $('operations').classList.toggle('error',backup?.state==='failed'||queue?.state==='unavailable');
+}
+async function refreshOperations(){
+ const epoch=++operationsEpoch;
+ try{
+  const data=await api('/status');
+  if(epoch!==operationsEpoch)return;
+  renderOperations(data);
+ }catch(e){
+  if(epoch!==operationsEpoch)return;
+  metricIds.forEach(id=>{$(id).textContent='—'});
+  $('operations').textContent='数据状态暂时不可读取，不影响已加载案例。';
+  $('operations').classList.add('error');
+ }
+}
+
+function refreshFacets(facets){
+ const industry=$('industry'),adType=$('adType'),oldIndustry=industry.value,oldType=adType.value;
+ industry.replaceChildren(new Option('全部行业',''),...(facets.industry||[]).map(v=>new Option(v,v)));
+ industry.value=oldIndustry;
+ groupedTypes=Array.isArray(facets.ad_groups);
+ const types=groupedTypes?facets.ad_groups:(facets.ad_type||[]).map(v=>({id:v,label:v}));
+ adType.replaceChildren(new Option('全部参考类型',''),...types.map(v=>new Option(v.label,v.id)));
+ adType.value=oldType;
+}
+
+async function load(){$('uniqueMediaNote').classList.toggle('hidden',!$('uniqueMedia').checked);const epoch=++loadEpoch;try{const q=new URLSearchParams({q:$('search').value,industry:$('industry').value,[groupedTypes?'ad_group':'ad_type']:$('adType').value,duration_band:$('durationBand').value,state:$('state').value,limit:24,offset,local_only:$('localOnly').checked,unique_media:$('uniqueMedia').checked});const data=await api('?'+q);if(epoch!==loadEpoch)return;$('loadFailure').classList.add('hidden');$('mediaScopeHint').textContent=$('localOnly').checked?'当前展示已缓存的视频，可取消“可直接播放”查看全部来源。':'当前展示全部来源，包括已缓存的视频、外部预览与待核验链接。';$('gate').classList.add('hidden');$('app').classList.remove('hidden');$('notice').textContent=key?'标注会保存到你的账户。':'当前可浏览；登录账户后可保存个人偏好。';$('notice').classList.remove('error');canReview=Boolean(key);void refreshOperations();refreshFacets(data.facets);visibleItems=data.items;$('grid').replaceChildren();for(const item of data.items){const card=el('button',undefined,'card');if(item.thumbnail_url){const img=el('img');img.src=item.thumbnail_url;img.alt=item.title;img.loading='lazy';img.referrerPolicy='no-referrer';img.onerror=()=>img.replaceWith(el('div','封面暂不可用','poster'));card.append(img)}else card.append(el('div','广告参考','poster'));const copy=el('div',undefined,'copy');if(item.media_status==='local')copy.append(el('small','▶ 可播放 · '+Math.round(item.duration)+'秒 · '+(item.audio?'有声':'无音轨')));if(awardLabel(item))copy.append(el('small',awardLabel(item),'source-level'));copy.append(el('span',labels[item.review.state],'pill'),el('h3',item.title),el('small',[item.brand,item.industry,item.ad_groups?.map(g=>g.label).join(' / ')||item.ad_type].filter(Boolean).join(' · ')));card.append(copy);card.onclick=()=>open(item);$('grid').append(card)}if(!data.items.length)renderEmpty(data.total);$('pageInfo').textContent=`${data.total?offset+1:0}–${Math.min(offset+24,data.total)} / ${data.total}`;$('previous').disabled=offset===0;$('next').disabled=offset+24>=data.total;void restoreLinkedItem()}catch(e){if(epoch!==loadEpoch)return;if(String(e.message).includes('Invalid API key')){sessionStorage.removeItem('h3_api_key');location.reload();return}if(e.status!==403){$('loadFailureMessage').textContent=e.message;$('loadFailure').classList.remove('hidden')}fail(e)}}
+function sourceMediumHint(item){
+ const section=String(item.creative_structure?.section||'').trim().toLowerCase();
+ if(String(item.ad_type||'').startsWith('Berlin Commercial · ')){
+  if(section==='music videos')return '来源类别：音乐视频。当前媒体版本仍待观看确认。';
+  if(section==='personal work')return '来源类别：个人作品。当前媒体版本仍待观看确认。';
+ }
+ return '原广告 / 案例说明片：待观看确认。';
+}
+function awardLabel(item){const kinds=new Set((item.quality_evidence||[]).map(e=>e.kind));if(kinds.has('award_winner'))return '来源：获奖记录';if(kinds.has('award_finalist')||kinds.has('award_shortlist'))return '来源：入围记录';if(kinds.has('award_listing'))return '来源：奖项级别待核实';return ''}
+function industryEvidence(item,box){const evidence=item.industry_evidence;if(evidence?.kind!=='source_category_mapping')return;const panel=el('details');panel.className='industry-evidence';panel.append(el('summary','行业归类：'+item.industry),el('p','根据官方来源的奖项类别归类，待人工核对；不代表个人偏好或广告效果。','status'));for(const category of evidence.categories||[])panel.append(el('p',category));box.append(panel)}
+function advanceReview(){if(dirty&&!confirm('当前标注尚未保存，暂时跳过这支广告？'))return;dirty=false;const index=visibleItems.findIndex(x=>x.id===current?.id);const ordered=[...visibleItems.slice(index+1),...visibleItems.slice(0,Math.max(0,index))];const next=ordered.find(x=>x.review.state==='pending')||ordered.find(x=>x.review.state==='revisit');if(next){open(next);return}clearCaseLink();stopPreview();document.body.classList.remove('reviewing');$('screen').classList.add('hidden');$('notice').textContent='当前页已看完，可翻到下一页继续筛选。';$('notice').classList.remove('error')}
+function sameVideoPanel(item,box){
+ if(!item.media_url)return;
+ const panel=el('details',undefined,'same-video-sources'),body=el('div');
+ panel.append(el('summary','同一视频的来源与标注'),body);box.append(panel);let loaded=false,loading=false;
+ panel.ontoggle=async()=>{
+  if(!panel.open||loaded||loading)return;loading=true;body.textContent='正在核对相同视频文件…';
+  try{
+   const data=await api('/'+item.id+'/same-video');
+   if(current?.id!==item.id||!panel.isConnected)return;
+   loaded=true;body.replaceChildren();
+   body.append(el('p',data.total>1?`${countLabel(data.total)} 条来源记录使用同一个视频文件。各来源的奖项依据和你的标注独立保留。`:'尚未发现其他来源使用完全相同的视频文件。'));
+   for(const source of data.items||[]){
+    const entry=el('section',undefined,'history-entry');
+    entry.append(el('strong',source.source_name),el('p',source.title),el('p','我的标注：'+(labels[source.review_state]||'待筛选')));
+    const link=el('a','打开官方来源 ↗');link.href=source.source_url;link.target='_blank';link.rel='noopener noreferrer';entry.append(link);
+    if(source.id===item.id)entry.append(el('p','当前来源','status'));
+    else{const view=el('button','查看此来源及标注');view.type='button';view.style.cssText='display:block;margin-top:10px;font-size:12px';
+     view.onclick=async()=>{view.disabled=true;try{const next=await api('/'+source.id);if(current?.id===item.id&&panel.isConnected)open(next)}catch(e){fail(e)}finally{view.disabled=false}};entry.append(view)}
+    body.append(entry);
+   }
+   if(data.total>(data.items||[]).length)body.append(el('p','仅展示最近20条来源，可在列表按作品名继续查找。','status'));
+  }catch(e){if(panel.isConnected)body.textContent='来源暂未读取，收起后重新展开可重试。'}finally{loading=false}
+ };
+}
+function strategyPanel(item,box,screen){const panel=el('details');panel.className='strategy-analysis';panel.append(el('summary','创意如何表达 · 查看结构分析'));const body=el('div');panel.append(body);box.append(panel);let loaded=false;panel.ontoggle=async()=>{if(!panel.open||loaded)return;body.textContent='正在读取已有分析…';try{const result=await api('/'+item.id+'/analysis');if(current?.id!==item.id||!panel.isConnected)return;loaded=true;body.replaceChildren();const a=result.analysis;if(!a){body.append(el('p','此片尚未完成结构分析，可先观看并记录你的判断。'));return}const roles={original_ad:'原广告候选',case_film:'案例说明片候选',music_video:'音乐影像候选',mixed:'混合内容',unknown:'类型待确认'};body.append(el('p',roles[a.media_role]+' · 采样画面分析 · 人工待审阅','status'),el('h3',a.principle),el('p',a.mechanism));const beats=el('details');beats.append(el('summary','时间证据 · 点击回看原片'));for(const b of a.beats){const seek=el('button',b.start+'–'+b.end+'s · '+b.observation);seek.type='button';seek.className='projectitem';seek.style.cssText='display:block;width:100%;text-align:left;margin:8px 0;font-size:12px;white-space:normal';seek.onclick=()=>{const v=screen.querySelector('video');if(v)v.currentTime=b.start};beats.append(seek,el('p',b.purpose))}body.append(beats);for(const [k,label]of [['grill_questions','导演应该追问什么'],['transfer_rules','如何迁移到新商品'],['avoid','不适合哪些情况']]){const section=el('details');section.append(el('summary',label));for(const value of a[k])section.append(el('p',value));body.append(section)}body.append(el('p','声音与完整运镜尚未核验。此分析不代表原作者思维链、投放效果或训练资格。以此为参考创作时，会带入策略和来源版本。','status'));}catch(e){body.textContent='策略暂未读取，收起再展开可重试。'}}}
+// Derive player URLs from a small set of public video identifiers.
+function publicEmbed(value){
+ try{
+  const u=new URL(value);
+  if(u.protocol!=='https:'||u.username||u.password||u.port||u.hash)return '';
+  const host=u.hostname.toLowerCase();
+  if((host==='www.youtube.com'||host==='youtube.com')&&u.pathname==='/watch'){
+   if([...u.searchParams.keys()].some(k=>k!=='v')||u.searchParams.getAll('v').length!==1)return '';
+   const id=u.searchParams.get('v');
+   return /^[A-Za-z0-9_-]{11}$/.test(id)?'https://www.youtube-nocookie.com/embed/'+id:'';
+  }
+  if(u.search)return '';
+  if(host==='youtu.be'&&/^\/[A-Za-z0-9_-]{11}$/.test(u.pathname))return 'https://www.youtube-nocookie.com/embed/'+u.pathname.slice(1);
+  if((host==='vimeo.com'||host==='www.vimeo.com')&&/^\/\d+$/.test(u.pathname))return 'https://player.vimeo.com/video/'+u.pathname.slice(1);
+  if(host==='player.vimeo.com'&&/^\/video\/\d+$/.test(u.pathname))return u.href;
+ }catch(e){}
+ return '';
+}
+function stopPreview(){
+ const screen=$('screen');
+ screen.querySelector('video')?.pause();
+ screen.querySelectorAll('iframe').forEach(frame=>frame.remove());
+}
+function open(item){if(dirty&&!confirm('当前标注尚未保存，放弃这次修改？'))return;const showNewCase=current?.id!==item.id||!document.body.classList.contains('reviewing');dirty=false;selectionEpoch++;pendingLinkedItem='';current=item;const linkToCase=caseLink(item.id);if(linkToCase)history.replaceState(null,'',linkToCase);document.body.classList.add('reviewing');const screen=$('screen');screen.classList.remove('hidden');screen.replaceChildren();const back=el('button','← 返回案例列表');back.onclick=()=>{if(dirty&&!confirm('当前标注尚未保存，返回列表会放弃修改？'))return;dirty=false;clearCaseLink();document.body.classList.remove('reviewing');screen.classList.add('hidden');stopPreview()};const actionsBar=el('div',undefined,'case-actions');actionsBar.append(back);const share=shareCaseButton(item,screen);if(share)actionsBar.append(share);screen.append(actionsBar,el('h2',item.title));if(item.media_url){const video=el('video');video.controls=true;video.playsInline=true;video.preload='metadata';video.src=item.media_url;screen.append(video)}else{const embed=publicEmbed(item.embed_url);if(embed){const frame=el('iframe');frame.src=embed;frame.title=item.title;frame.loading='lazy';frame.referrerPolicy='strict-origin-when-cross-origin';frame.setAttribute('allow','fullscreen; picture-in-picture; encrypted-media');frame.allowFullscreen=true;frame.setAttribute('sandbox','allow-scripts allow-same-origin allow-presentation');screen.append(frame,el('p','官方公开外链预览 · 作品身份、版本、时长与声音仍待人工确认。','status'));const watch=el('a','播放器不可用？打开视频原站 ↗');watch.href=embed.includes('youtube-nocookie.com')?'https://www.youtube.com/watch?v='+embed.split('/').pop():'https://vimeo.com/'+embed.split('/').pop();watch.target='_blank';watch.rel='noopener noreferrer';watch.className='external-video-link';screen.append(watch)}else if(item.thumbnail_url){const poster=el('img');poster.src=item.thumbnail_url;poster.alt=item.title;screen.append(poster)}const source=el('a','打开官方案例来源 ↗');source.href=item.source_url;source.target='_blank';source.rel='noopener noreferrer';screen.append(el('p',embed?'也可打开官方详情页查看完整来源。':item.creative_structure?.preview_mode==='official_source_only'?'当前仅提供官方作品页观看入口，原片尚未缓存。':'此案例保留在待筛选池，本地缓存按队列尝试；可先通过官方来源观看。'),source)}const box=$('inspector');box.replaceChildren(el('span',item.source_name||'来源待核实','pill'),el('h2',item.title));const link=el('a','打开官方案例来源 ↗');link.href=item.source_url;link.target='_blank';link.rel='noopener noreferrer';box.append(link);if(awardLabel(item))box.append(el('p',awardLabel(item)+' · 来源奖项与我的偏好分别记录。','status'));const evidence=el('details');evidence.append(el('summary','奖项与来源依据 · '+(item.quality_evidence||[]).length+' 条'),el('p',item.summary||'尚未补充创意拆解。'));if(item.ad_type)evidence.append(el('p','来源类别：'+item.ad_type,'source-category'));if(item.ad_groups?.length)evidence.append(el('p','参考类型：'+item.ad_groups.map(g=>g.label).join(' / ')+'。按来源类别分组，作品内容仍以实际观看为准。'));for(const e of item.quality_evidence||[])evidence.append(el('p',e.text));box.append(evidence);industryEvidence(item,box);sameVideoPanel(item,box);strategyPanel(item,box,screen);if(item.media_role==='work_or_case_film_unverified')box.append(el('p',sourceMediumHint(item),'status source-medium-hint'));box.append(el('p','当前媒体：'+(item.media_status==='local'?'已存入本地':'原始来源访问')));const use=el('button','以此为参考开始创作');use.disabled=!canReview;use.onclick=()=>{if(dirty){fail(Error('请先保存标注，再带入创作'));return}useItem=item;$('useStatus').textContent='';$('useDialog').showModal();$('productGoal').focus()};box.append(use);const form=el('form');const actions=el('div',undefined,'review-actions'),skip=el('button','暂时跳过');skip.type='button';skip.onclick=advanceReview;const saveNext=el('button',canReview?'保存并下一支':'登录后可连续标注','primary');saveNext.type='button';saveNext.disabled=!canReview;saveNext.onclick=()=>{if(saveNext.disabled)return;advanceAfterSave=true;form.requestSubmit()};actions.append(skip,saveNext);form.append(el('label','我的选择'));const choices=el('div',undefined,'choices');let chosen=item.review.state;for(const [state,name]of Object.entries(labels)){const b=el('button',name,state===chosen?'chosen':'');b.type='button';b.onclick=()=>{chosen=state;dirty=true;for(const x of choices.children)x.className='';b.className='chosen'};choices.append(b)}form.append(choices,el('label','分维度评价 · 可只评有把握的部分'),ratingGuide());const ratings=el('div',undefined,'ratings'),selectors={};for(const [dim,name]of Object.entries(dims)){const row=el('div',undefined,'rating'),select=el('select');select.setAttribute('aria-label',name);select.append(new Option('未评分 / 不适用',''),...[1,2,3,4,5].map(n=>new Option(n+' 分',n)));select.value=item.review.scores[dim]||'';select.onchange=()=>dirty=true;selectors[dim]=select;row.append(el('span',name),select);ratings.append(row)}const tags=el('input');tags.value=item.review.tags.join('，');tags.placeholder='如：产品微距，冷暖光影，幽默反转';const note=el('textarea');note.rows=4;note.value=item.review.note;note.placeholder='可以按时间写：0–3秒如何吸引注意、卖点何时出现、镜头节奏和声音如何配合；哪些做法值得借鉴？';tags.oninput=note.oninput=()=>dirty=true;const save=el('button',canReview?'保存我的标注':'登录后可标注','primary');save.disabled=!canReview;const feedback=el('p','', 'status');form.append(ratings,el('label','偏好标签 · 逗号分隔'),tags,el('label','选择原因'),note,save,feedback);form.onsubmit=async e=>{e.preventDefault();save.disabled=true;saveNext.disabled=true;skip.disabled=true;try{const scores=Object.fromEntries(Object.entries(selectors).filter(([,s])=>s.value).map(([k,s])=>[k,Number(s.value)]));current=await api('/'+item.id+'/review','POST',{version:item.review.version,state:chosen,scores,tags:tags.value.split(/[,，]/).map(s=>s.trim()).filter(Boolean),note:note.value});dirty=false;open(current);await load();if(advanceAfterSave){advanceAfterSave=false;advanceReview();return}$('notice').textContent='标注已保存，刷新后仍会保留。'}catch(e){advanceAfterSave=false;feedback.textContent=e.message;feedback.classList.add('error')}finally{save.disabled=!canReview;saveNext.disabled=!canReview;skip.disabled=false}};box.append(actions,form);if(showNewCase)screen.scrollIntoView({block:'start'});if(canReview){const history=el('details');history.append(el('summary','我的标注历史'));let loaded=false;history.ontoggle=async()=>{if(!history.open||loaded)return;try{const result=await api('/'+item.id+'/history');loaded=true;if(!result.history.length)history.append(el('p','尚未保存标注。'));for(const r of result.history){const entry=el('div',undefined,'history-entry');entry.append(el('strong','版本 '+r.version+' · '+labels[r.state]),el('p',new Date(r.created*1000).toLocaleString()),el('p',Object.entries(r.scores).map(([k,v])=>dims[k]+' '+v).join(' · ')),el('p',r.tags.join('，')),el('p',r.note));history.append(entry)}}catch(e){fail(e)}};box.append(history)}}
+$('cancelUse').onclick=()=>$('useDialog').close();$('useForm').onsubmit=async e=>{e.preventDefault();if(!useItem)return;const product=$('productGoal').value.trim();if(product.length<2)return;$('confirmUse').disabled=true;$('cancelUse').disabled=true;$('useStatus').textContent='正在整理参考资料与采样画面…';try{const r=await api('/'+useItem.id+'/use','POST',{product});sessionStorage.setItem('creative_project',r.project.id);dirty=false;location.href='/creative?project='+r.project.id}catch(error){if(error.message.includes('Invalid API key')||error.message.includes('请先登录')||error.message.includes('登录')){sessionStorage.removeItem('h3_api_key');sessionStorage.setItem('creative_pending_library',useItem.id);location.href='/account?next=creative';return}$('useStatus').textContent=error.message;$('confirmUse').disabled=false;$('cancelUse').disabled=false}};$('useDialog').addEventListener('cancel',e=>{if($('confirmUse').disabled)e.preventDefault()});
+$('retryLoad').onclick=async()=>{$('retryLoad').disabled=true;try{await load()}finally{$('retryLoad').disabled=false}};$('refresh').onclick=()=>load();for(const id of ['industry','adType','durationBand','state','localOnly','uniqueMedia'])$(id).onchange=()=>{offset=0;load()};let timer;$('search').oninput=()=>{clearTimeout(timer);timer=setTimeout(()=>{offset=0;load()},350)};$('previous').onclick=()=>{offset=Math.max(0,offset-24);load()};$('next').onclick=()=>{offset+=24;load()};$('gate').onsubmit=async e=>{e.preventDefault();try{const r=await fetch('/site/access',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:$('password').value})});if(!r.ok)throw Error('访问密码不正确');$('password').value='';await load()}catch(e){$('gateError').textContent=e.message}};window.addEventListener('beforeunload',e=>{if(dirty){e.preventDefault();e.returnValue=''}});load();
+</script></html>

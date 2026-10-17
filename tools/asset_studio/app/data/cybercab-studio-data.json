@@ -1,0 +1,542 @@
+{
+  "schema": "visualagent.asset-studio.v1",
+  "generatedAt": "2026-09-24T19:53:10.775011+00:00",
+  "caseId": "cybercab_live_60s_v2",
+  "assets": [
+    {
+      "id": "asset-008",
+      "name": "cybercab_live_60s_v1.generation.json",
+      "path": "configs/tasks/cybercab_live_60s_v1.generation.json",
+      "url": "/case-assets/configs__tasks__cybercab_live_60s_v1.generation.json",
+      "kind": "generation plan",
+      "group": "specs",
+      "owner": "Task / Agent",
+      "status": "generated",
+      "model": null,
+      "operation": null,
+      "bytes": 10400,
+      "sha256": "f90a09c9b6427e9f3d8b822323542eb7504cc122bc191a0eeabbed81c22552cd",
+      "trainingEligible": false,
+      "humanReview": "pending"
+    },
+    {
+      "id": "asset-009",
+      "name": "cybercab_live_60s_v1.plan.json",
+      "path": "configs/tasks/cybercab_live_60s_v1.plan.json",
+      "url": "/case-assets/configs__tasks__cybercab_live_60s_v1.plan.json",
+      "kind": "generation plan",
+      "group": "specs",
+      "owner": "Task / Agent",
+      "status": "generated",
+      "model": null,
+      "operation": null,
+      "bytes": 3421,
+      "sha256": "04a798aae5a6bf4460f5e0822f258a21fe0d9da10ec997c2c980ce0c7de5740b",
+      "trainingEligible": false,
+      "humanReview": "pending"
+    },
+    {
+      "id": "asset-010",
+      "name": "cybercab_live_60s_v1.review.json",
+      "path": "configs/tasks/cybercab_live_60s_v1.review.json",
+      "url": "/case-assets/configs__tasks__cybercab_live_60s_v1.review.json",
+      "kind": "generation plan",
+      "group": "specs",
+      "owner": "Task / Agent",
+      "status": "generated",
+      "model": null,
+      "operation": null,
+      "bytes": 2039,
+      "sha256": "2de65abaa6364aa23b972f88df23e49b339f0e9a5beed22ef0cc945e643f4985",
+      "trainingEligible": false,
+      "humanReview": "pending"
+    },
+    {
+      "id": "asset-011",
+      "name": "cybercab_live_60s_v2.omni-native-av.plan.json",
+      "path": "configs/tasks/cybercab_live_60s_v2.omni-native-av.plan.json",
+      "url": "/case-assets/configs__tasks__cybercab_live_60s_v2.omni-native-av.plan.json",
+      "kind": "generation plan",
+      "group": "specs",
+      "owner": "Task / Agent",
+      "status": "generated",
+      "model": null,
+      "operation": null,
+      "bytes": 6380,
+      "sha256": "fd58be24cd9f759cea7e4a5f04241a068a23370978279db821e6bbfeecd9fabb",
+      "trainingEligible": false,
+      "humanReview": "pending"
+    },
+    {
+      "id": "asset-012",
+      "name": "cybercab_live_60s_v2.seam-repair.plan.json",
+      "path": "configs/tasks/cybercab_live_60s_v2.seam-repair.plan.json",
+      "url": "/case-assets/configs__tasks__cybercab_live_60s_v2.seam-repair.plan.json",
+      "kind": "generation plan",
+      "group": "specs",
+      "owner": "Task / Agent",
+      "status": "generated",
+      "model": null,
+      "operation": null,
+      "bytes": 4197,
+      "sha256": "2fa1ec28ff616ce175af46a99cf78a86fab217a2c8380847cbd44c891b80d60a",
+      "trainingEligible": false,
+      "humanReview": "pending"
+    },
+    {
+      "id": "asset-025",
+      "name": "cybercab_live_60s_v1.timeline.json",
+      "path": "data/tasks/cybercab_live_60s_v1.timeline.json",
+      "url": "/case-assets/data__tasks__cybercab_live_60s_v1.timeline.json",
+      "kind": "timeline",
+      "group": "specs",
+      "owner": "Task",
+      "status": "generated",
+      "model": null,
+      "operation": null,
+      "bytes": 5348,
+      "sha256": "f320a2a64c1e7d32483088dac9d2efd48eca46a0bacdb4e7b2bb0dccec1b161c",
+      "trainingEligible": false,
+      "humanReview": "pending"
+    },
+    {
+      "id": "asset-026",
+      "name": "cybercab_live_60s_v2.timeline.json",
+      "path": "data/tasks/cybercab_live_60s_v2.timeline.json",
+      "url": "/case-assets/data__tasks__cybercab_live_60s_v2.timeline.json",
+      "kind": "timeline",
+      "group": "specs",
+      "owner": "Task",
+      "status": "generated",
+      "model": null,
+      "operation": null,
+      "bytes": 5972,
+      "sha256": "fe16826fe84afa4bff651e7585409816e5e64c961e2a2765099e7539bd8b093f",
+      "trainingEligible": false,
+      "humanReview": "pending"
+    },
+    {
+      "id": "asset-032",
+      "name": "DESIGN.md",
+      "path": "productions/cybercab_live_60s_v1/DESIGN.md",
+      "url": "/case-assets/productions__cybercab_live_60s_v1__DESIGN.md",
+      "kind": "storyboard",
+      "group": "specs",
+      "owner": "Creative",
+      "status": "generated",
+      "model": null,
+      "operation": null,
+      "bytes": 1601,
+      "sha256": "2644d1e8449bcf0da9c8b5958ccd73c4a4178ed18693cd8bf09d06043805daf2",
+      "trainingEligible": false,
+      "humanReview": "pending"
+    },
+    {
+      "id": "asset-033",
+      "name": "hyperframes.json",
+      "path": "productions/cybercab_live_60s_v1/hyperframes.json",
+      "url": "/case-assets/productions__cybercab_live_60s_v1__hyperframes.json",
+      "kind": "metadata",
+      "group": "provenance",
+      "owner": "Harness",
+      "status": "generated",
+      "model": null,
+      "operation": null,
+      "bytes": 289,
+      "sha256": "04b52626d08e69ca35b1872cd87f53a2fbc6dbfd41438f5d6b781e276fb1ee7c",
+      "trainingEligible": false,
+      "humanReview": "pending"
+    },
+    {
+      "id": "asset-034",
+      "name": "index.html",
+      "path": "productions/cybercab_live_60s_v1/index.html",
+      "url": "/case-assets/productions__cybercab_live_60s_v1__index.html",
+      "kind": "metadata",
+      "group": "provenance",
+      "owner": "Harness",
+      "status": "generated",
+      "model": null,
+      "operation": null,
+      "bytes": 4079,
+      "sha256": "4c77ff0bf3e420565c15903d27fea8ee754b38c86d44748b41d4d15ebacbd9d4",
+      "trainingEligible": false,
+      "humanReview": "pending"
+    },
+    {
+      "id": "asset-035",
+      "name": "live-room.css",
+      "path": "productions/cybercab_live_60s_v1/live-room.css",
+      "url": "/case-assets/productions__cybercab_live_60s_v1__live-room.css",
+      "kind": "metadata",
+      "group": "provenance",
+      "owner": "Harness",
+      "status": "generated",
+      "model": null,
+      "operation": null,
+      "bytes": 8319,
+      "sha256": "fc47923037dd53aa8862b6e00677bca1e82d74e4d014d3db3dbf0c16c480e395",
+      "trainingEligible": false,
+      "humanReview": "pending"
+    },
+    {
+      "id": "asset-036",
+      "name": "live-room.js",
+      "path": "productions/cybercab_live_60s_v1/live-room.js",
+      "url": "/case-assets/productions__cybercab_live_60s_v1__live-room.js",
+      "kind": "metadata",
+      "group": "provenance",
+      "owner": "Harness",
+      "status": "generated",
+      "model": null,
+      "operation": null,
+      "bytes": 7660,
+      "sha256": "6f5eb638030207b7f3dd3e337bdb86bb022cf082afa3bf05d50cbf2fd8582ad4",
+      "trainingEligible": false,
+      "humanReview": "pending"
+    },
+    {
+      "id": "asset-037",
+      "name": "DESIGN.md",
+      "path": "productions/cybercab_live_60s_v2/DESIGN.md",
+      "url": "/case-assets/productions__cybercab_live_60s_v2__DESIGN.md",
+      "kind": "storyboard",
+      "group": "specs",
+      "owner": "Creative",
+      "status": "generated",
+      "model": null,
+      "operation": null,
+      "bytes": 2225,
+      "sha256": "36758106121394211c37f753344a0c16275c49771249a9f6bdbef1b2d02873a9",
+      "trainingEligible": false,
+      "humanReview": "pending"
+    },
+    {
+      "id": "asset-038",
+      "name": "hyperframes.json",
+      "path": "productions/cybercab_live_60s_v2/hyperframes.json",
+      "url": "/case-assets/productions__cybercab_live_60s_v2__hyperframes.json",
+      "kind": "metadata",
+      "group": "provenance",
+      "owner": "Harness",
+      "status": "generated",
+      "model": null,
+      "operation": null,
+      "bytes": 289,
+      "sha256": "04b52626d08e69ca35b1872cd87f53a2fbc6dbfd41438f5d6b781e276fb1ee7c",
+      "trainingEligible": false,
+      "humanReview": "pending"
+    },
+    {
+      "id": "asset-039",
+      "name": "package.json",
+      "path": "productions/cybercab_live_60s_v2/package.json",
+      "url": "/case-assets/productions__cybercab_live_60s_v2__package.json",
+      "kind": "metadata",
+      "group": "provenance",
+      "owner": "Harness",
+      "status": "generated",
+      "model": null,
+      "operation": null,
+      "bytes": 391,
+      "sha256": "7d0c3e86bdf254cc0cfb161157020110bd54856ff2064fb770c3111802a557ce",
+      "trainingEligible": false,
+      "humanReview": "pending"
+    }
+  ],
+  "timeline": {
+    "schema": "visualagent.live-production-timeline.v1",
+    "id": "cybercab-live-60s-v2",
+    "duration": 60,
+    "disclosure": "人物、车辆与物理场景为合成画面；弹幕、价格、按钮、字幕和礼物由代码生成。",
+    "scene": {
+      "description": "A disclosed synthetic live demonstration of a gold two-seat autonomous vehicle in a closed showroom and test lane."
+    },
+    "reference_states": [
+      {
+        "id": "state-00-000",
+        "time": 0,
+        "camera_semantics": "展厅外观与虚构主持人同框；车辆静止、车门关闭。"
+      },
+      {
+        "id": "state-15-000",
+        "time": 15,
+        "camera_semantics": "同一展厅与人物，近侧蝶翼门开启，主持人展示乘客入口。"
+      },
+      {
+        "id": "state-30-000",
+        "time": 30,
+        "camera_semantics": "主持人进入乘客座并系好安全带；座舱不出现方向盘和踏板。"
+      },
+      {
+        "id": "state-45-000",
+        "time": 45,
+        "camera_semantics": "车门关闭，主持人指向空白中控；机位在座舱内连续移动。"
+      },
+      {
+        "id": "state-60-000",
+        "time": 60,
+        "camera_semantics": "车辆在封闭演示路线低速移动；窗外景物平滑运动。"
+      }
+    ],
+    "audio_lineage": {
+      "requested_model": "kling-video-v3_0_omni",
+      "requested_native_audio": true,
+      "native_av_source_intervals": [
+        [
+          0,
+          15
+        ],
+        [
+          15,
+          30
+        ],
+        [
+          30,
+          45
+        ],
+        [
+          45,
+          60
+        ]
+      ],
+      "native_av_seam_intervals": [
+        [
+          12.5,
+          17.5
+        ],
+        [
+          27.5,
+          32.5
+        ],
+        [
+          42.5,
+          47.5
+        ]
+      ],
+      "non_model_bridge_interval": null,
+      "current_review_final_audio": "same_container_native_audio_from_seven_omni_sources",
+      "full_60s_native_av_complete": true,
+      "independent_language_and_lip_sync_review": "pending"
+    },
+    "layout": {
+      "safe_areas": [
+        {
+          "id": "host",
+          "instruction": "Keep upper-left identity area clear"
+        },
+        {
+          "id": "actions",
+          "instruction": "Keep right action rail clear"
+        },
+        {
+          "id": "comments",
+          "instruction": "Keep lower-left comment queue clear"
+        }
+      ]
+    },
+    "tracks": {
+      "camera": [
+        {
+          "id": "camera_exterior",
+          "start": 0,
+          "end": 12.5,
+          "action": "continuous exterior walkaround and butterfly-door opening",
+          "model_owned": true
+        },
+        {
+          "id": "camera_seam_15",
+          "start": 12.5,
+          "end": 17.5,
+          "action": "continuous handheld lateral reposition between actual adjacent source frames",
+          "model_owned": true
+        },
+        {
+          "id": "camera_entry",
+          "start": 17.5,
+          "end": 27.5,
+          "action": "presenter enters as passenger and fastens seat belt",
+          "model_owned": true
+        },
+        {
+          "id": "camera_seam_30",
+          "start": 27.5,
+          "end": 32.5,
+          "action": "continuous camera move from passenger-door position into cabin view",
+          "model_owned": true
+        },
+        {
+          "id": "camera_activation",
+          "start": 32.5,
+          "end": 42.5,
+          "action": "door closes and presenter points to blank center display",
+          "model_owned": true
+        },
+        {
+          "id": "camera_seam_45",
+          "start": 42.5,
+          "end": 47.5,
+          "action": "continuous in-cabin camera pullback and turn",
+          "model_owned": true
+        },
+        {
+          "id": "camera_departure",
+          "start": 47.5,
+          "end": 60,
+          "action": "vehicle begins low-speed autonomous movement on a closed demonstration route",
+          "model_owned": true
+        }
+      ],
+      "speech": [
+        {
+          "id": "speech_open",
+          "start": 0.6,
+          "end": 11.8,
+          "text": "各位看这里，我们现在就从外观开始，把这台金色双座自动驾驶车的关键细节现场看清楚！"
+        },
+        {
+          "id": "speech_entry",
+          "start": 18.0,
+          "end": 27.0,
+          "text": "蝴蝶门打开以后，进出空间非常直接；这里没有方向盘，也没有踏板，乘员从一开始就是乘客。"
+        },
+        {
+          "id": "speech_activation",
+          "start": 33.0,
+          "end": 42.0,
+          "text": "现在坐稳，安全带已经扣好。所有行程操作都集中在中控屏上。"
+        },
+        {
+          "id": "speech_departure",
+          "start": 48.0,
+          "end": 59.2,
+          "text": "好，车辆已经自己平稳起步。注意我的双手完全离开控制区。"
+        }
+      ],
+      "comments": [
+        {
+          "id": "comment_door",
+          "start": 5.2,
+          "end": 11.0,
+          "text": "这个门怎么打开？",
+          "author": "车迷小周",
+          "model_owned": false
+        },
+        {
+          "id": "comment_controls",
+          "start": 20.0,
+          "end": 27.0,
+          "text": "真的没有方向盘吗？",
+          "author": "未来乘客",
+          "model_owned": false
+        },
+        {
+          "id": "comment_safety",
+          "start": 34.0,
+          "end": 41.0,
+          "text": "出发前会确认安全带吗？",
+          "author": "安全观察员",
+          "model_owned": false
+        },
+        {
+          "id": "comment_motion",
+          "start": 50.0,
+          "end": 58.0,
+          "text": "起步平稳吗？",
+          "author": "城市漫游",
+          "model_owned": false
+        }
+      ],
+      "ui": [
+        {
+          "id": "ui_identity",
+          "start": 0,
+          "end": 60,
+          "text": "VisualAgent 汽车体验",
+          "model_owned": false
+        },
+        {
+          "id": "ui_product",
+          "start": 9.0,
+          "end": 14.5,
+          "text": "金色双座自动驾驶体验车",
+          "model_owned": false,
+          "priority_surface": true
+        },
+        {
+          "id": "ui_safety",
+          "start": 33.0,
+          "end": 39.0,
+          "text": "封闭场地 · 乘客体验",
+          "model_owned": false,
+          "priority_surface": true
+        }
+      ],
+      "vfx": [
+        {
+          "id": "gift_rocket",
+          "start": 12.0,
+          "end": 14.6,
+          "style": "rocket",
+          "text": "星际火箭 ×1",
+          "model_owned": false
+        },
+        {
+          "id": "gift_sports_car",
+          "start": 27.0,
+          "end": 29.6,
+          "style": "sports_car",
+          "text": "霓虹跑车 ×1",
+          "model_owned": false
+        },
+        {
+          "id": "gift_sunglasses",
+          "start": 41.0,
+          "end": 43.8,
+          "style": "sunglasses",
+          "text": "酷黑墨镜 ×1",
+          "model_owned": false
+        }
+      ],
+      "ar": [],
+      "subtitles": [
+        {
+          "id": "subtitle_open",
+          "start": 0.6,
+          "end": 11.8,
+          "text": "从外观开始，看清关键细节",
+          "model_owned": false
+        },
+        {
+          "id": "subtitle_entry",
+          "start": 18.0,
+          "end": 27.0,
+          "text": "无方向盘、无踏板，乘员就是乘客",
+          "model_owned": false
+        },
+        {
+          "id": "subtitle_activation",
+          "start": 33.0,
+          "end": 42.0,
+          "text": "确认安全带与行程状态",
+          "model_owned": false
+        },
+        {
+          "id": "subtitle_departure",
+          "start": 48.0,
+          "end": 59.2,
+          "text": "封闭路线低速自动行驶演示",
+          "model_owned": false
+        }
+      ]
+    },
+    "technical_qa": "passed_media_probe_and_hyperframes_checks",
+    "semantic_visual_review": "departure_candidate_passed_contact_sheet; continuity_has_one_fail_and_one_needs_review",
+    "human_review": "pending",
+    "training_eligible": false
+  },
+  "counts": {
+    "provenance": 6,
+    "specs": 9
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "schema": "visualagent.camera-segment-batch.v1",
+  "case_id": "jensen_rubin_live_60s_v1",
+  "timeline": "data/tasks/jensen_rubin_live_60s_v1.timeline.json",
+  "model": "kling-video-v3_0_omni",
+  "source_duration_seconds": 8,
+  "assembled_duration_seconds": 7.5,
+  "aspect_ratio": "9:16",
+  "resolution": "1080p",
+  "assembly_output": "outputs/artifacts/jensen_rubin_live_60s_v1/camera/camera_feed_60s.mp4",
+  "format_contract": {"orientation": "portrait", "aspect_ratio": "9:16", "expected_width": 1080, "expected_height": 1920, "preview_fit": "contain"},
+  "enable_audio": true,
+  "prefer_multi_shots": false,
+  "segments": [
+    {"id": "seg_000_075_reuse", "start": 0.0, "end": 7.5, "source": "outputs/artifacts/jensen_rubin_live_30s_v2/camera_segments/seg_000_075_omni_retry_02.source-8s.mp4"},
+    {"id": "seg_075_150_reuse", "start": 7.5, "end": 15.0, "source": "outputs/artifacts/jensen_rubin_live_30s_v2/camera_segments/seg_075_150.source-8s.mp4"},
+    {"id": "seg_150_225_reuse", "start": 15.0, "end": 22.5, "source": "outputs/artifacts/jensen_rubin_live_30s_v2/camera_segments/seg_150_225.source-8s.mp4"},
+    {"id": "seg_225_300_reuse", "start": 22.5, "end": 30.0, "source": "outputs/artifacts/jensen_rubin_live_30s_v2/camera_segments/seg_225_300_retry_02.source-8s.mp4"},
+    {
+      "id": "seg_300_375",
+      "start": 30.0,
+      "end": 37.5,
+      "first": "outputs/artifacts/jensen_rtx5090_live_v2_20260820/camera_references/state-300-dynamic-v2.png",
+      "tail": "outputs/artifacts/jensen_rubin_live_60s_v1/camera_references/state-375-cable-v1-technical-v2.png",
+      "prompt": "图像1是第30秒，图像2是第37.5秒。保持图像中的同一位男性主播、黑色皮夹克、同一张双风扇显卡、同一间石墨色硬件直播棚和9:16眼平中景。人物从工作台另一侧回到开放式主机旁，保持显卡完整可见，用开放掌指示物理电源接口和线材路径并看向接口。使用普通成熟中文男声，不模仿任何真实人物，清楚说：电源够用还不等于连接就稳，接口要插到底，线材弯折和供电余量都要检查。单镜头，无切镜，脸部、五指、手腕和双风扇几何稳定。不要生成文字、数字、按钮、弹幕、价格、购物车、礼物、眼镜、logo或水印。"
+    },
+    {
+      "id": "seg_375_450",
+      "start": 37.5,
+      "end": 45.0,
+      "first": "outputs/artifacts/jensen_rubin_live_60s_v1/camera_references/state-375-cable-v1-technical-v2.png",
+      "tail": "outputs/artifacts/jensen_rubin_live_60s_v1/camera_references/state-450-airflow-v1-technical-v2.png",
+      "prompt": "图像1是第37.5秒，图像2是第45秒。保持图像中的同一位男性主播、服装、双风扇显卡、物理直播棚和9:16固定机位。人物结束线材说明后转向开放式主机，把显卡斜持于腰部，用另一只开放掌从机箱前部向后部做一次清楚的风道扫动，目光跟随手势。使用与前段一致的普通成熟中文男声，不模仿任何真实人物，清楚说：散热不是只看显卡风扇，机箱前进后出、冷空气补充和热空气排出要形成完整路径。单镜头，无切镜，无新人物。不要生成箭头、文字、UI、弹幕、购物车、礼物、眼镜、logo或水印；保持五指和商品几何稳定。"
+    },
+    {
+      "id": "seg_450_525",
+      "start": 45.0,
+      "end": 52.5,
+      "first": "outputs/artifacts/jensen_rubin_live_60s_v1/camera_references/state-450-airflow-v1-technical-v2.png",
+      "tail": "outputs/artifacts/jensen_rubin_live_60s_v1/camera_references/state-525-clearance-v1-technical-v2.png",
+      "prompt": "图像1是第45秒，图像2是第52.5秒。保持同一男性主播、黑色皮夹克、双风扇显卡、石墨色直播棚和9:16眼平中景。人物从风道手势自然过渡到机箱适配检查，双手水平托住显卡靠近开放式机箱，观察卡长、厚度、侧板距离和线材转弯空间，动作幅度清楚但物理自然。使用相同的普通成熟中文男声，不模仿任何真实人物，清楚说：装机前再确认显卡长度、厚度、侧板距离和线材转弯空间，别让局部挤压破坏稳定性。单镜头，无切镜。不要生成测量数字、文字、UI、弹幕、购物车、礼物、眼镜、logo或水印；保持五指、手腕和商品几何稳定。"
+    },
+    {
+      "id": "seg_525_600",
+      "source": "outputs/artifacts/jensen_rubin_live_60s_v1/camera_segments/seg_525_600_retry_02.source-8s.mp4",
+      "start": 52.5,
+      "end": 60.0,
+      "first": "outputs/artifacts/jensen_rubin_live_60s_v1/camera_references/state-525-clearance-v1-technical-v2.png",
+      "tail": "outputs/artifacts/jensen_rubin_live_60s_v1/camera_references/state-600-summary-v1-technical-v2.png",
+      "prompt": "图像1是第52.5秒，图像2是第60秒。保持同一男性主播、服装、双风扇显卡、丰富物理直播棚和9:16固定机位。人物结束机箱空间检查后回到画面中央，把显卡转为竖直胸前展示，长边平行画面竖轴、双风扇上下可见，直视镜头并用空闲手做开放掌收尾。使用相同的普通成熟中文男声，不模仿任何真实人物，清楚说：最后按官方规格逐项核对，再决定整机方案。今天的内容只是AI概念演示，我们下次继续。连续单镜头，无切镜。不要生成文字、UI、弹幕、购物车、礼物、眼镜、logo或水印；保持脸部、五指、手腕和商品几何稳定。"
+    }
+  ]
+}

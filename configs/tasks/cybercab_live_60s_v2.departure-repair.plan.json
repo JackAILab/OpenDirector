@@ -1,0 +1,41 @@
+{
+  "schema": "visualagent.omni-departure-repair-plan.v1",
+  "id": "cybercab-live-60s-v2-omni-departure-repair",
+  "case_id": "cybercab_live_60s_v2",
+  "objective": "Replace the semantically stationary final interval with a visibly moving closed-course autonomous departure while preserving native Mandarin audio.",
+  "status": "generated_pending_composite_review",
+  "model": "kling-video-v3_0_omni",
+  "input_mode": "omni_single_reference",
+  "parameters": {
+    "duration_seconds_per_segment": 15,
+    "aspect_ratio": "9:16",
+    "resolution": "1080p",
+    "enable_audio": true,
+    "prefer_multi_shots": false
+  },
+  "assembled_duration_seconds": 12.5,
+  "segments": [
+    {
+      "id": "departure-47_5-60-omni-v1",
+      "start": 47.5,
+      "end": 60,
+      "first_frame": "outputs/artifacts/cybercab_live_60s_v2/departure_references/departure-repair-first.png",
+      "prompt": "单一连续真实手机直播镜头，从给定首帧开始，不切镜。保持同一金色双座自动驾驶车、同一虚构亚洲男性科技主播、相同展厅、相同车身比例、衣着、灯光和色彩。两侧蝶翼门先平稳完全关闭；随后车辆从展厅连接的封闭演示路线明显低速向前行驶至少数米。车轮必须持续可见地转动，地面反光和背景立柱必须产生连续明显视差，证明车辆确实移动；摄影机稳定跟随，不允许用变焦伪装运动。主播双手离开控制区，兴奋但清晰地用普通话说：好，车门已经关闭，车辆现在自己平稳起步！看车轮和背景的相对运动，我们正在封闭路线里真实移动。原生同步普通话虚构男声与轻微电动车行驶声，不模仿任何真实人物。禁止闪变、瞬移、公共道路、其他交通或新增物体。画面内禁止可读文字、Logo、价格、UI、字幕和礼物特效。",
+      "output": "outputs/artifacts/cybercab_live_60s_v2/camera_repairs/departure-47_5-60-omni-v1.source-15s.mp4"
+    }
+  ],
+  "paid_generation_budget": {
+    "max_calls_without_confirmation": 1,
+    "used": 1,
+    "automatic_retry": false,
+    "model_substitution": false
+  },
+  "promotion_gates": [
+    "source contains video and native audio streams",
+    "doors visibly close before movement",
+    "wheel rotation and background parallax independently confirm movement",
+    "join and final composite pass review",
+    "explicit human approval"
+  ],
+  "training_eligible": false
+}

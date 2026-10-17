@@ -1,0 +1,13 @@
+{
+  "duration": 15,
+  "maxStaticSec": 2.5,
+  "assertions": [
+    { "kind": "appearsBy", "selector": ".hero h1", "bySec": 1.8 },
+    { "kind": "before", "a": ".hero h1", "b": ".fact-card" },
+    { "kind": "before", "a": ".fact-card", "b": ".drawer" },
+    { "kind": "staysInFrame", "selector": ".hero h1" },
+    { "kind": "staysInFrame", "selector": ".fact-card" },
+    { "kind": "staysInFrame", "selector": ".drawer" },
+    { "kind": "keepsMoving", "withinSelector": "#pilot-ad-scene" }
+  ]
+}

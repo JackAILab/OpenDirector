@@ -1,0 +1,60 @@
+{
+  "schema": "visualagent.live-case-review.v1",
+  "case_id": "cybercab_live_60s_v1",
+  "review_build": "v2",
+  "paid_generation": {
+    "authorized_calls": 9,
+    "used_calls": 9,
+    "automatic_retry": false,
+    "credits_before": 9985,
+    "credits_after": 9435,
+    "credits_consumed": 550
+  },
+  "retained": {
+    "reference_states": 5,
+    "provider_camera_sources": 3,
+    "provider_source_missing_after_completion": "30-45",
+    "deterministic_review_bridge": "30-45"
+  },
+  "artifacts": {
+    "camera_feed": {
+      "path": "outputs/artifacts/cybercab_live_60s_v1/camera/camera_feed_60s-review-v1.mp4",
+      "sha256": "5625ff230611f1b3cd496d61e7fe54f9ceea942c4514feadcd7a8f2a97a6baeb",
+      "duration_seconds": 60.07,
+      "resolution": "1080x1920",
+      "fps": 30,
+      "video_codec": "h264",
+      "audio_codec": "aac"
+    },
+    "speech": {
+      "path": "outputs/artifacts/cybercab_live_60s_v1/audio/speech_60s-zh-safe-v2.wav",
+      "sha256": "73aa604fd7ac4bfd1327b464f95239ac9d04a0d21bfff95cce2a2b1c5340caaf",
+      "duration_seconds": 60,
+      "language": "zh-CN",
+      "voice_clone": false,
+      "public_figure_reference_used": false
+    },
+    "final_review": {
+      "path": "outputs/artifacts/cybercab_live_60s_v1/final/cybercab_live_60s-review-v2.mp4",
+      "sha256": "5993a70d1d47e046c2cf37bdbd5077dd9233a77d1ff79e585d560bdd32b8e08e",
+      "duration_seconds": 60,
+      "resolution": "1080x1920",
+      "fps": 30,
+      "video_codec": "h264",
+      "audio_codec": "aac"
+    }
+  },
+  "evaluators": {
+    "technical_media": "passed",
+    "hyperframes_lint": "passed_0_errors_0_warnings",
+    "hyperframes_check": "passed_477_samples",
+    "harness_tests": "passed_64_of_64",
+    "asset_studio_tests": "passed_2_of_2",
+    "asset_studio_health": "passed_http_200_and_mp4_range_206",
+    "text_contrast": "passed_65_of_65",
+    "semantic_visual": "failed_autonomous_departure_remains_stationary_showroom",
+    "independent_review": "pending",
+    "human_approval": "pending"
+  },
+  "training_eligible": false
+}

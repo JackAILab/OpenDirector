@@ -1,0 +1,71 @@
+{
+  "schema": "visualagent.omni-tvc-benchmark.v1",
+  "case_count": 10,
+  "reference_url": "https://www.liblib.tv/detail/b3fe06ba1d274308962f0e42d0072c7d",
+  "reference_evidence": "Public page and embedded canvas inspected: smartwatch TVC, detail-to-product shots, lifestyle actions, native SFX without music. No claim of full video playback review.",
+  "budget": {
+    "codebuddy_reference_calls": 10,
+    "kling_video_calls": 10,
+    "automatic_retry": false,
+    "model_substitution": false,
+    "codebuddy_attempts_used": 12,
+    "kling_attempts_used": 6,
+    "codebuddy_additional_retry_limit": 10
+  },
+  "status": "blocked_insufficient_kling_credits",
+  "cases": [
+    {
+      "case_id": "01_smartwatch",
+      "title": "智能手表｜从晨光到山脊",
+      "input": "cases/01_smartwatch/input.json"
+    },
+    {
+      "case_id": "02_action_camera",
+      "title": "运动相机｜穿过浪尖",
+      "input": "cases/02_action_camera/input.json"
+    },
+    {
+      "case_id": "03_perfume",
+      "title": "香水｜夜色琥珀",
+      "input": "cases/03_perfume/input.json"
+    },
+    {
+      "case_id": "04_sports_car",
+      "title": "电动跑车｜雨后弯道",
+      "input": "cases/04_sports_car/input.json"
+    },
+    {
+      "case_id": "05_headphones",
+      "title": "头戴耳机｜城市静下来",
+      "input": "cases/05_headphones/input.json"
+    },
+    {
+      "case_id": "06_sneaker",
+      "title": "运动鞋｜第一步",
+      "input": "cases/06_sneaker/input.json"
+    },
+    {
+      "case_id": "07_coffee_machine",
+      "title": "咖啡机｜清晨的第一杯",
+      "input": "cases/07_coffee_machine/input.json"
+    },
+    {
+      "case_id": "08_skincare",
+      "title": "精华液｜光穿过一滴",
+      "input": "cases/08_skincare/input.json"
+    },
+    {
+      "case_id": "09_lounge_chair",
+      "title": "休闲椅｜给自己一刻",
+      "input": "cases/09_lounge_chair/input.json"
+    },
+    {
+      "case_id": "10_rain_shell",
+      "title": "冲锋衣｜风雨有形",
+      "input": "cases/10_rain_shell/input.json"
+    }
+  ],
+  "training_eligible": false,
+  "reference_images_ready": 10,
+  "videos_generated": 5
+}

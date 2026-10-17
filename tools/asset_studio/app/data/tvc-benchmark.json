@@ -1,0 +1,226 @@
+{
+  "cases": [
+    {
+      "id": "01_smartwatch",
+      "title": "智能手表｜从晨光到山脊",
+      "brief": "制作一条原创高质感商业TVC，15秒，16:9横屏，目标1920×1080。真实摄影质感、丰富物理场景、明确产品焦点。使用参考图固定商品外观与人物身份，但不得把参考图作为拼贴画播放。按时序完成三个镜头，动作连续且符合物理。原生环境音和与动作同步的音效；无配乐、无旁白。画面不出现可读文字、品牌标识、字幕、价格、界面卡片或水印。屏幕只显示抽象色彩，无功能或性能承诺。\n商品主体：oval titanium silver smartwatch with a single orange crown on its right side, graphite woven strap, black glass face showing only a blue abstract arc。\n人物主体：a fictional adult East Asian woman with a short dark bob, lavender athletic top and ivory trousers。\n场景：sunlit walnut dressing room opening onto a misty mountain landscape。\n镜头计划：0–4s：微距沿钛金属表壳与编织表带滑行，侧光扫过表冠。4–10s：切到晨光房间，同一位女性扣好左腕表带，抬腕后转身走向窗户。10–15s：动作匹配切到山脊，她迈出两步，镜头从手腕拉远显露晨雾与山线。\n连续性约束：腕表表冠位置、银色表壳与石墨表带恒定；扣表带动作自然；山脊收尾必须有步行动作。\n图片1固定商品外观、材质与人物身份；参考图中的前景放大是摄影透视，商品在人物使用时须为正常实物大小。",
+      "video": null,
+      "reference": "/tvc/01_smartwatch.png",
+      "status": "等待视频额度",
+      "findings": [],
+      "technicalPassed": false,
+      "trainingEligible": false
+    },
+    {
+      "id": "02_action_camera",
+      "title": "运动相机｜穿过浪尖",
+      "brief": "制作一条原创高质感商业TVC，15秒，16:9横屏，目标1920×1080。真实摄影质感、丰富物理场景、明确产品焦点。使用参考图固定商品外观与人物身份，但不得把参考图作为拼贴画播放。按时序完成三个镜头，动作连续且符合物理。原生环境音和与动作同步的音效；无配乐、无旁白。画面不出现可读文字、品牌标识、字幕、价格、界面卡片或水印。屏幕只显示抽象色彩，无功能或性能承诺。\n商品主体：compact graphite action camera, large circular lens at right, small blank black glass panel at left, orange shutter button on top, ribbed rubber sides。\n人物主体：a fictional adult athletic man in a charcoal wetsuit。\n场景：wet volcanic rock beside turquoise surf at first light。\n镜头计划：0–4s：超近景水滴滚过镜头保护玻璃，焦点转到橙色快门。4–10s：相机固定在冲浪板前端，同一名冲浪者压低重心划过真实浪面，摄影机平行跟拍。10–15s：切回湿黑岩上的相机，浪花在背景炸开，缓慢半环绕形成产品英雄镜头。\n连续性约束：镜头始终在机身右侧；相机固定在板上不漂浮；海浪、板与人物运动有因果关系。\n图片1用于固定相机外观与成年男性身份；参考图的近大远小只是摄影透视，实物相机为正常手掌大小，不要生成巨型相机。",
+      "video": "/api/media/02_action_camera-attempt-01.mp4",
+      "reference": "/tvc/02_action_camera.png",
+      "status": "已生成 · 有待改进项",
+      "findings": [
+        {
+          "severity": "medium",
+          "criterion": "visible_planned_actions",
+          "detail": "开场可见镜头微距及橙色快门，但抽样画面未见水滴滚过保护玻璃。"
+        },
+        {
+          "severity": "medium",
+          "criterion": "product_in_use",
+          "detail": "中段冲浪动作和浪面变化清楚，但抽样画面无法确认冲浪板前端固定有指定相机。"
+        },
+        {
+          "severity": "medium",
+          "criterion": "motion_physics",
+          "detail": "约8–10秒冲浪者接近前景岩石后被遮挡，需要连续运动审查确认是否存在穿模。"
+        },
+        {
+          "severity": "info",
+          "criterion": "three_shot_narrative",
+          "detail": "微距、冲浪跟拍、岩石产品展示三段结构成立；结尾有明显视角变化。"
+        },
+        {
+          "severity": "info",
+          "criterion": "product_identity",
+          "detail": "前后产品保持石墨色机身、右侧圆镜头和顶部橙色按键；无可读文字。"
+        }
+      ],
+      "technicalPassed": true,
+      "trainingEligible": false
+    },
+    {
+      "id": "03_perfume",
+      "title": "香水｜夜色琥珀",
+      "brief": "制作一条原创高质感商业TVC，15秒，16:9横屏，目标1920×1080。真实摄影质感、丰富物理场景、明确产品焦点。使用参考图固定商品外观与人物身份，但不得把参考图作为拼贴画播放。按时序完成三个镜头，动作连续且符合物理。原生环境音和与动作同步的音效；无配乐、无旁白。画面不出现可读文字、品牌标识、字幕、价格、界面卡片或水印。屏幕只显示抽象色彩，无功能或性能承诺。\n商品主体：smoky amber rectangular glass perfume bottle with beveled shoulders, heavy clear base, unmarked brushed gold cylindrical cap。\n人物主体：a fictional adult woman with short wavy dark hair, plain black silk evening dress。\n场景：black marble vanity, amber practical lights, deep brown velvet and warm haze。\n镜头计划：0–4s：侧逆光穿过琥珀色液体，摄影机滑过厚玻璃底座。4–10s：女性取下金属盖，手持同一瓶香水朝手腕轻喷一次，逆光显现细雾。10–15s：瓶子落回黑色大理石，金属盖置于右侧，焦点从雾滴回到瓶身，最后静稳两秒。\n连续性约束：瓶盖取下后不能自动出现；只有一次喷雾；液体色泽与瓶体切角一致。\n图片1固定商品外观、材质与人物身份；参考图中的前景放大是摄影透视，商品在人物使用时须为正常实物大小。",
+      "video": "/api/media/03_perfume-attempt-01.mp4",
+      "reference": "/tvc/03_perfume.png",
+      "status": "已生成 · 有待改进项",
+      "findings": [
+        {
+          "severity": "high",
+          "criterion": "cap_continuity",
+          "detail": "结尾瓶口重新出现一个金色盖，同时桌面右侧仍保留一个盖，违背取盖后不能自动出现的明确约束。"
+        },
+        {
+          "severity": "medium",
+          "criterion": "normal_product_scale",
+          "detail": "香水瓶在人物手中仍接近双手大罐尺度，超过普通手持香水瓶的预期。"
+        },
+        {
+          "severity": "medium",
+          "criterion": "spray_action",
+          "detail": "可见取盖、举瓶、放瓶与手腕雾气，但按压喷头并向手腕喷一次的因果链在抽样中不够清楚。"
+        },
+        {
+          "severity": "info",
+          "criterion": "commercial_image_quality",
+          "detail": "厚玻璃与琥珀液体微距、暖灯和深色材质层次成立，人物形象与参考接近。"
+        }
+      ],
+      "technicalPassed": true,
+      "trainingEligible": false
+    },
+    {
+      "id": "04_sports_car",
+      "title": "电动跑车｜雨后弯道",
+      "brief": "制作一条原创高质感商业TVC，15秒，16:9横屏，目标1920×1080。真实摄影质感、丰富物理场景、明确产品焦点。使用参考图固定商品外观与人物身份，但不得把参考图作为拼贴画播放。按时序完成三个镜头，动作连续且符合物理。原生环境音和与动作同步的音效；无配乐、无旁白。画面不出现可读文字、品牌标识、字幕、价格、界面卡片或水印。屏幕只显示抽象色彩，无功能或性能承诺。\n商品主体：fictional unbranded deep petrol-blue low two-door electric sports coupe, continuous thin rear light, black panoramic roof and five-spoke silver wheels。\n人物主体：no visible driver identity。\n场景：closed mountain test track after rain, dark pines, overcast silver sky。\n镜头计划：0–4s：近地微距从轮胎水珠移到五辐轮毂，车轮开始转动。4–10s：低位追拍车辆驶过一个宽弯，轮胎排水真实，车身与路面保持接触。10–15s：后侧三分之四跟拍逐渐拉远，蓝色车身映出树影，车尾灯线稳定，山景展开。\n连续性约束：始终同一辆双门车；轮辐和车灯不能改变；封闭场地，不出现危险驾驶或漂浮轮胎。\n图片1固定商品外观、材质与人物身份；参考图中的前景放大是摄影透视，商品在人物使用时须为正常实物大小。",
+      "video": "/api/media/04_sports_car-attempt-01.mp4",
+      "reference": "/tvc/04_sports_car.png",
+      "status": "已生成 · 有待改进项",
+      "findings": [
+        {
+          "severity": "high",
+          "criterion": "closing_product_visibility",
+          "detail": "约10秒后切成空赛道，最后约5秒看不到车辆；没有按简报保留后侧跟拍商品收尾。"
+        },
+        {
+          "severity": "medium",
+          "criterion": "shot_brief_adherence",
+          "detail": "开头呈现轮毂旋转，但轮胎水珠细节不明显；宽弯行驶动作辨识度不足。"
+        },
+        {
+          "severity": "info",
+          "criterion": "product_consistency",
+          "detail": "前10秒蓝色双门跑车、银色轮毂和横向尾灯外观基本稳定，车轮保持路面接触。"
+        },
+        {
+          "severity": "info",
+          "criterion": "commercial_image_quality",
+          "detail": "湿路反射、针叶林和阴天光照协调，轮胎排水可见。"
+        }
+      ],
+      "technicalPassed": true,
+      "trainingEligible": false
+    },
+    {
+      "id": "05_headphones",
+      "title": "头戴耳机｜城市静下来",
+      "brief": "制作一条原创高质感商业TVC，15秒，16:9横屏，目标1920×1080。真实摄影质感、丰富物理场景、明确产品焦点。使用参考图固定商品外观与人物身份，但不得把参考图作为拼贴画播放。按时序完成三个镜头，动作连续且符合物理。原生环境音和与动作同步的音效；无配乐、无旁白。画面不出现可读文字、品牌标识、字幕、价格、界面卡片或水印。屏幕只显示抽象色彩，无功能或性能承诺。\n商品主体：ivory over-ear headphones, oval cushions, satin silver yokes, narrow padded headband, tiny circular amber indicator on the left earcup。\n人物主体：a fictional adult woman with tied-back dark hair wearing a sand-colored trench coat。\n场景：quiet concrete metro concourse with glass panels and muted daylight。\n镜头计划：0–4s：耳罩皮革微距，摄影机拉到完整耳机，金属支架反射柔光。4–10s：女性双手戴好耳机，闭眼轻呼气，镜头小幅绕至侧脸，背景行人自然行走。10–15s：切到石台上的耳机，柔和城市反射掠过外壳，最后完整产品稳定展示两秒。\n连续性约束：左右耳罩结构一致；戴耳机时手与头带没有穿模；以声音收束体现安静，不凭空改变场景。\n图片1固定商品外观、材质与人物身份；参考图中的前景放大是摄影透视，商品在人物使用时须为正常实物大小。",
+      "video": "/api/media/05_headphones-attempt-01.mp4",
+      "reference": "/tvc/05_headphones.png",
+      "status": "已生成 · 有待改进项",
+      "findings": [
+        {
+          "severity": "medium",
+          "criterion": "complete_product_display",
+          "detail": "结尾耳罩展示清楚，但头带被遮住或缺失，无法确认完整耳机结构；不满足完整产品展示的验收要求。"
+        },
+        {
+          "severity": "medium",
+          "criterion": "opening_shot",
+          "detail": "开场始终停留在耳罩细节，没有按计划拉到完整耳机。"
+        },
+        {
+          "severity": "info",
+          "criterion": "wearing_action",
+          "detail": "双手抬起、戴好、闭眼、放下双手的动作链清楚，抽样中未见明显手部穿模。"
+        },
+        {
+          "severity": "info",
+          "criterion": "commercial_image_quality",
+          "detail": "奶白耳罩与银色支架质感协调，人物比例自然，背景行人有连续运动。"
+        }
+      ],
+      "technicalPassed": true,
+      "trainingEligible": false
+    },
+    {
+      "id": "06_sneaker",
+      "title": "运动鞋｜第一步",
+      "brief": "制作一条原创高质感商业TVC，15秒，16:9横屏，目标1920×1080。真实摄影质感、丰富物理场景、明确产品焦点。使用参考图固定商品外观与人物身份，但不得把参考图作为拼贴画播放。按时序完成三个镜头，动作连续且符合物理。原生环境音和与动作同步的音效；无配乐、无旁白。画面不出现可读文字、品牌标识、字幕、价格、界面卡片或水印。屏幕只显示抽象色彩，无功能或性能承诺。\n商品主体：pair of cream running shoes with coral sculpted midsoles, black heel pull tabs, cream laces and translucent textured outsoles。\n人物主体：a fictional adult athletic woman, rust sports top and charcoal running shorts。\n场景：terracotta outdoor running track, low morning sun, dew on adjacent grass。\n镜头计划：0–4s：鞋底纹理微距，露珠沿纹理滑落，焦点转向珊瑚色中底。4–10s：跑者弯腰拉紧鞋带，起身后连续跑出三步，低位跟拍呈现鞋底压缩与回弹。10–15s：侧面短距离跟拍后切到跑道边的双鞋静物，晨光勾出曲线。\n连续性约束：鞋带、后跟拉环与中底配色不漂移；脚落地与中底压缩同步；无额外脚或鞋。\n图片1固定商品外观、材质与人物身份；参考图中的前景放大是摄影透视，商品在人物使用时须为正常实物大小。",
+      "video": null,
+      "reference": "/tvc/06_sneaker.png",
+      "status": "等待视频额度",
+      "findings": [],
+      "technicalPassed": false,
+      "trainingEligible": false
+    },
+    {
+      "id": "07_coffee_machine",
+      "title": "咖啡机｜清晨的第一杯",
+      "brief": "制作一条原创高质感商业TVC，15秒，16:9横屏，目标1920×1080。真实摄影质感、丰富物理场景、明确产品焦点。使用参考图固定商品外观与人物身份，但不得把参考图作为拼贴画播放。按时序完成三个镜头，动作连续且符合物理。原生环境音和与动作同步的音效；无配乐、无旁白。画面不出现可读文字、品牌标识、字幕、价格、界面卡片或水印。屏幕只显示抽象色彩，无功能或性能承诺。\n商品主体：compact matte sage-green espresso machine, brushed steel group head, one round cream control knob, ribbed drip tray, small handleless ivory ceramic cup。\n人物主体：adult hands only, natural skin and short nails。\n场景：warm oak kitchen counter with linen curtain, morning sun and soft steam。\n镜头计划：0–4s：金属冲煮头微距，第一滴咖啡凝聚并落入象牙白杯。4–10s：镜头后移，双细流咖啡连续注入同一杯，金色油脂形成，蒸汽轻升。10–15s：手取走杯子，焦点由杯口油脂转向鼠尾草绿咖啡机，温暖厨房层次清晰。\n连续性约束：咖啡只能从冲煮头流出；杯子保持同一个；旋钮、接水盘与机身颜色恒定。\n图片1固定商品外观、材质与人物身份；参考图中的前景放大是摄影透视，商品在人物使用时须为正常实物大小。",
+      "video": "/api/media/07_coffee_machine-attempt-01.mp4",
+      "reference": "/tvc/07_coffee_machine.png",
+      "status": "画面审片通过 · 有备注",
+      "findings": [
+        {
+          "severity": "medium",
+          "criterion": "input_ambiguity",
+          "detail": "文本定义为无把杯，但实际参考图已带杯把；生成片沿用参考图的带把杯。这是输入冲突，应在下一轮统一，不归因于模型独立失误。"
+        },
+        {
+          "severity": "info",
+          "criterion": "planned_actions",
+          "detail": "首滴咖啡、双流注入、手取杯三个阶段清楚，手取杯后焦点回到机器。"
+        },
+        {
+          "severity": "info",
+          "criterion": "continuity",
+          "detail": "鼠尾草绿机身、旋钮、接水盘与同一杯保持连续，抽样未见明显手部穿模。"
+        },
+        {
+          "severity": "info",
+          "criterion": "commercial_image_quality",
+          "detail": "暖木台面、亚麻窗帘与晨光构成较完整的商品场景。"
+        }
+      ],
+      "technicalPassed": true,
+      "trainingEligible": false
+    },
+    {
+      "id": "08_skincare",
+      "title": "精华液｜光穿过一滴",
+      "brief": "制作一条原创高质感商业TVC，15秒，16:9横屏，目标1920×1080。真实摄影质感、丰富物理场景、明确产品焦点。使用参考图固定商品外观与人物身份，但不得把参考图作为拼贴画播放。按时序完成三个镜头，动作连续且符合物理。原生环境音和与动作同步的音效；无配乐、无旁白。画面不出现可读文字、品牌标识、字幕、价格、界面卡片或水印。屏幕只显示抽象色彩，无功能或性能承诺。\n商品主体：frosted pale aqua serum bottle with rounded rectangular body, glossy white dropper cap, clear glass pipette and translucent serum。\n人物主体：adult hands only with natural unpolished nails。\n场景：pale travertine beauty set, shallow clear water, soft moving caustics。\n镜头计划：0–4s：微距一滴透明精华悬在玻璃滴管末端，背后为浅青色磨砂瓶。4–10s：精华滴落手背并自然展开，镜头慢移，真实皮肤纹理保留。10–15s：滴管回入瓶口，产品在浅水旁稳立，流动光纹滑过石材和玻璃。\n连续性约束：不表现瞬间美白或皱纹消失；滴管和瓶口对齐；液滴真实落下，不倒流。\n图片1固定商品外观、材质与人物身份；参考图中的前景放大是摄影透视，商品在人物使用时须为正常实物大小。",
+      "video": null,
+      "reference": "/tvc/08_skincare.png",
+      "status": "提交失败 · 视频额度不足",
+      "findings": [],
+      "technicalPassed": false,
+      "trainingEligible": false
+    },
+    {
+      "id": "09_lounge_chair",
+      "title": "休闲椅｜给自己一刻",
+      "brief": "制作一条原创高质感商业TVC，15秒，16:9横屏，目标1920×1080。真实摄影质感、丰富物理场景、明确产品焦点。使用参考图固定商品外观与人物身份，但不得把参考图作为拼贴画播放。按时序完成三个镜头，动作连续且符合物理。原生环境音和与动作同步的音效；无配乐、无旁白。画面不出现可读文字、品牌标识、字幕、价格、界面卡片或水印。屏幕只显示抽象色彩，无功能或性能承诺。\n商品主体：warm walnut lounge chair with three curved wood shells, ivory boucle upholstery, black five-star base, matching low ottoman。\n人物主体：a fictional adult man with close-cropped hair wearing a loose olive linen shirt and beige trousers。\n场景：modern apartment with tall window, warm afternoon sunlight, cream wool rug and potted olive tree。\n镜头计划：0–4s：镜头掠过核桃木弧面和羊羔绒纤维，阳光描出细节。4–10s：男性坐进同一把椅子，坐垫轻微受压，双脚轻放脚凳，肩膀放松。10–15s：摄影机缓慢拉远露出完整客厅，树影轻动，椅子和人物形成安静收尾。\n连续性约束：椅子支架与壳体保持一致；坐下有合理承重压缩；身体不穿过扶手或脚凳。\n图片1固定商品外观、材质与人物身份；参考图中的前景放大是摄影透视，商品在人物使用时须为正常实物大小。",
+      "video": null,
+      "reference": "/tvc/09_lounge_chair.png",
+      "status": "等待视频额度",
+      "findings": [],
+      "technicalPassed": false,
+      "trainingEligible": false
+    },
+    {
+      "id": "10_rain_shell",
+      "title": "冲锋衣｜风雨有形",
+      "brief": "制作一条原创高质感商业TVC，15秒，16:9横屏，目标1920×1080。真实摄影质感、丰富物理场景、明确产品焦点。使用参考图固定商品外观与人物身份，但不得把参考图作为拼贴画播放。按时序完成三个镜头，动作连续且符合物理。原生环境音和与动作同步的音效；无配乐、无旁白。画面不出现可读文字、品牌标识、字幕、价格、界面卡片或水印。屏幕只显示抽象色彩，无功能或性能承诺。\n商品主体：moss-green technical hooded rain jacket with charcoal waterproof center zipper, structured hood brim, two diagonal zip pockets, no logos。\n人物主体：a fictional adult East Asian woman with a low dark ponytail wearing the jacket and charcoal hiking trousers。\n场景：windy alpine ridge with wet slate rock, fine rain and a break in the clouds。\n镜头计划：0–4s：近景雨珠在绿色面料上汇聚滚落，侧光显出织物结构。4–10s：同一位女性拉上中间拉链并收紧帽沿，迎风迈出两步，衣服有真实风压褶皱。10–15s：镜头从肩部绕向后侧并拉远，云隙光照到山脊，她站稳望向远处。\n连续性约束：口袋、拉链和帽沿形状固定；手部拉链动作正确；雨和风方向一致，衣料不融化。\n图片1固定商品外观、材质与人物身份；参考图中的前景放大是摄影透视，商品在人物使用时须为正常实物大小。",
+      "video": null,
+      "reference": "/tvc/10_rain_shell.png",
+      "status": "等待视频额度",
+      "findings": [],
+      "technicalPassed": false,
+      "trainingEligible": false
+    }
+  ],
+  "inputArchive": "/tvc/comparison-inputs-10-cases-v1.zip",
+  "completed": 5
+}

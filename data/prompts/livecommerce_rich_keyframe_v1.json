@@ -1,0 +1,23 @@
+{
+  "schema": "visualagent.image-prompt-template.v1",
+  "use_case": "ads-marketing",
+  "composition_contract": {
+    "foreground": "presenter plus hero product, natural hands and strong eye contact",
+    "midground": "active open PC build, product box or secondary comparison prop, desk surface and practical tools",
+    "background": "layered hardware shelving, GPU/component silhouettes, acoustic treatment and colored practical lights",
+    "depth": "clear overlap, scale change, focused foreground and readable environmental storytelling",
+    "density": "at least five coherent non-text visual anchors distributed across at least six of nine grid regions"
+  },
+  "generation_boundary": {
+    "model_owned": ["presenter", "product", "studio", "lighting", "physical props", "camera framing"],
+    "postproduction_owned": ["profile header", "LIVE badge", "viewer and like counts", "comments", "product pin", "price", "buttons", "captions"],
+    "forbidden_in_generated_pixels": ["readable UI text", "comments", "prices", "counters", "watermarks", "fake logos"]
+  },
+  "shared_constraints": "Use an original fictional presenter who resembles no real person. Preserve a true 9:16 portrait canvas, natural five-finger hands and believable product geometry. Keep only compact calm patches where deterministic overlays will be added later; do not simplify the whole set into empty negative space. No readable text, UI, comments, counters, prices, product card, buttons, logos or watermark.",
+  "variants": [
+    {
+      "id": "rich-studio-01",
+      "prompt": "Create a high-density photorealistic PC-hardware live-commerce clean plate. FOREGROUND: a charismatic fictional East Asian technology host with direct eye contact presents a flagship graphics card close to camera. MIDGROUND: an active open white PC build, light-oak desk, product box silhouette, compact tools and a second comparison component. BACKGROUND: layered GPU and component shelving, acoustic panels, one small plant and restrained emerald/cyan practical lights. Preserve clear foreground, midground and background depth; distribute coherent hardware and studio anchors across at least six areas of the frame. The set should feel busy, premium and actively used, not like a portrait against an empty wall."
+    }
+  ]
+}

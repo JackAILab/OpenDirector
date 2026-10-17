@@ -1,0 +1,7 @@
+制作一条原创高质感商业TVC，15秒，16:9横屏，目标1920×1080。真实摄影质感、丰富物理场景、明确产品焦点。使用参考图固定商品外观与人物身份，但不得把参考图作为拼贴画播放。按时序完成三个镜头，动作连续且符合物理。原生环境音和与动作同步的音效；无配乐、无旁白。画面不出现可读文字、品牌标识、字幕、价格、界面卡片或水印。屏幕只显示抽象色彩，无功能或性能承诺。
+商品主体：fictional unbranded deep petrol-blue low two-door electric sports coupe, continuous thin rear light, black panoramic roof and five-spoke silver wheels。
+人物主体：no visible driver identity。
+场景：closed mountain test track after rain, dark pines, overcast silver sky。
+镜头计划：0–4s：近地微距从轮胎水珠移到五辐轮毂，车轮开始转动。4–10s：低位追拍车辆驶过一个宽弯，轮胎排水真实，车身与路面保持接触。10–15s：后侧三分之四跟拍逐渐拉远，蓝色车身映出树影，车尾灯线稳定，山景展开。
+连续性约束：始终同一辆双门车；轮辐和车灯不能改变；封闭场地，不出现危险驾驶或漂浮轮胎。
+图片1固定商品外观、材质与人物身份；参考图中的前景放大是摄影透视，商品在人物使用时须为正常实物大小。

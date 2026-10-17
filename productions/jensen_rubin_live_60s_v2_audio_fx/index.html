@@ -1,0 +1,393 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <title>AI Hardware Synthetic Livestream — 60s Review</title>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      @font-face { font-family: "Live Chinese UI"; src: url("assets/fonts/chinese-ui.ttf") format("truetype"); font-weight: 100 900; font-style: normal; }
+      @font-face { font-family: "IBM Plex Mono"; src: local("IBM Plex Mono"), local("DejaVu Sans Mono"); }
+      @font-face { font-family: "Archivo Black"; src: local("Archivo Black"), local("DejaVu Sans"); font-weight: 900; }
+      :root {
+        --graphite: #0b0d0c;
+        --paper: #f2f3ed;
+        --mineral: #aeb4aa;
+        --signal: #b7f52a;
+        --live: #ff5a67;
+        --glass: rgba(11, 13, 12, 0.68);
+        --line: rgba(242, 243, 237, 0.18);
+      }
+
+      * { box-sizing: border-box; }
+      html, body {
+        width: 1080px; height: 1920px; margin: 0; overflow: hidden;
+        background: transparent; color: var(--paper);
+        font-family: "Live Chinese UI", sans-serif;
+      }
+
+      #root {
+        position: relative; width: 1080px; height: 1920px; overflow: hidden;
+        isolation: isolate; background: transparent;
+      }
+
+      .qa-camera {
+        position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+        z-index: -4; filter: saturate(0.96) contrast(1.02);
+      }
+      .camera-grade {
+        position: absolute; inset: 0; z-index: -3; pointer-events: none;
+        background:
+          radial-gradient(circle at 58% 42%, transparent 35%, rgba(3, 5, 4, 0.18) 83%),
+          linear-gradient(180deg, rgba(5, 7, 6, 0.12) 0%, transparent 24%, transparent 67%, rgba(5, 7, 6, 0.48) 100%);
+      }
+      .grain {
+        position: absolute; inset: 0; z-index: 20; opacity: 0.13; pointer-events: none;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.22'/%3E%3C/svg%3E");
+        mix-blend-mode: soft-light;
+      }
+      .scanline {
+        position: absolute; left: 0; right: 0; top: 244px; height: 1px; z-index: 4;
+        background: linear-gradient(90deg, transparent 4%, rgba(183,245,42,.38) 45%, transparent 92%);
+        box-shadow: 0 0 18px rgba(183,245,42,.14); opacity: .5;
+      }
+
+      .top-frame {
+        position: absolute; top: 38px; left: 42px; right: 42px; height: 176px; z-index: 9;
+        display: grid; grid-template-columns: 1fr auto; grid-template-rows: 96px 56px; gap: 12px 16px;
+      }
+      .identity {
+        display: flex; align-items: center; min-width: 0; padding: 13px 18px 13px 14px;
+        background: linear-gradient(105deg, rgba(11,13,12,.86), rgba(17,20,18,.61));
+        border: 1px solid var(--line); border-radius: 24px 12px 24px 24px;
+        box-shadow: 0 18px 54px rgba(0,0,0,.28), inset 0 1px rgba(255,255,255,.05);
+        backdrop-filter: blur(22px) saturate(1.2);
+      }
+      .host-avatar {
+        position: relative; width: 68px; height: 68px; flex: 0 0 68px; border-radius: 21px; overflow: hidden;
+        background: radial-gradient(circle at 38% 32%, #d8cab4 0 17%, #4a4a3c 18% 31%, #171c18 32% 100%);
+        border: 1px solid rgba(242,243,237,.32); box-shadow: 0 0 0 3px rgba(183,245,42,.12);
+      }
+      .host-avatar::after { content: ""; position: absolute; left: 17px; right: 17px; bottom: -5px; height: 29px; border-radius: 50% 50% 0 0; background: #252a26; }
+      .identity-copy { min-width: 0; margin-left: 15px; }
+      .identity-name { display: flex; align-items: center; gap: 9px; font-size: 28px; font-weight: 700; letter-spacing: -.022em; white-space: nowrap; }
+      .verified { width: 20px; height: 20px; color: var(--signal); }
+      .identity-meta { margin-top: 3px; color: #c7ccc2; font-family: "IBM Plex Mono", monospace; font-size: 16px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; }
+      .live-group { display: flex; align-items: stretch; gap: 10px; }
+      .live-badge {
+        min-width: 106px; display: flex; align-items: center; justify-content: center; gap: 10px;
+        border-radius: 12px; background: rgba(255,90,103,.94); color: #170607;
+        font-family: "IBM Plex Mono", monospace; font-size: 18px; font-weight: 700; letter-spacing: .06em;
+        box-shadow: 0 11px 34px rgba(255,90,103,.28);
+      }
+      .live-dot { width: 8px; height: 8px; border-radius: 50%; background: #fff3f1; box-shadow: 0 0 0 5px rgba(255,255,255,.14); }
+      .viewer {
+        min-width: 196px; padding: 14px 19px; border-radius: 12px 24px 24px 12px;
+        background: var(--glass); border: 1px solid var(--line); backdrop-filter: blur(22px);
+        display: flex; flex-direction: column; justify-content: center; align-items: flex-end;
+      }
+      .viewer-label { color: var(--mineral); font-size: 14px; letter-spacing: .12em; text-transform: uppercase; }
+      .viewer-count { margin-top: 2px; font-family: "IBM Plex Mono", monospace; font-size: 27px; font-weight: 600; font-variant-numeric: tabular-nums; }
+      .disclosure {
+        grid-column: 1 / -1; align-self: start; justify-self: start; height: 50px;
+        display: flex; align-items: center; gap: 12px; padding: 0 18px 0 12px; border-radius: 8px 18px 18px 8px;
+        background: rgba(11,13,12,.77); border: 1px solid rgba(183,245,42,.2); backdrop-filter: blur(16px);
+        color: #e5e8de; font-size: 19px; font-weight: 500; letter-spacing: .01em;
+      }
+      .disclosure-mark { width: 26px; height: 26px; border-radius: 8px 4px 8px 8px; display: grid; place-items: center; background: var(--signal); color: #11150c; font-family: "IBM Plex Mono", monospace; font-size: 14px; font-weight: 700; }
+
+      .action-rail {
+        position: absolute; z-index: 10; right: 43px; top: 620px; width: 92px;
+        display: flex; flex-direction: column; align-items: center; gap: 31px;
+      }
+      .action { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+      .action-button {
+        position: relative; width: 80px; height: 80px; border-radius: 28px 18px 28px 28px;
+        display: grid; place-items: center; background: rgba(11,13,12,.67); border: 1px solid rgba(242,243,237,.22);
+        box-shadow: 0 18px 45px rgba(0,0,0,.25), inset 0 1px rgba(255,255,255,.06); backdrop-filter: blur(20px);
+      }
+      .action-button svg { width: 34px; height: 34px; fill: none; stroke: var(--paper); stroke-width: 2.1; stroke-linecap: round; stroke-linejoin: round; }
+      .action-button.like svg { stroke: var(--live); }
+      .action-button.bag::after { content: "1"; position: absolute; top: -6px; right: -5px; width: 27px; height: 27px; border-radius: 9px; display: grid; place-items: center; background: var(--signal); color: #11150c; font-family: "IBM Plex Mono", monospace; font-size: 14px; font-weight: 700; }
+      .action-label { display: inline-flex; align-items: center; min-height: 28px; padding: 3px 10px 4px; border-radius: 10px; color: #f2f3ed; background: rgba(11,13,12,.88); border: 1px solid rgba(242,243,237,.13); font-family: "IBM Plex Mono", monospace; font-size: 15px; font-weight: 600; font-variant-numeric: tabular-nums; text-shadow: 0 2px 8px #000; }
+
+      .comments {
+        position: absolute; z-index: 11; left: 42px; bottom: 187px; width: 674px; height: 448px;
+        overflow: hidden; pointer-events: none;
+      }
+      .comment {
+        position: absolute; left: 0; bottom: 0; display: grid; grid-template-columns: 54px 1fr; gap: 13px; align-items: center;
+        width: max-content; max-width: 650px; min-height: 78px; padding: 10px 21px 10px 11px;
+        border: 1px solid rgba(242,243,237,.14); background: linear-gradient(105deg, rgba(8,10,9,.79), rgba(14,17,15,.56));
+        box-shadow: 0 15px 44px rgba(0,0,0,.24), inset 0 1px rgba(255,255,255,.04);
+        backdrop-filter: blur(22px); transform-origin: left bottom; will-change: transform, opacity;
+      }
+      .comment:nth-child(1) { border-radius: 21px 12px 21px 21px; left: 0; }
+      .comment:nth-child(2) { border-radius: 11px 23px 23px 23px; left: 25px; }
+      .comment:nth-child(3) { border-radius: 23px 23px 12px 23px; left: 8px; }
+      .comment:nth-child(4) { border-radius: 18px 10px 18px 18px; left: 37px; }
+      .comment:nth-child(5) { border-radius: 21px 21px 10px 21px; left: 14px; }
+      .comment.power { border-color: rgba(183,245,42,.54); background: linear-gradient(100deg, rgba(19,27,13,.88), rgba(11,15,12,.65)); }
+      .comment.power::before { content: "主播回应"; position: absolute; right: 14px; top: -17px; padding: 5px 9px; border-radius: 6px; background: var(--signal); color: #11150c; font-family: "IBM Plex Mono", monospace; font-size: 11px; font-weight: 700; letter-spacing: .08em; }
+      .avatar { width: 54px; height: 54px; border-radius: 19px; overflow: hidden; border: 1px solid rgba(242,243,237,.22); display: grid; place-items: center; }
+      .avatar svg { width: 100%; height: 100%; }
+      .comment-user { color: var(--signal); font-family: "IBM Plex Mono", monospace; font-size: 14px; font-weight: 600; letter-spacing: .02em; }
+      .comment-text { margin-top: 2px; color: var(--paper); font-size: 24px; font-weight: 500; line-height: 1.3; white-space: nowrap; }
+
+      .product-card {
+        position: absolute; z-index: 13; right: 42px; bottom: 166px; width: 500px; height: 283px; overflow: hidden;
+        display: grid; grid-template-columns: 158px 1fr;
+        border-radius: 34px 14px 34px 34px; border: 1px solid rgba(242,243,237,.24);
+        background: linear-gradient(115deg, rgba(13,16,14,.96), rgba(22,27,23,.86));
+        box-shadow: 0 29px 80px rgba(0,0,0,.43), inset 0 1px rgba(255,255,255,.08); backdrop-filter: blur(28px);
+      }
+      .product-visual { position: relative; overflow: hidden; border-right: 1px solid rgba(242,243,237,.11); background: radial-gradient(circle at 42% 38%, rgba(183,245,42,.22), transparent 44%), #0a0c0b; }
+      .gpu-mini { position: absolute; width: 140px; height: 76px; left: 8px; top: 104px; transform: rotate(-15deg); border-radius: 7px 22px 7px 18px; background: linear-gradient(135deg, #4d534d, #171a18 42%, #383d38); border: 1px solid rgba(242,243,237,.24); box-shadow: 0 22px 35px #000; }
+      .gpu-mini::before, .gpu-mini::after { content: ""; position: absolute; top: 10px; width: 53px; height: 53px; border-radius: 50%; border: 7px solid #171a18; background: repeating-conic-gradient(from 0deg, #8d968d 0 7deg, #292d29 7deg 17deg); box-shadow: inset 0 0 0 5px #111411; }
+      .gpu-mini::before { left: 9px; } .gpu-mini::after { right: 9px; }
+      .product-index { position: absolute; top: 17px; left: 18px; color: var(--signal); font-family: "IBM Plex Mono", monospace; font-size: 13px; letter-spacing: .12em; }
+      .product-copy { position: relative; padding: 24px 22px 21px; display: flex; flex-direction: column; }
+      .product-kicker { color: var(--signal); font-family: "IBM Plex Mono", monospace; font-size: 14px; font-weight: 600; letter-spacing: .11em; text-transform: uppercase; }
+      .product-title { margin-top: 8px; font-family: "Archivo Black", sans-serif; font-size: 42px; font-weight: 900; line-height: .98; letter-spacing: -.035em; }
+      .product-desc { margin-top: 13px; color: #d3d7ce; font-size: 16px; line-height: 1.45; font-weight: 350; max-width: 285px; }
+      .product-foot { margin-top: auto; display: flex; justify-content: space-between; align-items: center; padding-top: 13px; border-top: 1px solid rgba(242,243,237,.13); }
+      .product-status { display: flex; align-items: center; gap: 8px; color: #e6e9e1; font-family: "IBM Plex Mono", monospace; font-size: 13px; }
+      .product-status::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--signal); box-shadow: 0 0 12px rgba(183,245,42,.55); }
+      .product-code { color: var(--mineral); font-family: "IBM Plex Mono", monospace; font-size: 12px; letter-spacing: .08em; }
+      .metal-sweep { position: absolute; top: 0; bottom: 0; left: -72px; width: 72px; transform: skewX(-18deg); background: linear-gradient(90deg, transparent, rgba(255,255,255,.19), transparent); filter: blur(3px); }
+
+      .composer {
+        position: absolute; z-index: 15; left: 42px; right: 42px; bottom: 42px; height: 98px;
+        display: grid; grid-template-columns: 1fr 82px 82px; gap: 11px;
+      }
+      .input-shell { display: flex; align-items: center; gap: 16px; padding: 0 24px; border-radius: 29px 14px 29px 29px; background: rgba(11,13,12,.72); border: 1px solid rgba(242,243,237,.19); backdrop-filter: blur(24px); box-shadow: 0 20px 48px rgba(0,0,0,.25); }
+      .input-shell svg { width: 26px; height: 26px; fill: none; stroke: var(--mineral); stroke-width: 2; stroke-linecap: round; }
+      .input-placeholder { color: #c5cac0; font-size: 21px; font-weight: 350; }
+      .composer-button { display: grid; place-items: center; border-radius: 17px 29px 29px 29px; background: rgba(11,13,12,.72); border: 1px solid rgba(242,243,237,.19); backdrop-filter: blur(24px); }
+      .composer-button svg { width: 31px; height: 31px; fill: none; stroke: var(--paper); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+      .heart-field { position: absolute; inset: 0; z-index: 12; pointer-events: none; }
+      .float-heart { position: absolute; width: 54px; height: 54px; filter: drop-shadow(0 8px 16px rgba(255,42,92,.32)); }
+      .float-heart path { fill: var(--live); }
+
+      .gift-stage { position: absolute; inset: 0; z-index: 17; pointer-events: none; overflow: hidden; }
+      .gift-rocket { position: absolute; left: 80px; top: 1110px; width: 510px; height: 510px; transform-origin: 52% 54%; will-change: transform, opacity; }
+      .gift-rocket img, .gift-car img { width: 100%; height: 100%; object-fit: contain; }
+      .gift-car { position: absolute; left: 68px; top: 1228px; width: 820px; height: 548px; transform-origin: 50% 72%; will-change: transform, opacity; }
+      .gift-car::before { content: ""; position: absolute; z-index: -1; left: 8%; right: 8%; bottom: 13%; height: 21%; border-radius: 50%; background: rgba(255,68,126,.24); box-shadow: 0 0 62px 24px rgba(78,221,255,.14); }
+      .gift-banner { position: absolute; left: 80px; top: 1512px; width: 460px; min-height: 88px; display: grid; grid-template-columns: 62px 1fr auto; align-items: center; gap: 12px; padding: 10px 18px 10px 10px; border-radius: 999px; background: linear-gradient(105deg, rgba(33,18,34,.82), rgba(12,15,17,.72)); border: 1px solid rgba(255,213,236,.42); box-shadow: 0 16px 44px rgba(0,0,0,.28), inset 0 1px rgba(255,255,255,.16); backdrop-filter: blur(22px) saturate(1.3); will-change: transform, opacity; }
+      .gift-emblem { width: 62px; height: 62px; border-radius: 50%; display: grid; place-items: center; overflow: hidden; background: rgba(255,95,164,.14); }
+      .gift-emblem img { width: 74px; height: 74px; object-fit: contain; }
+      .gift-user { color: #ffd8eb; font-size: 15px; font-weight: 650; }
+      .gift-copy { margin-top: 2px; color: #fffaf3; font-size: 21px; font-weight: 760; }
+      .gift-multiplier { color: #ffe08b; font-family: "Archivo Black", sans-serif; font-size: 31px; letter-spacing: -.04em; text-shadow: 0 0 18px rgba(255,190,75,.35); }
+      .car-gift-label { position: absolute; left: 185px; top: 424px; padding: 10px 18px; border-radius: 999px; color: #fff7f1; background: rgba(24,12,25,.72); border: 1px solid rgba(255,202,227,.4); box-shadow: 0 12px 34px rgba(0,0,0,.26); backdrop-filter: blur(18px); font-size: 18px; font-weight: 720; white-space: nowrap; }
+      .concept-chip { margin-left: 7px; color: #ffe08b; }
+      .speed-line { position:absolute; height:5px; border-radius:999px; background:linear-gradient(90deg,transparent,rgba(255,78,148,.9),#ffe7a5); opacity:.75; will-change:transform,opacity; }
+      .speed-line.s1 { left: 15px; top: 1390px; width: 360px; }
+      .speed-line.s2 { left: 5px; top: 1465px; width: 250px; }
+      .speed-line.s3 { left: 62px; top: 1540px; width: 430px; }
+      .gift-impact { position:absolute; left:310px; top:1350px; width:410px; height:410px; border-radius:50%; border:4px solid rgba(255,209,232,.72); box-shadow:0 0 60px rgba(255,69,142,.42), inset 0 0 45px rgba(76,229,255,.18); will-change:transform,opacity; }
+      .particle { position:absolute; left:520px; top:1500px; width:12px; height:12px; border-radius:50%; background:#fff1aa; box-shadow:0 0 18px rgba(255,93,164,.75); will-change:transform,opacity; }
+      .particle:nth-of-type(3n) { width:8px; height:8px; background:#5eeaff; }
+      .particle:nth-of-type(4n) { border-radius:2px; background:#ff67a9; }
+
+      .ar-stage { position:absolute; inset:0; z-index:18; pointer-events:none; }
+      .ar-glasses {
+        position:absolute; left:407px; top:460px; width:310px; height:118px;
+        filter:drop-shadow(0 13px 14px rgba(0,0,0,.55)); transform-origin:center;
+      }
+      .lens { fill:url(#lensTint); stroke:#0a0d0c; stroke-width:11; }
+      .glasses-arm { fill:none; stroke:#0a0d0c; stroke-width:13; stroke-linecap:round; }
+      .ar-tag {
+        position:absolute; left:690px; top:565px; padding:7px 11px; border-radius:7px;
+        color:#11150c; background:var(--signal); font:700 12px "IBM Plex Mono",monospace; letter-spacing:.08em;
+      }
+      .energy-ring { position:absolute; left:610px; top:850px; width:310px; height:310px; border:10px solid var(--signal); border-radius:50%; box-shadow:0 0 38px rgba(183,245,42,.52), inset 0 0 30px rgba(183,245,42,.22); opacity:0; }
+      .energy-ring::before,.energy-ring::after { content:""; position:absolute; inset:30px; border:3px solid rgba(242,243,237,.72); border-radius:50%; }
+      .energy-ring::after { inset:68px; border-color:rgba(183,245,42,.78); }
+      .identity-meta,.live-badge,.action-label,.comment.power::before,
+      .product-index,.product-kicker,.product-title,.product-status,.product-code,
+      .car-gift-label,.ar-tag { font-family:"Live Chinese UI",sans-serif; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="jensen-rubin-live-60s-v2-audio-fx" data-start="0" data-duration="60" data-width="1080" data-height="1920" data-composition-variables='[{"id":"layerMode","label":"Layer mode","type":"enum","default":"review","options":[{"label":"Review","value":"review"},{"label":"UI","value":"ui"},{"label":"VFX","value":"vfx"}]}]'>
+      <video id="qa-camera" class="qa-camera clip" data-start="0" data-duration="60" data-track-index="0" src="assets/camera/camera_feed_60s.mp4" muted playsinline></video>
+      <audio id="qa-audio" data-start="0" data-duration="60" data-track-index="1" data-volume="1" src="assets/audio/camera_feed_60s_live-mix-v3.m4a"></audio>
+      <div class="camera-grade" data-layout-ignore></div><div class="grain" data-layout-ignore></div><div class="scanline" data-layout-ignore></div>
+
+      <header class="top-frame">
+        <section class="identity">
+          <div class="host-avatar" aria-hidden="true"></div>
+          <div class="identity-copy"><div class="identity-name">AI 硬件直播间
+            <svg class="verified" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2.4l2.2 2 3-.3 1.3 2.7 2.7 1.3-.3 3 2 2.2-2 2.2.3 3-2.7 1.3-1.3 2.7-3-.3-2.2 2-2.2-2-3 .3-1.3-2.7-2.7-1.3.3-3-2-2.2 2-2.2-.3-3 2.7-1.3L6.8 4l3 .3L12 2.4z"/><path d="M8.2 12.2l2.3 2.3 5.3-5.5" fill="none" stroke="#10150a" stroke-width="2"/></svg>
+          </div><div class="identity-meta">AI 合成演示 · 硬件实验室</div></div>
+        </section>
+        <div class="live-group"><div class="live-badge"><i class="live-dot"></i>直播中</div><div class="viewer"><span class="viewer-label">正在观看</span><span id="viewer-count" class="viewer-count">126,700</span></div></div>
+        <div class="disclosure"><span class="disclosure-mark">AI</span><span>AI 合成概念演示 · 非真实直播、代言或产品发布</span></div>
+      </header>
+
+      <aside class="action-rail">
+        <div class="action"><div class="action-button like"><svg viewBox="0 0 40 40"><path d="M20 33S6.5 25.2 6.5 15.8c0-4.8 3.6-8 8-8 2.9 0 4.8 1.5 5.5 3.2.8-1.7 2.7-3.2 5.6-3.2 4.3 0 7.9 3.2 7.9 8C33.5 25.2 20 33 20 33z"/></svg></div><span id="like-count" class="action-label">284.9K</span></div>
+        <div class="action"><div class="action-button"><svg viewBox="0 0 40 40"><path d="M15 14h-4.2A4.8 4.8 0 006 18.8v10.4a4.8 4.8 0 004.8 4.8h18.4a4.8 4.8 0 004.8-4.8V18.8a4.8 4.8 0 00-4.8-4.8H25"/><path d="M20 25V5m0 0l-7 7m7-7l7 7"/></svg></div><span class="action-label">分享</span></div>
+        <div class="action"><div class="action-button bag"><svg viewBox="0 0 40 40"><path d="M8 13h24l-2 22H10L8 13z"/><path d="M14 15V9a6 6 0 0112 0v6"/></svg></div><span class="action-label">展示中</span></div>
+        <div class="action"><div class="action-button"><svg viewBox="0 0 40 40"><path d="M7 16h26v19H7z"/><path d="M20 16v19M6 16h28V9H6z"/><path d="M20 9c-1.6-5.3-8.2-6.2-8.2-1.8 0 2.4 3.3 2.7 8.2 1.8zm0 0c1.6-5.3 8.2-6.2 8.2-1.8 0 2.4-3.3 2.7-8.2 1.8z"/></svg></div><span class="action-label">礼物</span></div>
+      </aside>
+
+      <section class="comments">
+        <article id="comment-hook" class="comment"><div class="avatar"><svg viewBox="0 0 54 54"><defs><linearGradient id="a1" x2="1" y2="1"><stop stop-color="#e15454"/><stop offset="1" stop-color="#6124a9"/></linearGradient></defs><rect width="54" height="54" fill="url(#a1)"/><path d="M8 35l10-17 9 10 6-7 13 18" fill="none" stroke="#fff" stroke-width="4"/><circle cx="38" cy="13" r="4" fill="#b7f52a"/></svg></div><div><div class="comment-user">tensor_tom</div><div class="comment-text">这张卡的结构很扎实</div></div></article>
+        <article id="comment-power" class="comment power"><div class="avatar"><svg viewBox="0 0 54 54"><rect width="54" height="54" fill="#18211c"/><circle cx="27" cy="27" r="18" fill="none" stroke="#b7f52a" stroke-width="3"/><path d="M29 8L18 29h9l-2 17 12-23h-9z" fill="#b7f52a"/></svg></div><div><div class="comment-user">watt_guard</div><div class="comment-text">显卡功耗这么高，电源真的够用吗？</div></div></article>
+        <article id="comment-rubin" class="comment"><div class="avatar"><svg viewBox="0 0 54 54"><rect width="54" height="54" fill="#2a2638"/><circle cx="27" cy="27" r="7" fill="#ff5a67"/><path d="M27 6c7 0 7 12 0 14-7-2-7-14 0-14zm21 21c0 7-12 7-14 0 2-7 14-7 14 0zM27 48c-7 0-7-12 0-14 7 2 7 14 0 14zM6 27c0-7 12-7 14 0-2 7-14 7-14 0z" fill="#d3d7ce"/></svg></div><div><div class="comment-user">thermal_lab</div><div class="comment-text">Rubin 散热设计是什么思路？</div></div></article>
+        <article id="comment-case" class="comment"><div class="avatar"><svg viewBox="0 0 54 54"><rect width="54" height="54" fill="#4d3020"/><path d="M13 12h28v30H13z" fill="none" stroke="#f2f3ed" stroke-width="3"/><circle cx="27" cy="27" r="9" fill="none" stroke="#ffb25a" stroke-width="3"/><path d="M27 18v18M18 27h18" stroke="#ffb25a" stroke-width="2"/></svg></div><div><div class="comment-user">small_case</div><div class="comment-text">别忘了机箱和线材空间</div></div></article>
+        <article id="comment-close" class="comment"><div class="avatar"><svg viewBox="0 0 54 54"><rect width="54" height="54" fill="#18211c"/><path d="M12 28l9 9 21-22" fill="none" stroke="#b7f52a" stroke-width="5" stroke-linecap="round"/></svg></div><div><div class="comment-user">frame_chaser</div><div class="comment-text">概念演示很清楚，等官方规格</div></div></article>
+      </section>
+
+      <section id="product-card" class="product-card" data-layout-allow-overflow><div class="product-visual"><span class="product-index">展示 / 01</span><div class="gpu-mini"></div></div><div class="product-copy"><span id="product-kicker" class="product-kicker">旗舰 GPU · 概念演示</span><h1 id="product-title" class="product-title">旗舰显卡</h1><p id="product-desc" class="product-desc">AI 合成概念展示。供电、散热与机箱适配请核对官方资料。</p><div class="product-foot"><span class="product-status">镜头展示</span><span class="product-code">无价格 · 非正式规格</span></div></div><div class="metal-sweep"></div></section>
+
+      <div class="heart-field" data-layout-ignore>
+        <svg class="float-heart h1" viewBox="0 0 64 64"><path d="M32 55C24 49 8 38 8 23c0-8 6-14 14-14 5 0 9 3 10 7 2-4 6-7 11-7 8 0 14 6 14 14 0 15-17 26-25 32z"/></svg>
+        <svg class="float-heart h2" viewBox="0 0 64 64"><path d="M32 55C24 49 8 38 8 23c0-8 6-14 14-14 5 0 9 3 10 7 2-4 6-7 11-7 8 0 14 6 14 14 0 15-17 26-25 32z"/></svg>
+        <svg class="float-heart h3" viewBox="0 0 64 64"><path d="M32 55C24 49 8 38 8 23c0-8 6-14 14-14 5 0 9 3 10 7 2-4 6-7 11-7 8 0 14 6 14 14 0 15-17 26-25 32z"/></svg>
+        <svg class="float-heart h4" viewBox="0 0 64 64"><path d="M32 55C24 49 8 38 8 23c0-8 6-14 14-14 5 0 9 3 10 7 2-4 6-7 11-7 8 0 14 6 14 14 0 15-17 26-25 32z"/></svg>
+        <svg class="float-heart h5" viewBox="0 0 64 64"><path d="M32 55C24 49 8 38 8 23c0-8 6-14 14-14 5 0 9 3 10 7 2-4 6-7 11-7 8 0 14 6 14 14 0 15-17 26-25 32z"/></svg>
+        <svg class="float-heart h6" viewBox="0 0 64 64"><path d="M32 55C24 49 8 38 8 23c0-8 6-14 14-14 5 0 9 3 10 7 2-4 6-7 11-7 8 0 14 6 14 14 0 15-17 26-25 32z"/></svg>
+      </div>
+
+      <div class="gift-stage" data-layout-ignore>
+        <div id="rocket" class="gift-rocket"><img src="assets/live_fx/rocket-premium-v1.png" alt="" /></div>
+        <div id="gift-banner" class="gift-banner" data-layout-allow-occlusion><div class="gift-emblem"><img src="assets/live_fx/crystal-gift-box-v1.png" alt="" /></div><div><div id="gift-user" class="gift-user">render_farm 送出</div><div id="gift-copy" class="gift-copy">星际火箭</div></div><div class="gift-multiplier">×1</div></div>
+        <i class="speed-line s1"></i><i class="speed-line s2"></i><i class="speed-line s3"></i>
+        <div id="sports-car" class="gift-car" data-layout-allow-occlusion><img src="assets/live_fx/sports-car-premium-v1.png" alt="" /><div class="car-gift-label">small_case 送出 <span class="concept-chip">霓虹跑车 ×1</span></div></div>
+        <div id="gift-impact" class="gift-impact"></div>
+        <i class="particle"></i><i class="particle"></i><i class="particle"></i><i class="particle"></i><i class="particle"></i><i class="particle"></i><i class="particle"></i><i class="particle"></i><i class="particle"></i><i class="particle"></i><i class="particle"></i><i class="particle"></i>
+        <div id="energy-ring" class="energy-ring"></div>
+      </div>
+
+      <div class="ar-stage" data-layout-ignore><div id="ar-glasses" class="ar-glasses"><svg viewBox="0 0 310 118"><defs><linearGradient id="lensTint" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#121717"/><stop offset=".62" stop-color="#355348"/><stop offset="1" stop-color="#b7f52a" stop-opacity=".54"/></linearGradient></defs><path class="glasses-arm" d="M10 28L0 16M300 28l10-12"/><path class="lens" d="M13 28h122v42c0 27-20 40-55 40-38 0-57-19-60-51z"/><path class="lens" d="M175 28h122l-7 31c-3 32-22 51-60 51-35 0-55-13-55-40z"/><path d="M135 45c14-8 26-8 40 0" fill="none" stroke="#0a0d0c" stroke-width="12"/></svg></div><span id="ar-tag" class="ar-tag">AR 试戴 · 代码图层</span></div>
+
+      <footer class="composer"><div class="input-shell"><svg viewBox="0 0 32 32"><path d="M6 8h20v13H14l-6 5v-5H6z"/></svg><span class="input-placeholder">说点关于这场 AI 演示的想法…</span></div><div class="composer-button"><svg viewBox="0 0 36 36"><path d="M18 30S6 23 6 14.5C6 10 9.3 7 13.3 7c2.5 0 4 1.3 4.7 2.8C18.7 8.3 20.2 7 22.7 7 26.7 7 30 10 30 14.5 30 23 18 30 18 30z"/></svg></div><div class="composer-button"><svg viewBox="0 0 36 36"><path d="M7 14h22v17H7zM18 14v17M6 14h24V8H6z"/><path d="M18 8c-1-5-7-5-7-1 0 2 3 2 7 1zm0 0c1-5 7-5 7-1 0 2-3 2-7 1z"/></svg></div></footer>
+    </div>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      const { layerMode = "review" } = window.__hyperframes?.getVariables?.() || {};
+      if (layerMode !== "review") {
+        document.querySelectorAll("#qa-camera, .camera-grade").forEach((node) => { node.style.display = "none"; });
+      }
+      if (layerMode === "ui") {
+        document.querySelectorAll(".heart-field, .gift-stage").forEach((node) => { node.style.display = "none"; });
+      }
+      if (layerMode === "vfx") {
+        document.querySelectorAll(".top-frame, .action-rail, .comments, .product-card, .composer, .grain, .scanline").forEach((node) => { node.style.display = "none"; });
+      }
+      const tl = gsap.timeline({ paused: true });
+      const viewerState = { value: 126700 };
+      const likeState = { value: 284900 };
+      const formatViewer = (n) => Math.round(n).toLocaleString("en-US");
+      const formatLike = (n) => (n / 1000).toFixed(1) + "K";
+
+      // Fixed UI is already visible at frame zero and never changes geometry.
+      gsap.set(["#comment-hook", "#comment-power", "#comment-rubin", "#comment-case", "#comment-close", "#product-card", "#rocket", "#gift-banner", "#sports-car", "#gift-impact", "#energy-ring", ".speed-line", "#ar-glasses", "#ar-tag", ".float-heart", ".particle"], { opacity: 0 });
+      tl.to(viewerState, { value: 127800, duration: 1.2, ease: "power2.inOut", onUpdate: () => { document.querySelector("#viewer-count").textContent = formatViewer(viewerState.value); } }, 8.0);
+      tl.to(likeState, { value: 288400, duration: 1.2, ease: "power2.inOut", onUpdate: () => { document.querySelector("#like-count").textContent = formatLike(likeState.value); } }, 8.0);
+      tl.to(viewerState, { value: 129100, duration: 1.2, ease: "power2.inOut", onUpdate: () => { document.querySelector("#viewer-count").textContent = formatViewer(viewerState.value); } }, 20.0);
+      tl.to(likeState, { value: 293800, duration: 1.2, ease: "power2.inOut", onUpdate: () => { document.querySelector("#like-count").textContent = formatLike(likeState.value); } }, 20.0);
+      const enterComment = (selector, at) => {
+        tl.set(selector, { opacity: 1, x: -28, y: 30, scale: .96 }, at);
+        tl.to(selector, { x: 0, y: 0, scale: 1, duration: .34, ease: "power4.out" }, at);
+      };
+      const liftComment = (selector, at) => {
+        tl.to(selector, { y: -10, duration: .05, ease: "power3.in" }, at);
+        tl.to(selector, { y: -78, duration: .06, ease: "none" }, at + .051);
+        tl.to(selector, { y: -108, duration: .15, ease: "power4.out" }, at + .112);
+      };
+      const retireComment = (selector, at) => tl.to(selector, { y: -122, opacity: 0, scale: .97, duration: .28, ease: "power3.in" }, at);
+      enterComment("#comment-hook", 1.3);
+      liftComment("#comment-hook", 6.6); enterComment("#comment-power", 6.88); retireComment("#comment-hook", 10.4);
+      liftComment("#comment-power", 14.8); enterComment("#comment-rubin", 15.08); retireComment("#comment-power", 18.9);
+      liftComment("#comment-rubin", 21.2); enterComment("#comment-case", 21.48); retireComment("#comment-rubin", 24.0);
+      liftComment("#comment-case", 26.0); enterComment("#comment-close", 26.28); retireComment("#comment-case", 28.4); retireComment("#comment-close", 29.35);
+      tl.fromTo("#product-card", { x: 86, opacity: 0 }, { x: 0, opacity: 1, duration: .55, ease: "expo.out" }, 12.0).to("#product-card", { x: 66, opacity: 0, duration: .4, ease: "power3.in" }, 17.6);
+      tl.set("#product-kicker", { textContent: "whole-system · validation list" }, 23.98).set("#product-title", { textContent: "整机清单" }, 23.98).set("#product-desc", { textContent: "供电 · 散热 · 线材 · 空间；真实规格请核对官方资料。" }, 23.98);
+      tl.fromTo("#product-card", { x: 86, opacity: 0 }, { x: 0, opacity: 1, duration: .5, ease: "expo.out" }, 24.0).to("#product-card", { x: 66, opacity: 0, duration: .38, ease: "power3.in" }, 27.82);
+      tl.to(".metal-sweep", { x: 616, duration: 1.0, ease: "sine.inOut" }, 12.35).to(".metal-sweep", { x: 1232, duration: 1.0, ease: "sine.inOut" }, 24.35);
+
+      const heartPaths = [
+        { s: ".h1", x: 922, y: 1412, dx: -92, dy: -530, r: -14, sc: .72 },
+        { s: ".h2", x: 963, y: 1478, dx: 28, dy: -630, r: 19, sc: .48 },
+        { s: ".h3", x: 899, y: 1519, dx: -126, dy: -420, r: -26, sc: .58 },
+        { s: ".h4", x: 976, y: 1562, dx: -34, dy: -710, r: 31, sc: .83 },
+        { s: ".h5", x: 934, y: 1491, dx: 67, dy: -475, r: 11, sc: .43 },
+        { s: ".h6", x: 978, y: 1439, dx: -76, dy: -592, r: -9, sc: .64 }
+      ];
+      const addHearts = (start) => heartPaths.forEach((h, i) => {
+        tl.fromTo(h.s, { x: h.x, y: h.y, opacity: 0, scale: .25, rotation: 0 }, { x: h.x + h.dx, y: h.y + h.dy, opacity: .96, scale: h.sc, rotation: h.r, duration: 1.45 + i * .09, ease: "power2.out" }, start + i * .11);
+        tl.to(h.s, { opacity: 0, scale: h.sc * .76, duration: .35, ease: "power2.in" }, start + 1.85 + i * .03);
+      });
+      addHearts(9.4);
+      addHearts(27.0);
+      addHearts(56.0);
+
+      const particleVectors = [
+        [-310,-190],[-230,-280],[-118,-340],[20,-365],[146,-318],[248,-226],
+        [306,-92],[284,52],[198,148],[72,188],[-62,176],[-205,94]
+      ];
+      const burstParticles = (start) => document.querySelectorAll(".particle").forEach((node, index) => {
+        const [dx, dy] = particleVectors[index];
+        tl.fromTo(node, { x: 0, y: 0, scale: 0, rotation: index * 17, opacity: 0 }, { x: dx, y: dy, scale: 1, rotation: index * 43, opacity: .95, duration: .62, ease: "power3.out" }, start + index * .012);
+        tl.to(node, { x: dx * 1.18, y: dy * 1.22 + 70, scale: .25, opacity: 0, duration: .42, ease: "power2.in" }, start + .62 + index * .012);
+      });
+      const animateRocket = (start) => {
+        tl.fromTo("#rocket", { x: -280, y: 260, rotation: -18, scale: .35, opacity: 0 }, { x: -230, y: 230, rotation: -12, scale: .7, opacity: 1, duration: .16, ease: "power2.in" }, start);
+        tl.to("#rocket", { x: -190, y: 180, rotation: -8, scale: 1.08, duration: .22, ease: "back.out(2.2)" }, start + .16);
+        tl.to("#rocket", { x: 520, y: -730, rotation: 9, scale: .96, duration: .9, ease: "power3.inOut" }, start + .38);
+        tl.to("#rocket", { x: 610, y: -840, rotation: 11, scale: 1.02, duration: .72, ease: "power2.out" }, start + 1.28);
+        tl.to("#rocket", { x: 760, y: -1020, scale: .84, opacity: 0, duration: .34, ease: "power3.in" }, start + 2.0);
+        tl.fromTo("#gift-banner", { x: -70, scale: .82, opacity: 0 }, { x: 0, scale: 1, opacity: 1, duration: .32, ease: "back.out(1.8)" }, start + .24);
+        tl.to("#gift-banner", { y: -12, scale: .96, opacity: 0, duration: .3, ease: "power2.in" }, start + 2.02);
+        burstParticles(start + .18);
+      };
+      const animateCar = (start) => {
+        tl.fromTo("#sports-car", { x: -930, y: 120, rotation: -4, scale: .55, opacity: 0 }, { x: -760, y: 80, rotation: -2, scale: .72, opacity: 1, duration: .14, ease: "power2.in" }, start);
+        tl.to("#sports-car", { x: -570, y: 30, rotation: 1, scale: 1.1, duration: .24, ease: "back.out(2.4)" }, start + .14);
+        tl.to("#sports-car", { x: 70, y: 0, rotation: 0, scale: 1.02, duration: .82, ease: "power4.out" }, start + .38);
+        tl.to("#sports-car", { x: 110, y: -8, scale: 1, duration: .78, ease: "power2.out" }, start + 1.2);
+        tl.to("#sports-car", { x: 970, y: -30, scale: .92, opacity: 0, duration: .339, ease: "power3.in" }, start + 1.981);
+        tl.fromTo("#gift-impact", { scale: .22, opacity: 0 }, { scale: 1, opacity: .82, duration: .24, ease: "back.out(1.8)" }, start + .22);
+        tl.to("#gift-impact", { scale: 1.58, opacity: 0, duration: .52, ease: "power2.out" }, start + .46);
+        tl.fromTo(".speed-line", { x: -360, opacity: 0 }, { x: 690, opacity: .88, duration: .72, stagger: .045, ease: "power3.out" }, start + .12);
+        tl.to(".speed-line", { x: 960, opacity: 0, duration: .34, stagger: .025, ease: "power2.in" }, start + .92);
+        burstParticles(start + .26);
+      };
+      animateRocket(16.8);
+      animateCar(21.4);
+      tl.fromTo("#ar-glasses", { opacity: 0, scale: .72, y: -8 }, { opacity: 1, scale: 1, y: 0, duration: .34, ease: "back.out(1.25)" }, 22.8).to("#ar-glasses", { opacity: 0, scale: .92, duration: .28, ease: "power2.in" }, 25.92);
+      tl.fromTo("#ar-tag", { opacity: 0, x: 18 }, { opacity: 1, x: 0, duration: .3, ease: "power3.out" }, 22.98).to("#ar-tag", { opacity: 0, duration: .22 }, 25.9);
+      tl.set("#comment-hook", { opacity: 0, x: 0, y: 0, scale: 1 }, 29.45).set("#comment-hook .comment-user", { textContent: "cable_check" }, 29.45).set("#comment-hook .comment-text", { textContent: "线材怎么走才更稳？" }, 29.45);
+      tl.set("#comment-power", { opacity: 0, x: 0, y: 0, scale: 1 }, 37.05).set("#comment-power .comment-user", { textContent: "airflow_map" }, 37.05).set("#comment-power .comment-text", { textContent: "机箱风道要怎么配？" }, 37.05);
+      tl.set("#comment-rubin", { opacity: 0, x: 0, y: 0, scale: 1 }, 44.65).set("#comment-rubin .comment-user", { textContent: "small_case" }, 44.65).set("#comment-rubin .comment-text", { textContent: "小机箱放得下吗？" }, 44.65);
+      tl.set("#comment-case", { opacity: 0, x: 0, y: 0, scale: 1 }, 53.25).set("#comment-case .comment-user", { textContent: "frame_chaser" }, 53.25).set("#comment-case .comment-text", { textContent: "整机清单很实用" }, 53.25);
+      enterComment("#comment-hook", 29.6);
+      liftComment("#comment-hook", 37.2); enterComment("#comment-power", 37.48); retireComment("#comment-hook", 41.2);
+      liftComment("#comment-power", 44.8); enterComment("#comment-rubin", 45.08); retireComment("#comment-power", 48.8);
+      liftComment("#comment-rubin", 53.5); enterComment("#comment-case", 53.78); retireComment("#comment-rubin", 57.1); retireComment("#comment-case", 58.3);
+      tl.set("#product-kicker", { textContent: "connector · cable · headroom" }, 31.95).set("#product-title", { textContent: "连接检查" }, 31.95).set("#product-desc", { textContent: "接口插到底 · 线材弯折 · 供电余量；按官方规范逐项确认。" }, 31.95);
+      tl.fromTo("#product-card", { x: 86, opacity: 0 }, { x: 0, opacity: 1, duration: .5, ease: "expo.out" }, 32.0).to("#product-card", { x: 66, opacity: 0, duration: .38, ease: "power3.in" }, 36.45);
+      tl.fromTo("#energy-ring", { opacity: 0, scale: .35, rotation: -55 }, { opacity: .92, scale: 1, rotation: 0, duration: .5, ease: "back.out(1.2)" }, 34.0).to("#energy-ring", { opacity: 0, scale: 1.35, duration: .55, ease: "power3.in" }, 35.45);
+      animateRocket(41.0);
+      tl.set("#product-kicker", { textContent: "length · width · side panel" }, 46.95).set("#product-title", { textContent: "机箱适配" }, 46.95).set("#product-desc", { textContent: "长度 · 厚度 · 侧板距离 · 线材转弯空间；装机前实际测量。" }, 46.95);
+      tl.fromTo("#product-card", { x: 86, opacity: 0 }, { x: 0, opacity: 1, duration: .5, ease: "expo.out" }, 47.0).to("#product-card", { x: 66, opacity: 0, duration: .38, ease: "power3.in" }, 51.45);
+      animateCar(48.6);
+      tl.fromTo("#ar-glasses", { opacity: 0, scale: .72, y: -8 }, { opacity: 1, scale: 1, y: 0, duration: .34, ease: "back.out(1.25)" }, 54.0).to("#ar-glasses", { opacity: 0, scale: .92, duration: .28, ease: "power2.in" }, 56.72);
+      tl.fromTo("#ar-tag", { opacity: 0, x: 18 }, { opacity: 1, x: 0, duration: .3, ease: "power3.out" }, 54.15).to("#ar-tag", { opacity: 0, duration: .22 }, 56.7);
+      tl.to(viewerState, { value: 134800, duration: 1.2, ease: "power2.inOut", onUpdate: () => { document.querySelector("#viewer-count").textContent = formatViewer(viewerState.value); } }, 54.0);
+      tl.to(likeState, { value: 318600, duration: 1.2, ease: "power2.inOut", onUpdate: () => { document.querySelector("#like-count").textContent = formatLike(likeState.value); } }, 54.0);
+      tl.to(".camera-grade", { opacity: .82, duration: 59.5, ease: "none" }, .2);
+      tl.to(".scanline", { y: 1340, duration: 59.2, ease: "none" }, .3);
+      tl.to(".live-dot", { scale: 1.45, opacity: .54, duration: .75, repeat: 78, yoyo: true, ease: "sine.inOut" }, .25);
+
+      window.__timelines["jensen-rubin-live-60s-v2-audio-fx"] = tl;
+    </script>
+  </body>
+</html>

@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VisualAgent Agent Harness — 交互式讲解</title>
+    <script src="vendor/hyperframes-player.global.js"></script>
+    <script src="vendor/hyperframes-slideshow.global.js"></script>
+    <style>
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      html, body { width: 100%; height: 100%; overflow: hidden; background: #1e251f; }
+      hyperframes-slideshow { display: block; position: relative; width: 100vw; height: 100vh; }
+      hyperframes-player { position: absolute; inset: 0; }
+    </style>
+  </head>
+  <body>
+    <hyperframes-slideshow tabindex="0" notes-storage-key="visualagent-agent-harness-v1">
+      <hyperframes-player interactive src="composition/index.html"></hyperframes-player>
+      <script type="application/hyperframes-slideshow+json">
+        {
+          "slides": [
+            {"sceneId":"s01-cover","notes":"开场只讲一句：我们不是在做模型调用封装，而是在做可审计的数据生产系统。"},
+            {"sceneId":"s02-why","notes":"左边是一次性脚本：快，但无法稳定回答成本、失败、重试、数据是否可用。右边是 harness：每一步都有边界和证据。"},
+            {"sceneId":"s03-pipeline","notes":"按四次 Next 逐层展开。强调 Runner 是唯一执行循环，Agent 不直接碰 provider。点击右下区域可进入仓库职责分支。","fragments":[14.2,14.5,14.8,15.1],"hotspots":[{"id":"repo-map","label":"查看仓库职责映射","target":"repo-deep-dive","region":{"x":70,"y":72,"w":22,"h":13}}]},
+            {"sceneId":"s04-task","notes":"Task 是不可变合同：objective、inputs、constraints、metadata。付费预算属于 constraints，不属于口头默契。"},
+            {"sceneId":"s05-agent","notes":"当前主力是 ScriptedAgent，适合可复现生产；LLMAgent 只是明确的策略扩展点。Agent 只返回 AgentAction。"},
+            {"sceneId":"s06-runner","notes":"Runner 创建 RunState、驱动 next_action、执行工具、写 Observation、判断恢复/停止、最后调用 Evaluator 和 Recorder。"},
+            {"sceneId":"s07-tool-model","notes":"Tool 是 Agent 可见的窄接口；Model 是 provider protocol adapter。这个分离让预算、输出路径和安全策略可以在工具层统一约束。"},
+            {"sceneId":"s08-evidence","notes":"Observation 是当步事实；Trajectory 是只追加证据。Prompt 只保存 hash 和字符数，secret/token/base URL 被替换，临时 URL 从错误文本中移除。"},
+            {"sceneId":"s09-evaluator","notes":"技术通过不等于训练可用。CompositeEvaluator 聚合多个 gate；human review 是独立第三层。三层未齐，training_eligible 必须保持 false。"},
+            {"sceneId":"s10-timeline","notes":"Timeline 是直播生产唯一标准时钟。继续按 Next 查看 camera/speech、comments/UI、VFX/AR 三组轨道。因果关系用 responds_to 和 caused_by 表达。","fragments":[63.2,63.5,63.8]},
+            {"sceneId":"s11-ownership","notes":"模型负责人、商品、物理布景、光线和动作；Code/HyperFrames 负责所有可读 UI。这个边界既提高可读性，也让 UI 修复无需重跑 Kling。"},
+            {"sceneId":"s12-case","notes":"案例执行：参考状态先过审；Kling 只生成相邻状态之间的 camera segment；代码 trim/assemble 保音轨；HyperFrames 再叠加 UI/VFX/AR。"},
+            {"sceneId":"s13-budget","notes":"Runner 在进入 paid tool 前消耗 attempt。一次 terminal failure 结束当前 attempt；明确重试必须新 Task、新 output、新 trajectory，并记录 retry_of_run。"},
+            {"sceneId":"s14-studio","notes":"Asset Studio 是 canonical artifact 的只读 projection。它帮助人审阅，但 local note 不能直接变成 approval，网页状态也不能反写事实源。"},
+            {"sceneId":"s15-flywheel","notes":"结尾：边界清楚、证据完整、门禁独立，才能把一次 case 变成批量数据飞轮。邀请团队用同一 harness 扩展新的 task、tool、model 和 evaluator。"}
+          ],
+          "slideSequences": [
+            {"id":"repo-deep-dive","label":"仓库职责映射","slides":[{"sceneId":"branch-repo","notes":"逐项说明目录边界：core 只拥有 loop；models 只适配 provider；tools 只暴露有界 action；trajectory 只追加；evaluators 只判断。按 Back 返回主线。"}]}
+          ]
+        }
+      </script>
+    </hyperframes-slideshow>
+  </body>
+</html>

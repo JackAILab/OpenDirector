@@ -1,0 +1,8 @@
+{
+  "name": "visualagent-pilot-ads-15s-v1",
+  "private": true,
+  "scripts": {
+    "check": "npx hyperframes check",
+    "preview": "npx hyperframes preview --background"
+  }
+}

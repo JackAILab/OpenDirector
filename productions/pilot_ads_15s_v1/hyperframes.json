@@ -1,0 +1,13 @@
+{
+  "compositions": [
+    {
+      "id": "visualagent-pilot-ad-15s",
+      "name": "VisualAgent Pilot Ad 15s",
+      "entry": "index.html",
+      "width": 1080,
+      "height": 1920,
+      "duration": 15,
+      "fps": 30
+    }
+  ]
+}

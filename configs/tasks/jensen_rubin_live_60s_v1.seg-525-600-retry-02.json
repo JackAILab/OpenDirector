@@ -1,0 +1,31 @@
+{
+  "schema": "visualagent.camera-segment-batch.v1",
+  "case_id": "jensen_rubin_live_60s_v1",
+  "timeline": "data/tasks/jensen_rubin_live_60s_v1.timeline.json",
+  "model": "kling-video-v3_0_omni",
+  "source_duration_seconds": 8,
+  "assembled_duration_seconds": 7.5,
+  "aspect_ratio": "9:16",
+  "resolution": "1080p",
+  "format_contract": {
+    "orientation": "portrait",
+    "aspect_ratio": "9:16",
+    "expected_width": 1080,
+    "expected_height": 1920,
+    "preview_fit": "contain"
+  },
+  "enable_audio": true,
+  "prefer_multi_shots": false,
+  "segments": [
+    {
+      "id": "seg_525_600_retry_02",
+      "attempt": 2,
+      "retry_of_run": "855486a238914dd1a0a8230fab254083",
+      "start": 52.5,
+      "end": 60.0,
+      "first": "outputs/artifacts/jensen_rubin_live_60s_v1/camera_references/state-525-clearance-v1-technical-v2.png",
+      "tail": "outputs/artifacts/jensen_rubin_live_60s_v1/camera_references/state-600-summary-v1-technical-v2.png",
+      "prompt": "图像1是第52.5秒，图像2是第60秒。保持同一男性主播、服装、双风扇显卡、丰富物理直播棚和9:16固定机位。人物结束机箱空间检查后回到画面中央，把显卡转为竖直胸前展示，长边平行画面竖轴、双风扇上下可见，直视镜头并用空闲手做开放掌收尾。使用相同的普通成熟中文男声，不模仿任何真实人物，清楚说：最后按官方规格逐项核对，再决定整机方案。今天的内容只是AI概念演示，我们下次继续。连续单镜头，无切镜。不要生成文字、UI、弹幕、购物车、礼物、眼镜、logo或水印；保持脸部、五指、手腕和商品几何稳定。"
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+const {clickEditorControl}=require('./editor_controls.cjs');
+// EDIT_RETAKE_FIXTURE=1 EDIT_ACCEPTANCE_PORT=30132 python3 tests/browser/edit_suggestions_server.py
+// Real source/candidate media, fixed provider output; zero external generation calls.
+const {chromium}=require('playwright'),fs=require('fs'),assert=require('assert/strict');
+(async()=>{const origin='http://127.0.0.1:30132',browser=await chromium.launch({channel:'chromium',headless:true,args:['--no-sandbox']});try{
+ const p=await browser.newPage({viewport:{width:1512,height:982}}),errors=[];p.on('pageerror',e=>errors.push(e.message));
+ const headers={Authorization:'Bearer fixture'},identity=await(await p.request.get(origin+'/acceptance/identity')).json();assert.equal(identity.fixture,'edit-retake-fixed-provider');
+ const evidence='outputs/creative_ui/20261016_retake_comparison';fs.mkdirSync(evidence,{recursive:true});fs.rmSync(evidence+'/verification.json',{force:true});
+ await p.addInitScript(()=>sessionStorage.setItem('h3_api_key','fixture'));
+ const project=await(await p.request.post(origin+'/creative/api/projects',{headers,data:{message:'重拍候选验收',duration:15}})).json(),api=origin+'/creative/api/projects/'+project.id+'/edit';
+ await p.goto(origin+'/creative/editor?project='+project.id);await p.waitForFunction(()=>document.getElementById('status').textContent.includes('项目已载入'));
+ await clickEditorControl(p,'editorMediaToggle');await p.locator('#uploadVideo').click();await p.locator('#file').setInputFiles(identity.fixtures+'/red.mp4');await p.waitForFunction(()=>document.getElementById('status').textContent.includes('素材已导入'),{},{timeout:60000});await p.getByText('＋ 画面',{exact:true}).click();await clickEditorControl(p,'save');await p.waitForFunction(()=>document.getElementById('status').textContent==='剪辑已保存');
+ let doc=await(await p.request.get(api,{headers})).json();const source=doc.spec.clips[0].source;
+ doc.spec.clips=[{source,start:0,end:3,gain:.4,transition:{kind:'dissolve',duration:.4}},{source,start:0,end:3,gain:.8}];
+ doc.spec.captions=[{start:.5,end:1.8,text:'Hello jacket.',word_highlight:true,words:[{text:'Hello',start:0,end:.4},{text:' jacket.',start:.6,end:1.1}]}];
+ doc.spec.audio=[{source,start:0,end:2,at:3,gain:.3}];
+ assert.equal((await p.request.put(api,{headers,data:{revision:doc.revision,spec:doc.spec}})).status(),200);
+ await p.reload();await p.waitForFunction(()=>document.getElementById('status').textContent.includes('项目已载入'));doc=await(await p.request.get(api,{headers})).json();const before=structuredClone(doc.spec);
+ await p.locator('#retake').click();await p.locator('#retakeIntent').fill('让背景光更暖，保留衣服细节和人物动作。');await p.locator('#retakePrepare').click();await p.waitForFunction(()=>!document.getElementById('retakeGenerate').hidden&&!document.getElementById('retakeGenerate').disabled,{},{timeout:60000});
+ assert((await p.locator('#retakeQuote').textContent()).includes('4 积分'));
+ assert.equal((await(await p.request.get(origin+'/acceptance/identity')).json()).retake_calls,identity.retake_calls);
+ const prepared=await p.evaluate(()=>structuredClone(RetakeUI.job));const route=api+'/retakes/'+prepared.id;
+ assert.equal((await p.request.get(route+'/input',{headers:{Authorization:'Bearer other'}})).status(),404);
+ await p.screenshot({path:evidence+'/retake-ready.png'});
+ await p.locator('#retakeGenerate').click();await p.waitForFunction(()=>!document.getElementById('retakeApply').hidden&&!document.getElementById('retakeApply').disabled,{},{timeout:60000});
+ const completed=await(await p.request.get(route,{headers})).json();assert.equal(completed.state,'completed');assert.equal(completed.qa.semantic,'pending');
+ assert.deepEqual((await(await p.request.get(api,{headers})).json()).spec,before);
+ assert.equal((await p.request.post(route+'/generate',{headers,data:{revision:prepared.revision,quote_digest:prepared.quote_digest,approved_credits:4}})).status(),200);
+ assert.equal((await(await p.request.get(origin+'/acceptance/identity')).json()).retake_calls,identity.retake_calls+1);
+ await p.waitForFunction(()=>RetakeUI.compareReady);assert(await p.locator('#retakeOriginal').evaluate(v=>v.muted&&!v.controls));assert(await p.locator('#retakeCandidate').evaluate(v=>!v.controls&&!v.muted));
+ const snapshot=await(await p.request.get(api,{headers})).json(),generationCalls=(await(await p.request.get(origin+'/acceptance/identity')).json()).retake_calls;
+ await p.locator('#retakeComparePlay').click();await p.waitForFunction(()=>RetakeUI.comparePlaying&&document.getElementById('retakeCandidate').currentTime>.35);await p.locator('#retakeOriginal').evaluate(v=>{Object.defineProperty(v,'readyState',{configurable:true,value:2});v.dispatchEvent(new Event('waiting'));delete v.readyState});assert.equal(await p.evaluate(()=>RetakeUI.comparePlaying),false);assert.match(await p.locator('#retakeStatus').innerText(),/缓冲/);assert(await p.locator('#retakeOriginal').evaluate(v=>v.paused));assert(await p.locator('#retakeCandidate').evaluate(v=>v.paused));assert(await p.evaluate(()=>Math.abs(document.getElementById('retakeOriginal').currentTime-document.getElementById('retakeCandidate').currentTime)<.1));
+ await p.locator('#retakeCompareSeek').fill('1.24');await p.waitForFunction(()=>['retakeOriginal','retakeCandidate'].every(id=>!document.getElementById(id).seeking&&Math.abs(document.getElementById(id).currentTime-1.24)<.03));assert.match(await p.locator('#retakeCompareClock').innerText(),/1.24/);await p.screenshot({path:evidence+'/comparison.png'});
+ await p.locator('#retakeCompareAudio').click();assert(await p.locator('#retakeCandidate').evaluate(v=>v.muted));assert.equal(await p.locator('#retakeCompareAudio').getAttribute('aria-pressed'),'false');await p.locator('#retakeCompareAudio').click();assert(await p.locator('#retakeCandidate').evaluate(v=>!v.muted));
+ await p.locator('#retakeCompareSeek').fill('2.9');await p.locator('#retakeComparePlay').click();await p.waitForFunction(()=>!RetakeUI.comparePlaying&&document.getElementById('retakeCandidate').currentTime>2.9);assert(await p.locator('#retakeOriginal').evaluate(v=>v.paused));await p.locator('#retakeComparePlay').click();await p.waitForFunction(()=>RetakeUI.comparePlaying&&document.getElementById('retakeCandidate').currentTime>.1&&document.getElementById('retakeCandidate').currentTime<1);
+ await p.locator('#closeRetake').click();assert(await p.locator('#retakeOriginal').evaluate(v=>v.paused));assert(await p.locator('#retakeCandidate').evaluate(v=>v.paused));await p.locator('#retake').click();assert.equal(await p.evaluate(()=>RetakeUI.comparePlaying),false);
+ await p.setViewportSize({width:390,height:844});await p.locator('#retakeComparePlay').scrollIntoViewIfNeeded();assert(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));await p.screenshot({path:evidence+'/mobile.png'});
+ await p.locator('#retakeHistory').selectOption('');assert(await p.locator('#retakeCompareControls').isHidden());await p.locator('#retakeHistory').selectOption(prepared.id);await p.waitForFunction(()=>RetakeUI.compareReady);assert.equal(await p.evaluate(()=>RetakeUI.comparePlaying),false);
+ assert.deepEqual((await(await p.request.get(api,{headers})).json()),snapshot);assert.equal((await(await p.request.get(origin+'/acceptance/identity')).json()).retake_calls,generationCalls);assert.deepEqual(errors,[]);
+ fs.writeFileSync(evidence+'/verification.json',JSON.stringify({passed:true,fixture:true,shared_playback:true,shared_seek:true,muted_input_single_candidate_audio:true,mute_toggle:true,end_stop_and_restart:true,buffering_pauses_both:true,close_pauses_both:true,history_reload:true,mobile:true,comparison_does_not_change_edit:true,external_paid_calls:0,fixed_provider_submissions:generationCalls,errors},null,2));console.log('PASS fixed candidate paired playback/seek/audio/end/reopen/mobile; comparison leaves edit unchanged');
+}finally{await browser.close()}})().catch(e=>{console.error(e);process.exit(1)});

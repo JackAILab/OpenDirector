@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "dataset": "JackAILab/AdvertiseAgent_Assests",
+  "bundles": [
+    {
+      "name": "showcase",
+      "file": "releases/2026-10-17/showcase-assets.tar.gz",
+      "bytes": 339360918,
+      "sha256": "2dd5269d6ca6e0437ac6155c0c82758d16448a5530b9da7b7cc5c473184aa97d",
+      "target": "."
+    }
+  ],
+  "revision": "7562085e88bd76b3e72d2fda9d6191b565521d2f"
+}

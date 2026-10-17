@@ -1,0 +1,19 @@
+// Run canvas_lineage_server.py locally first. The provider is a fixed pixel stub.
+const {chromium}=require('playwright'),assert=require('assert/strict');
+(async()=>{const browser=await chromium.launch({headless:true,args:['--no-sandbox']});try{
+ const page=await browser.newPage({viewport:{width:1512,height:982}}),base='http://127.0.0.1:30129',errors=[];page.on('pageerror',e=>errors.push(e.message));
+ const request=async(path,method='GET',data)=>{const r=await page.request.fetch(base+'/creative/api'+path,{method,headers:{Authorization:'Bearer fixture'},data});assert(r.ok(),await r.text());return r.json()};
+ const identity=await (await page.request.get(base+'/acceptance/identity')).json();assert.deepEqual(identity,{fixture:'canvas-lineage-fixed-pixels',paid_calls:false});
+ let p=await request('/projects','POST',{message:'图片变换像素观察验收',aspect:'16:9'}),path='/projects/'+p.id;
+ const sourcePng=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=','base64');const upload=await page.request.post(base+'/creative/api'+path+'/canvas/assets?kind=image&revision='+p.revision,{headers:{Authorization:'Bearer fixture'},data:sourcePng});assert(upload.ok());const uploaded=await upload.json();p=uploaded.project;const asset=uploaded.asset.id;
+ p=await request(path+'/canvas','PUT',{revision:p.revision,nodes:[{id:'source',asset,kind:'image',role:'product',label:'商品原图',text:'',x:40,y:30}],edges:[]});
+ const draftInput={revision:p.revision,asset,angle:'俯视特写',light:'暖色侧光'};const preview=await request(path+'/image-transforms/preview','POST',draftInput);const saved=await request(path+'/image-transforms/drafts','POST',{...draftInput,preview_hash:preview.preview_hash,confirm:'save'});const draft=saved.draft;
+ const generation={revision:saved.revision,model:'hunyuan-image-v2.0-general-edit',prompt:'像素观察：生成一张可见变化的固定测试图',references:[],source_asset:asset,connect_to_director:false,adjustments:{angle:draft.angle,light:draft.light},transform_draft_id:draft.id};
+ const reviewed=await request(path+'/images/preview','POST',generation);p=await request(path+'/images','POST',{...generation,request_id:'e'.repeat(32),approved_credits:1,input_hash:reviewed.input_hash});
+ for(let i=0;i<80;i++){p=await request(path);if(p.image_task.state!=='running')break;await new Promise(r=>setTimeout(r,75))}
+ assert.equal(p.image_task.state,'completed');const result=p.image_task.asset,observation=p.image_transform_drafts[draft.id].result_observation;assert.equal(observation.status,'changed_observed');assert.equal(observation.human_review_required,true);assert.equal(observation.training_eligible,false);assert.equal(p.canvas_lineage[result].transform_alignment.status,'changed_observed');
+ await page.addInitScript(()=>sessionStorage.setItem('h3_api_key','fixture'));await page.route('**/creative/api/model-status',r=>r.fulfill({json:{models:[]}}));await page.goto(base+'/creative?project='+p.id+'&view=canvas');await page.waitForSelector('.reference-node .node-image-controls',{state:'attached'});
+ const sourceNode=page.locator('.reference-node').first();await sourceNode.getByRole('button',{name:'编辑素材',exact:true}).click();await sourceNode.locator('.generation-options').evaluate(e=>e.open=true);await sourceNode.locator('.image-transforms').evaluate(e=>e.open=true);assert.match(await sourceNode.locator('.image-transform-status').textContent(),/像素变化已观察.*待人工核对/);
+ const taskObservations=await page.locator('.production-task-observations').textContent();assert.match(taskObservations,/图像处理[\s\S]*像素变化已观察[\s\S]*人工核对/);assert.doesNotMatch(taskObservations,/质量通过|自动通过/);
+ assert.deepEqual(errors,[]);console.log('PASS real API + browser: transform draft, generated result, pixel observation, canvas status, task-card projection and human-review boundary; fixed model stub only');
+ }finally{await browser.close()}})().catch(e=>{console.error(e);process.exit(1)});

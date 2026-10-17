@@ -1,0 +1,278 @@
+@font-face {
+  font-family: "Live CJK";
+  src: url("/assets/fonts/chinese-ui.ttf") format("truetype");
+  font-weight: 100 900;
+  font-style: normal;
+}
+
+:root {
+  --graphite: #0b0d0c;
+  --paper: #f5f3eb;
+  --mineral: #aab1a7;
+  --signal: #b7f52a;
+  --live: #ff5268;
+  --ink: #171a18;
+  --rail: #f6f5ef;
+  --glass: rgba(10, 12, 11, 0.72);
+  --hairline: rgba(245, 243, 235, 0.18);
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: transparent; }
+body { font-family: "Live CJK", "DejaVu Sans", sans-serif; }
+
+.composition {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  background: var(--graphite);
+  color: var(--paper);
+}
+.portrait { width: 1080px; height: 1920px; }
+.landscape { width: 1920px; height: 1080px; }
+
+.camera-video,
+.ambient-video {
+  position: absolute;
+  border: 0;
+  pointer-events: none;
+}
+.portrait .camera-video { inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -3; }
+.portrait .ambient-video { display: none; }
+.landscape .ambient-video { display: none; }
+.landscape .camera-video {
+  left: 416px; top: 0; width: 608px; height: 1080px; object-fit: contain; z-index: -3;
+  filter: saturate(.96) contrast(1.02); box-shadow: 0 0 120px rgba(0,0,0,.56);
+}
+.landscape::before {
+  content: ""; position: absolute; z-index: -5; left: 0; top: 0; width: 1440px; height: 1080px;
+  background:
+    radial-gradient(circle at 50% 44%, rgba(61,82,61,.6), transparent 35%),
+    linear-gradient(135deg, #151b17, #070908 58%, #182018);
+}
+
+.ui-root { position: absolute; inset: 0; }
+.video-grade {
+  position: absolute; inset: 0; z-index: -2; pointer-events: none;
+  background: linear-gradient(180deg, rgba(3,5,4,.34), transparent 27%, transparent 64%, rgba(3,5,4,.58));
+}
+.landscape .video-grade { right: 480px; background: linear-gradient(180deg, rgba(3,5,4,.38), transparent 24%, transparent 70%, rgba(3,5,4,.48)); }
+.video-grade::after {
+  content: ""; position: absolute; inset: 0; opacity: .14; mix-blend-mode: soft-light;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.76' numOctaves='2' stitchTiles='stitchTiles'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.24'/%3E%3C/svg%3E");
+}
+
+.topbar {
+  position: absolute; z-index: 18; display: flex; align-items: center;
+}
+.portrait .topbar { left: 36px; right: 36px; top: 42px; height: 92px; }
+.landscape .topbar { left: 34px; right: 512px; top: 28px; height: 70px; }
+.identity { display: flex; align-items: center; min-width: 0; }
+.avatar {
+  display: grid; place-items: center; flex: 0 0 auto; border-radius: 18px 8px 18px 18px;
+  background: radial-gradient(circle at 38% 34%, #ddd1bc 0 18%, #596056 19% 33%, #181d19 34% 100%);
+  border: 1px solid rgba(255,255,255,.34); color: var(--signal); font-weight: 900;
+}
+.portrait .avatar { width: 64px; height: 64px; font-size: 18px; }
+.landscape .avatar { width: 52px; height: 52px; font-size: 16px; }
+.identity-copy { margin-left: 13px; min-width: 0; text-shadow: 0 2px 10px #000; }
+.host-name { font-weight: 800; letter-spacing: -.02em; white-space: nowrap; }
+.portrait .host-name { font-size: 27px; }
+.landscape .host-name { font-size: 23px; }
+.host-meta { margin-top: 2px; color: #d0d4cb; font: 600 14px/1.2 "DejaVu Sans Mono", monospace; letter-spacing: .08em; text-transform: uppercase; }
+.live-pill {
+  margin-left: auto; display: flex; align-items: center; gap: 9px; padding: 12px 17px; border-radius: 10px 20px 20px 20px;
+  background: var(--live); color: #190506; font: 800 15px/1 "DejaVu Sans Mono", monospace; letter-spacing: .08em;
+  box-shadow: 0 12px 32px rgba(255,82,104,.25);
+}
+.live-pill i { width: 8px; height: 8px; border-radius: 50%; background: #fff; }
+.demo-pill {
+  margin-left: 10px; padding: 12px 15px; border-radius: 20px 8px 20px 20px;
+  background: rgba(10,12,11,.7); border: 1px solid var(--hairline); color: #e3e7dd;
+  font: 700 14px/1 "DejaVu Sans Mono", monospace; letter-spacing: .06em;
+  backdrop-filter: blur(18px);
+}
+
+.disclosure {
+  position: absolute; z-index: 18; display: flex; align-items: center; gap: 9px;
+  color: #edf0e8; background: rgba(10,12,11,.74); border: 1px solid rgba(183,245,42,.24);
+  backdrop-filter: blur(16px); box-shadow: 0 10px 28px rgba(0,0,0,.2);
+}
+.portrait .disclosure { left: 38px; top: 147px; padding: 10px 15px; border-radius: 8px 18px 18px 18px; font-size: 18px; }
+.landscape .disclosure { left: 34px; top: 112px; padding: 8px 13px; border-radius: 8px 16px 16px 16px; font-size: 15px; }
+.disclosure strong { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 8px 4px 8px 8px; color: var(--ink); background: var(--signal); font: 900 13px/1 "DejaVu Sans Mono", monospace; }
+
+.action-rail { position: absolute; z-index: 18; display: flex; flex-direction: column; align-items: center; }
+.portrait .action-rail { right: 34px; top: 655px; gap: 28px; }
+.landscape .action-rail { right: 507px; top: 304px; gap: 20px; }
+.action { display: flex; flex-direction: column; align-items: center; gap: 7px; }
+.action-button {
+  display: grid; place-items: center; border-radius: 24px 14px 24px 24px;
+  background: rgba(8,10,9,.72); border: 1px solid rgba(255,255,255,.2); backdrop-filter: blur(18px);
+  box-shadow: 0 14px 36px rgba(0,0,0,.28); color: var(--paper); font-weight: 800;
+}
+.portrait .action-button { width: 78px; height: 78px; font-size: 29px; }
+.landscape .action-button { width: 58px; height: 58px; font-size: 21px; }
+.action-label { padding: 3px 9px; border-radius: 9px; background: rgba(8,10,9,.84); color: #f2f3ed; font: 700 14px/1.3 "DejaVu Sans Mono", monospace; }
+
+.discussion-rail { display: none; }
+.landscape .discussion-rail {
+  display: block; position: absolute; z-index: 6; right: 0; top: 0; width: 480px; height: 1080px;
+  background: linear-gradient(180deg, rgba(250,249,245,.98), rgba(241,241,235,.98)); color: var(--ink);
+  border-left: 1px solid rgba(14,18,15,.12); box-shadow: -22px 0 60px rgba(0,0,0,.22);
+}
+.rail-head { position: absolute; left: 26px; right: 26px; top: 28px; height: 54px; display: flex; align-items: center; border-bottom: 1px solid rgba(20,24,21,.11); }
+.rail-head strong { font-size: 24px; letter-spacing: -.02em; }
+.rail-head span { margin-left: auto; color: #5d655d; font: 700 13px/1 "DejaVu Sans Mono", monospace; letter-spacing: .08em; }
+.system-note { position: absolute; left: 26px; right: 26px; top: 91px; padding: 12px 13px; border-radius: 10px; background: #e9ebe5; color: #5a6159; font-size: 15px; line-height: 1.42; }
+
+.comments { position: absolute; z-index: 10; pointer-events: none; overflow: hidden; }
+.portrait .comments { left: 34px; bottom: 196px; width: 700px; height: 455px; }
+.locale-en.portrait .comments { height: 600px; }
+.landscape .comments { right: 20px; bottom: 96px; width: 440px; height: 820px; color: var(--ink); }
+.comment {
+  position: absolute; left: 0; bottom: 30px; display: grid; align-items: center; transform-origin: left center;
+}
+.portrait .comment { grid-template-columns: 48px 1fr; column-gap: 10px; max-width: 680px; min-height: 66px; }
+.locale-en.portrait .comment { min-height: 140px; }
+.landscape .comment { grid-template-columns: 42px 1fr; column-gap: 11px; width: 418px; min-height: 66px; padding: 7px 8px; border-bottom: 1px solid rgba(20,24,21,.07); }
+.locale-en.landscape .comment { min-height: 112px; }
+.comment-avatar {
+  display: grid; place-items: center; align-self: center; border-radius: 50%; color: white;
+  background: linear-gradient(145deg, hsl(var(--avatar-hue) 52% 35%), hsl(calc(var(--avatar-hue) + 42) 58% 20%));
+  border: 1px solid rgba(255,255,255,.35); font: 800 14px/1 "DejaVu Sans Mono", monospace;
+}
+.portrait .comment-avatar { width: 44px; height: 44px; box-shadow: 0 4px 16px rgba(0,0,0,.34); }
+.landscape .comment-avatar { width: 38px; height: 38px; }
+.comment-line { min-width: 0; line-height: 1.28; }
+.portrait .comment-head { display: inline; }
+.locale-en.portrait .comment-head { display: block; min-height: 30px; }
+.locale-en.portrait .comment-text { display: block; margin-top: 7px; line-height: 1.36; }
+.landscape .comment-head { display: flex; align-items: center; min-height: 22px; }
+.comment-badge {
+  display: inline-flex; align-items: center; margin-right: 7px; padding: 2px 7px 3px; border-radius: 8px;
+  background: linear-gradient(100deg, #4d3fc7, #7b318f); color: white; font: 800 13px/1 "DejaVu Sans Mono", monospace;
+  vertical-align: 2px;
+}
+.comment-user { margin-right: 7px; color: #7de8ff; font-weight: 800; }
+.portrait .comment-user { font-size: 21px; text-shadow: 0 2px 10px #000; }
+.portrait .comment-text { color: white; font-size: 24px; font-weight: 570; text-shadow: 0 2px 11px #000, 0 0 3px #000; }
+.landscape .comment-user { display: inline-block; margin-bottom: 2px; color: #2e675b; font-size: 16px; }
+.landscape .comment-badge { float: none; margin-top: 2px; }
+.landscape .comment-text { display: block; margin-top: 2px; color: #282d29; font-size: 18px; line-height: 1.34; }
+
+.priority-card {
+  position: absolute; z-index: 12; overflow: hidden; border: 1px solid rgba(255,255,255,.2);
+  background: linear-gradient(120deg, rgba(12,15,13,.94), rgba(28,34,28,.86)); color: var(--paper);
+  backdrop-filter: blur(24px); box-shadow: 0 24px 70px rgba(0,0,0,.36);
+}
+.portrait .priority-card { left: 34px; bottom: 184px; width: 770px; min-height: 172px; padding: 22px 24px; border-radius: 20px 9px 24px 24px; }
+.landscape .priority-card { left: 34px; bottom: 36px; width: 500px; min-height: 142px; padding: 18px 20px; border-radius: 18px 8px 22px 22px; }
+.priority-card::before { content: ""; position: absolute; left: 0; top: 0; width: 8px; height: 100%; background: var(--signal); }
+.product-kicker { color: #dfff8c; font: 800 14px/1 "DejaVu Sans Mono", monospace; text-transform: uppercase; letter-spacing: .08em; }
+.product-title { margin-top: 9px; font-size: 29px; line-height: 1.08; font-weight: 900; letter-spacing: -.025em; }
+.landscape .product-title { font-size: 25px; }
+.product-copy { margin-top: 8px; max-width: 620px; color: #c9cec5; font-size: 18px; line-height: 1.42; }
+.landscape .product-copy { font-size: 16px; }
+.demo-chip { position: absolute; right: 18px; top: 17px; padding: 8px 11px; border-radius: 10px; color: var(--ink); background: var(--signal); font: 900 12px/1 "DejaVu Sans Mono", monospace; letter-spacing: .08em; }
+
+.gift-stage { position: absolute; inset: 0; z-index: 13; overflow: hidden; pointer-events: none; }
+.landscape .gift-stage { right: 480px; }
+.gift-hero { position: absolute; transform-origin: 52% 54%; will-change: transform, opacity; }
+.gift-hero img { width: 100%; height: 100%; object-fit: contain; }
+.portrait .gift-rocket { left: 80px; top: 1110px; width: 510px; height: 510px; }
+.landscape .gift-rocket { left: 125px; top: 602px; width: 360px; height: 360px; }
+.portrait .gift-car { left: 68px; top: 1228px; width: 820px; height: 548px; }
+.landscape .gift-car { left: 92px; top: 657px; width: 610px; height: 408px; }
+.gift-car::before {
+  content: ""; position: absolute; z-index: -1; left: 8%; right: 8%; bottom: 13%; height: 21%; border-radius: 50%;
+  background: rgba(255,68,126,.24); box-shadow: 0 0 62px 24px rgba(78,221,255,.14);
+}
+.gift-banner {
+  position: absolute; z-index: 16; display: grid; grid-template-columns: 58px minmax(0,1fr) auto; align-items: center; gap: 11px;
+  min-height: 80px; padding: 9px 17px 9px 9px; border-radius: 999px;
+  background: linear-gradient(105deg, rgba(33,18,34,.86), rgba(12,15,17,.82)); color: #fffaf3;
+  border: 1px solid rgba(255,213,236,.42); box-shadow: 0 16px 44px rgba(0,0,0,.3), inset 0 1px rgba(255,255,255,.16);
+  backdrop-filter: blur(22px) saturate(1.3); pointer-events: none; will-change: transform, opacity;
+}
+.portrait .gift-banner { left: 42px; top: 1516px; width: 444px; }
+.landscape .gift-banner { left: 38px; bottom: 46px; width: 410px; min-height: 70px; grid-template-columns: 50px minmax(0,1fr) auto; }
+.gift-emblem { width: 58px; height: 58px; display: grid; place-items: center; overflow: hidden; border-radius: 50%; background: rgba(255,95,164,.14); }
+.landscape .gift-emblem { width: 50px; height: 50px; }
+.gift-emblem img { width: 100%; height: 100%; object-fit: contain; }
+.gift-user { color: #ffd8eb; font-size: 14px; font-weight: 650; }
+.gift-name { margin-top: 2px; color: #fffaf3; font-size: 20px; font-weight: 800; line-height: 1.08; }
+.gift-count { color: #ffe08b; font: 900 29px/1 "DejaVu Sans", sans-serif; letter-spacing: -.04em; text-shadow: 0 0 18px rgba(255,190,75,.35); }
+.gift-impact {
+  position: absolute; left: 310px; top: 1350px; width: 410px; height: 410px; border-radius: 50%;
+  border: 4px solid rgba(255,209,232,.72); box-shadow: 0 0 60px rgba(255,69,142,.42), inset 0 0 45px rgba(76,229,255,.18);
+  will-change: transform, opacity;
+}
+.landscape .gift-impact { left: 330px; top: 700px; width: 280px; height: 280px; }
+.speed-line { position: absolute; height: 5px; border-radius: 999px; background: linear-gradient(90deg, rgba(255,78,148,0), rgba(255,78,148,.9), #ffe7a5); opacity: 0; will-change: transform, opacity; }
+.portrait .speed-line.s1 { left: 15px; top: 1390px; width: 360px; }
+.portrait .speed-line.s2 { left: 5px; top: 1465px; width: 250px; }
+.portrait .speed-line.s3 { left: 62px; top: 1540px; width: 430px; }
+.landscape .speed-line.s1 { left: 18px; top: 760px; width: 330px; }
+.landscape .speed-line.s2 { left: 6px; top: 822px; width: 230px; }
+.landscape .speed-line.s3 { left: 56px; top: 884px; width: 390px; }
+.gift-particle { position: absolute; left: 520px; top: 1500px; width: 12px; height: 12px; border-radius: 50%; background: #fff1aa; box-shadow: 0 0 18px rgba(255,93,164,.75); will-change: transform, opacity; }
+.landscape .gift-particle { left: 535px; top: 810px; }
+.gift-particle:nth-of-type(3n) { width: 8px; height: 8px; background: #5eeaff; }
+.gift-particle:nth-of-type(4n) { border-radius: 2px; background: #ff67a9; }
+.gift-glasses { position: absolute; z-index: 15; filter: drop-shadow(0 13px 14px rgba(0,0,0,.55)); transform-origin: center; will-change: transform, opacity; }
+.portrait .gift-glasses { left: 390px; top: 340px; width: 330px; height: 126px; }
+.landscape .gift-glasses { left: 636px; top: 191px; width: 186px; height: 69px; }
+.gift-glasses svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.gift-glasses .lens { stroke: #0a0d0c; stroke-width: 11; }
+.gift-glasses .glasses-arm, .gift-glasses .bridge { fill: none; stroke: #0a0d0c; stroke-width: 13; stroke-linecap: round; }
+
+.composer {
+  position: absolute; z-index: 14; display: flex; align-items: center; gap: 13px;
+}
+.portrait .composer { left: 34px; right: 34px; bottom: 40px; height: 104px; }
+.landscape .composer { right: 18px; bottom: 20px; width: 444px; height: 62px; color: var(--ink); }
+.composer-input {
+  flex: 1; display: flex; align-items: center; border: 1px solid rgba(255,255,255,.2); color: #d9ddd5;
+  background: rgba(8,10,9,.7); backdrop-filter: blur(20px);
+}
+.portrait .composer-input { height: 78px; padding: 0 24px; border-radius: 28px 16px 28px 28px; font-size: 23px; }
+.landscape .composer-input { height: 50px; padding: 0 16px; border-color: rgba(20,24,21,.1); background: #e5e7e1; color: #586058; border-radius: 20px 10px 20px 20px; font-size: 17px; }
+.composer-button { display: grid; place-items: center; flex: 0 0 auto; border-radius: 50%; background: rgba(8,10,9,.72); border: 1px solid rgba(255,255,255,.18); }
+.portrait .composer-button { width: 76px; height: 76px; font-size: 27px; }
+.landscape .composer-button { width: 50px; height: 50px; background: #dfe2dc; border-color: rgba(20,24,21,.1); font-size: 20px; }
+
+.stage-label {
+  position: absolute; z-index: 7; color: #dce1d7; font: 700 13px/1 "DejaVu Sans Mono", monospace; letter-spacing: .08em; text-transform: uppercase;
+}
+.portrait .stage-label { display: none; }
+.landscape .stage-label { left: 34px; top: 172px; bottom: auto; text-shadow: 0 2px 10px #000; }
+.stage-rule { position: absolute; left: 34px; bottom: 188px; width: 214px; height: 2px; background: linear-gradient(90deg, var(--signal), transparent); }
+.landscape .stage-rule { top: 194px; bottom: auto; }
+.portrait .stage-rule { display: none; }
+
+.heart { position: absolute; z-index: 15; color: var(--live); font-size: 35px; text-shadow: 0 8px 20px rgba(0,0,0,.25); pointer-events: none; }
+.portrait .heart { right: 72px; bottom: 178px; }
+.landscape .heart { right: 680px; bottom: 92px; }
+
+.continuity-veil {
+  position: absolute; inset: 0; z-index: 0; opacity: 0; pointer-events: none;
+  background: radial-gradient(circle at 50% 46%, rgba(246,249,241,.18), rgba(8,11,9,.38));
+  backdrop-filter: blur(0px) saturate(.9); overflow: hidden;
+}
+.landscape .continuity-veil { right: 480px; }
+.continuity-veil i { display: none; }
+
+.locale-en .host-name,
+.locale-en .comment-text,
+.locale-en .product-title,
+.locale-en .product-copy,
+.locale-en .system-note,
+.locale-en .composer-input { font-family: "DejaVu Sans", sans-serif; }
+.locale-en.portrait .comment-text { font-size: 22px; }
+.locale-en.portrait .comment-user { font-size: 19px; }
+.locale-zh .host-meta,
+.locale-zh .demo-pill,
+.locale-zh .action-label,
+.locale-zh .rail-head span,
+.locale-zh .stage-label { font-family: "Live CJK", sans-serif; }

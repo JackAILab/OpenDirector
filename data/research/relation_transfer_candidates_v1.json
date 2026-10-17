@@ -1,0 +1,10 @@
+{
+  "schema": "visualagent.relation-candidates.v1",
+  "status": "author_proposed_pending_source_review",
+  "training_eligible": false,
+  "pairs": [
+    {"family_id": "carry", "card_id": "67297f118c74", "candidate_reference": "R008", "contrast_reference": "R011", "hypothesis": "极端情境与人物反应，对照功能夸张导致常规动作失效。", "review_risk": "两者都可能属于夸张功能证明；R008的性能解释缺少音频和连续动作验证，可能不能构成关系错配。"},
+    {"family_id": "glass", "card_id": "4986bf5a5a7e", "candidate_reference": "R010", "contrast_reference": "R009", "hypothesis": "通过日常操作到可见成果的任务推进，对照商品让位于人际情感的反转。", "review_risk": "儿童烘焙与婴儿照护的视觉内容不同；需判断关系差异能否与场景差异区分。"},
+    {"family_id": "speaker", "card_id": "5f119fb7444d", "candidate_reference": "R004", "contrast_reference": "R006", "hypothesis": "商品与群体身份的集结关系，对照字面执行受众标签导致反常行为。", "review_risk": "群体身份适配野餐仅为作者假设；两源的对白与行动含义未核实。"}
+  ]
+}

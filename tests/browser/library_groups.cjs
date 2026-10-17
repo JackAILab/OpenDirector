@@ -1,0 +1,40 @@
+// Browsing groups retain raw source categories; synthetic data, no writes.
+const {chromium}=require('playwright'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
+(async()=>{const browser=await chromium.launch({headless:true,args:['--no-sandbox']});try{
+ const page=await browser.newPage({viewport:{width:1440,height:1000}}),errors=[],queries=[];
+ page.on('pageerror',e=>errors.push(e.message));
+ const category='Production & Post-Production / Cinematography Campaign';
+ const groups=[{id:'tv_cinema',label:'电视与影院'},{id:'craft',label:'摄影与制作'}];
+ const item={id:'one',title:'作品标题',brand:'品牌',industry:'食品饮料',ad_type:category,ad_groups:[groups[1]],source_url:'https://example.org/one',quality_evidence:[{kind:'award_winner',text:'官方获奖依据'}],review:{state:'pending',scores:{},tags:[],note:'',version:0}};
+ await page.route('http://library.test/**',route=>{
+  const r=route.request(),u=new URL(r.url());assert.equal(r.method(),'GET');
+  if(u.pathname==='/creative/library')return route.fulfill({contentType:'text/html',body:fs.readFileSync(path.join(__dirname,'../../tools/agent_studio/library.html'),'utf8')});
+  if(u.pathname.endsWith('.woff2'))return route.fulfill({status:404});
+  if(u.pathname.endsWith('/status'))return route.fulfill({json:{total:25,playable:25,review_queue:{state:'ready',total_pending:0}}});
+  assert.equal(u.pathname,'/creative/api/library');queries.push(Object.fromEntries(u.searchParams));
+  const selected=u.searchParams.get('ad_group'),total=selected==='tv_cinema'?0:selected?1:25,offset=Number(u.searchParams.get('offset'));
+  return route.fulfill({json:{total,items:Array.from({length:Math.max(0,Math.min(24,total-offset))},()=>item),facets:{industry:['食品饮料'],ad_type:[category],ad_groups:groups}}});
+ });
+ await page.goto('http://library.test/creative/library');await page.locator('.card').nth(23).waitFor();
+ assert.equal(await page.locator('#adType option').count(),3);
+ assert.equal(await page.locator('#adType').textContent(),'全部参考类型电视与影院摄影与制作');
+ assert(!(await page.locator('.card').first().textContent()).includes(category));
+ assert((await page.locator('.card').first().textContent()).includes('摄影与制作'));
+ await page.locator('#next').click();await page.waitForFunction(()=>document.querySelector('#pageInfo').textContent==='25–25 / 25');
+ await page.locator('#adType').selectOption('craft');await page.waitForFunction(()=>document.querySelector('#pageInfo').textContent==='1–1 / 1');
+ assert.equal(queries.at(-1).ad_group,'craft');assert.equal(queries.at(-1).ad_type,undefined);assert.equal(queries.at(-1).offset,'0');assert.equal(queries.at(-1).local_only,'true');
+ const shortResponse=page.waitForResponse(r=>new URL(r.url()).searchParams.get('duration_band')==='short');
+ await page.locator('#durationBand').selectOption('short');await shortResponse;
+ assert.equal(queries.at(-1).ad_group,'craft');assert.equal(await page.locator('#adType').inputValue(),'craft');
+ await page.locator('.card').first().click();await page.getByText('奖项与来源依据 · 1 条',{exact:true}).click();
+ assert.equal(await page.locator('.source-category').textContent(),'来源类别：'+category);
+ assert.match(await page.locator('#inspector').textContent(),/官方获奖依据/);
+ await page.setViewportSize({width:390,height:844});assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+ await page.locator('#screen button').first().click();
+ await page.locator('#adType').selectOption('tv_cinema');await page.getByRole('button',{name:'查看全部来源',exact:true}).waitFor();
+ await page.getByRole('button',{name:'查看全部来源',exact:true}).click();await page.getByRole('button',{name:'清空筛选条件',exact:true}).waitFor();
+ assert.equal(queries.at(-1).ad_group,'tv_cinema');assert.equal(queries.at(-1).duration_band,'short');assert.equal(queries.at(-1).local_only,'false');
+ await page.getByRole('button',{name:'清空筛选条件',exact:true}).click();await page.locator('.card').nth(23).waitFor();
+ assert.equal(queries.at(-1).ad_group,'');assert.equal(queries.at(-1).local_only,'false');
+ assert.deepEqual(errors,[]);console.log('PASS compact groups, filter/pagination composition, source evidence, mobile, empty recovery; no writes');
+}finally{await browser.close()}})().catch(e=>{console.error(e);process.exit(1)});

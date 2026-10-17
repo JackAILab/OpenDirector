@@ -1,0 +1,31 @@
+{
+  "schema": "visualagent.camera-segment-batch.v1",
+  "case_id": "jensen_rubin_live_30s_v2",
+  "timeline": "data/tasks/jensen_rubin_live_30s_v2.timeline.json",
+  "model": "kling-video-v3_0_omni",
+  "source_duration_seconds": 8,
+  "assembled_duration_seconds": 7.5,
+  "aspect_ratio": "9:16",
+  "resolution": "1080p",
+  "format_contract": {
+    "orientation": "portrait",
+    "aspect_ratio": "9:16",
+    "expected_width": 1080,
+    "expected_height": 1920,
+    "preview_fit": "contain"
+  },
+  "enable_audio": true,
+  "prefer_multi_shots": false,
+  "segments": [
+    {
+      "id": "seg_225_300_retry_02",
+      "attempt": 2,
+      "retry_of_run": "e084c05166b24cf9bbe6ba18b81b2a18",
+      "start": 22.5,
+      "end": 30.0,
+      "first": "outputs/artifacts/jensen_rtx5090_live_v2_20260820/camera_references/state-225-dynamic-v2.png",
+      "tail": "outputs/artifacts/jensen_rtx5090_live_v2_20260820/camera_references/state-300-dynamic-v2.png",
+      "prompt": "图片1是第22.5秒，图片2是第30秒。图像中的同一位男性主播、同一张双风扇旗舰显卡和同一直播棚。开头保持脸部与眼睛稳定约一秒供代码AR锚定，随后移动到工作台相对一侧，将显卡从水平前送自然转为斜抱在左前臂下、两枚风扇仍清楚可见；右手抬起做开放掌收尾，重新直视镜头并平静点头。使用与前段一致的普通成熟中文男声，不模仿任何真实人物，清楚说：别只看单个数字，功耗、散热、线材和机箱空间要放在一起验证。动作轮廓清楚但物理自然，连续眼平中景，无切镜。不要生成墨镜、跑车、爱心、文字、数字、UI、弹幕、购物车、价格、logo或水印；保持脸部曝光自然、五指和商品几何一致。"
+    }
+  ]
+}

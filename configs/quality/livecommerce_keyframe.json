@@ -1,0 +1,23 @@
+{
+  "technical": {
+    "target_aspect": "9:16",
+    "aspect_tolerance": 0.02,
+    "min_mean_luma": 92.0,
+    "max_dark_pixel_ratio": 0.34
+  },
+  "scene_richness": {
+    "min_entropy": 5.2,
+    "min_edge_density": 0.08,
+    "min_active_tiles_3x3": 6,
+    "min_luma_stddev_spread": 34.0
+  },
+  "semantic_requirements": [
+    "foreground, midground and background are visually distinct",
+    "presenter, hero product, active PC build, hardware shelving, practical lights and desk props form one coherent studio",
+    "the frame feels like an active commerce broadcast, not a portrait against a sparse set",
+    "overlay-safe zones remain usable without erasing environmental richness",
+    "all readable UI, comments, counters, product cards, prices and calls to action are deterministic post-production"
+  ],
+  "human_review_required": true,
+  "training_eligible_before_human_review": false
+}

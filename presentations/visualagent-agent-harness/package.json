@@ -1,0 +1,11 @@
+{
+  "name": "visualagent-agent-harness",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "npx --yes hyperframes@0.8.15 present ./composition",
+    "check": "npx --yes hyperframes@0.8.15 check ./composition",
+    "lint": "npx --yes hyperframes@0.8.15 lint ./composition",
+    "studio": "npx --yes hyperframes@0.8.15 preview ./composition --background"
+  }
+}

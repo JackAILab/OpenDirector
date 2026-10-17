@@ -1,0 +1,14 @@
+{
+  "name": "jensen-rubin-live-60s-v4-multiformat",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "preview:hub": "node server.mjs",
+    "lint": "npx --yes hyperframes@0.8.6 lint portrait-zh && npx --yes hyperframes@0.8.6 lint portrait-en && npx --yes hyperframes@0.8.6 lint landscape-zh && npx --yes hyperframes@0.8.6 lint landscape-en",
+    "check": "npx --yes hyperframes@0.8.6 check portrait-zh --samples 12 --at-transitions && npx --yes hyperframes@0.8.6 check portrait-en --samples 12 --at-transitions && npx --yes hyperframes@0.8.6 check landscape-zh --samples 12 --at-transitions && npx --yes hyperframes@0.8.6 check landscape-en --samples 12 --at-transitions",
+    "preview:portrait:zh": "npx --yes hyperframes@0.8.6 preview portrait-zh --port 3005 --no-open",
+    "preview:portrait:en": "npx --yes hyperframes@0.8.6 preview portrait-en --port 3006 --no-open",
+    "preview:landscape:zh": "npx --yes hyperframes@0.8.6 preview landscape-zh --port 3007 --no-open",
+    "preview:landscape:en": "npx --yes hyperframes@0.8.6 preview landscape-en --port 3008 --no-open"
+  }
+}

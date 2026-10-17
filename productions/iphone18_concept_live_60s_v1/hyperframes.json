@@ -1,0 +1,11 @@
+{
+  "compositions": [{
+    "id": "iphone18-concept-live-60s-v1",
+    "name": "iPhone 18 concept live 60s v1",
+    "entry": "index.html",
+    "width": 1080,
+    "height": 1920,
+    "duration": 60,
+    "fps": 30
+  }]
+}

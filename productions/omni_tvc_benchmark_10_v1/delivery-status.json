@@ -1,0 +1,297 @@
+{
+  "schema": "visualagent.tvc-benchmark-delivery.v1",
+  "updated_at": "2026-09-25T17:45:31.832933+00:00",
+  "required_videos": 10,
+  "videos_ready": 5,
+  "reference_images_ready": 10,
+  "semantic_reviews_recorded": 5,
+  "cases": [
+    {
+      "case_id": "01_smartwatch",
+      "title": "智能手表｜从晨光到山脊",
+      "reference_ready": true,
+      "reference_attempts": 2,
+      "video_attempted": false,
+      "video_submitted": false,
+      "video_ready": false,
+      "elapsed_seconds": null,
+      "credits_consumed": null,
+      "technical_passed": null,
+      "semantic_verdict": "pending",
+      "perceptual_audio_review": "not_verified",
+      "findings": [],
+      "training_eligible": false
+    },
+    {
+      "case_id": "02_action_camera",
+      "title": "运动相机｜穿过浪尖",
+      "reference_ready": true,
+      "reference_attempts": 1,
+      "video_attempted": true,
+      "video_submitted": true,
+      "video_ready": true,
+      "elapsed_seconds": 349.7,
+      "credits_consumed": 180,
+      "technical_passed": true,
+      "semantic_verdict": "needs_revision",
+      "perceptual_audio_review": "not_verified",
+      "findings": [
+        {
+          "severity": "medium",
+          "criterion": "visible_planned_actions",
+          "detail": "开场可见镜头微距及橙色快门，但抽样画面未见水滴滚过保护玻璃。"
+        },
+        {
+          "severity": "medium",
+          "criterion": "product_in_use",
+          "detail": "中段冲浪动作和浪面变化清楚，但抽样画面无法确认冲浪板前端固定有指定相机。"
+        },
+        {
+          "severity": "medium",
+          "criterion": "motion_physics",
+          "detail": "约8–10秒冲浪者接近前景岩石后被遮挡，需要连续运动审查确认是否存在穿模。"
+        },
+        {
+          "severity": "info",
+          "criterion": "three_shot_narrative",
+          "detail": "微距、冲浪跟拍、岩石产品展示三段结构成立；结尾有明显视角变化。"
+        },
+        {
+          "severity": "info",
+          "criterion": "product_identity",
+          "detail": "前后产品保持石墨色机身、右侧圆镜头和顶部橙色按键；无可读文字。"
+        }
+      ],
+      "training_eligible": false
+    },
+    {
+      "case_id": "03_perfume",
+      "title": "香水｜夜色琥珀",
+      "reference_ready": true,
+      "reference_attempts": 1,
+      "video_attempted": true,
+      "video_submitted": true,
+      "video_ready": true,
+      "elapsed_seconds": 369.0,
+      "credits_consumed": 180,
+      "technical_passed": true,
+      "semantic_verdict": "needs_revision",
+      "perceptual_audio_review": "not_verified",
+      "findings": [
+        {
+          "severity": "high",
+          "criterion": "cap_continuity",
+          "detail": "结尾瓶口重新出现一个金色盖，同时桌面右侧仍保留一个盖，违背取盖后不能自动出现的明确约束。"
+        },
+        {
+          "severity": "medium",
+          "criterion": "normal_product_scale",
+          "detail": "香水瓶在人物手中仍接近双手大罐尺度，超过普通手持香水瓶的预期。"
+        },
+        {
+          "severity": "medium",
+          "criterion": "spray_action",
+          "detail": "可见取盖、举瓶、放瓶与手腕雾气，但按压喷头并向手腕喷一次的因果链在抽样中不够清楚。"
+        },
+        {
+          "severity": "info",
+          "criterion": "commercial_image_quality",
+          "detail": "厚玻璃与琥珀液体微距、暖灯和深色材质层次成立，人物形象与参考接近。"
+        }
+      ],
+      "training_eligible": false
+    },
+    {
+      "case_id": "04_sports_car",
+      "title": "电动跑车｜雨后弯道",
+      "reference_ready": true,
+      "reference_attempts": 1,
+      "video_attempted": true,
+      "video_submitted": true,
+      "video_ready": true,
+      "elapsed_seconds": 375.5,
+      "credits_consumed": 180,
+      "technical_passed": true,
+      "semantic_verdict": "needs_revision",
+      "perceptual_audio_review": "not_verified",
+      "findings": [
+        {
+          "severity": "high",
+          "criterion": "closing_product_visibility",
+          "detail": "约10秒后切成空赛道，最后约5秒看不到车辆；没有按简报保留后侧跟拍商品收尾。"
+        },
+        {
+          "severity": "medium",
+          "criterion": "shot_brief_adherence",
+          "detail": "开头呈现轮毂旋转，但轮胎水珠细节不明显；宽弯行驶动作辨识度不足。"
+        },
+        {
+          "severity": "info",
+          "criterion": "product_consistency",
+          "detail": "前10秒蓝色双门跑车、银色轮毂和横向尾灯外观基本稳定，车轮保持路面接触。"
+        },
+        {
+          "severity": "info",
+          "criterion": "commercial_image_quality",
+          "detail": "湿路反射、针叶林和阴天光照协调，轮胎排水可见。"
+        }
+      ],
+      "training_eligible": false
+    },
+    {
+      "case_id": "05_headphones",
+      "title": "头戴耳机｜城市静下来",
+      "reference_ready": true,
+      "reference_attempts": 1,
+      "video_attempted": true,
+      "video_submitted": true,
+      "video_ready": true,
+      "elapsed_seconds": 424.8,
+      "credits_consumed": 180,
+      "technical_passed": true,
+      "semantic_verdict": "needs_revision",
+      "perceptual_audio_review": "not_verified",
+      "findings": [
+        {
+          "severity": "medium",
+          "criterion": "complete_product_display",
+          "detail": "结尾耳罩展示清楚，但头带被遮住或缺失，无法确认完整耳机结构；不满足完整产品展示的验收要求。"
+        },
+        {
+          "severity": "medium",
+          "criterion": "opening_shot",
+          "detail": "开场始终停留在耳罩细节，没有按计划拉到完整耳机。"
+        },
+        {
+          "severity": "info",
+          "criterion": "wearing_action",
+          "detail": "双手抬起、戴好、闭眼、放下双手的动作链清楚，抽样中未见明显手部穿模。"
+        },
+        {
+          "severity": "info",
+          "criterion": "commercial_image_quality",
+          "detail": "奶白耳罩与银色支架质感协调，人物比例自然，背景行人有连续运动。"
+        }
+      ],
+      "training_eligible": false
+    },
+    {
+      "case_id": "06_sneaker",
+      "title": "运动鞋｜第一步",
+      "reference_ready": true,
+      "reference_attempts": 2,
+      "video_attempted": false,
+      "video_submitted": false,
+      "video_ready": false,
+      "elapsed_seconds": null,
+      "credits_consumed": null,
+      "technical_passed": null,
+      "semantic_verdict": "pending",
+      "perceptual_audio_review": "not_verified",
+      "findings": [],
+      "training_eligible": false
+    },
+    {
+      "case_id": "07_coffee_machine",
+      "title": "咖啡机｜清晨的第一杯",
+      "reference_ready": true,
+      "reference_attempts": 1,
+      "video_attempted": true,
+      "video_submitted": true,
+      "video_ready": true,
+      "elapsed_seconds": 412.1,
+      "credits_consumed": 180,
+      "technical_passed": true,
+      "semantic_verdict": "visual_pass_with_notes",
+      "perceptual_audio_review": "not_verified",
+      "findings": [
+        {
+          "severity": "medium",
+          "criterion": "input_ambiguity",
+          "detail": "文本定义为无把杯，但实际参考图已带杯把；生成片沿用参考图的带把杯。这是输入冲突，应在下一轮统一，不归因于模型独立失误。"
+        },
+        {
+          "severity": "info",
+          "criterion": "planned_actions",
+          "detail": "首滴咖啡、双流注入、手取杯三个阶段清楚，手取杯后焦点回到机器。"
+        },
+        {
+          "severity": "info",
+          "criterion": "continuity",
+          "detail": "鼠尾草绿机身、旋钮、接水盘与同一杯保持连续，抽样未见明显手部穿模。"
+        },
+        {
+          "severity": "info",
+          "criterion": "commercial_image_quality",
+          "detail": "暖木台面、亚麻窗帘与晨光构成较完整的商品场景。"
+        }
+      ],
+      "training_eligible": false
+    },
+    {
+      "case_id": "08_skincare",
+      "title": "精华液｜光穿过一滴",
+      "reference_ready": true,
+      "reference_attempts": 1,
+      "video_attempted": true,
+      "video_submitted": false,
+      "video_ready": false,
+      "elapsed_seconds": null,
+      "credits_consumed": null,
+      "technical_passed": null,
+      "semantic_verdict": "pending",
+      "perceptual_audio_review": "not_verified",
+      "findings": [],
+      "training_eligible": false
+    },
+    {
+      "case_id": "09_lounge_chair",
+      "title": "休闲椅｜给自己一刻",
+      "reference_ready": true,
+      "reference_attempts": 1,
+      "video_attempted": false,
+      "video_submitted": false,
+      "video_ready": false,
+      "elapsed_seconds": null,
+      "credits_consumed": null,
+      "technical_passed": null,
+      "semantic_verdict": "pending",
+      "perceptual_audio_review": "not_verified",
+      "findings": [],
+      "training_eligible": false
+    },
+    {
+      "case_id": "10_rain_shell",
+      "title": "冲锋衣｜风雨有形",
+      "reference_ready": true,
+      "reference_attempts": 1,
+      "video_attempted": false,
+      "video_submitted": false,
+      "video_ready": false,
+      "elapsed_seconds": null,
+      "credits_consumed": null,
+      "technical_passed": null,
+      "semantic_verdict": "pending",
+      "perceptual_audio_review": "not_verified",
+      "findings": [],
+      "training_eligible": false
+    }
+  ],
+  "training_eligible": false,
+  "video_credits_reported": 900,
+  "video_receipts_without_credit_value": 0,
+  "blocker": {
+    "reason": "insufficient_kling_credits",
+    "observed_at": "2026-09-25T17:43:04.528384+00:00",
+    "available_credits": 179,
+    "credits_per_video_from_five_receipts": 180,
+    "remaining_videos": 5,
+    "estimated_remaining_credits": 900,
+    "estimated_top_up_needed": 721,
+    "failed_case": "08_skincare",
+    "failed_run": "b528a4d06ea54e75af7ddb42a5f21b56",
+    "generation_id_received": false,
+    "automatic_retry": false,
+    "training_eligible": false
+  }
+}

@@ -1,0 +1,89 @@
+{
+  "schema": "visualagent.kling-generation-plan.v1",
+  "case_id": "cybercab_live_60s_v1",
+  "task_trace_id": "0199ad34-b6b7-7cd2-95d4-0f291906ed14",
+  "image_model": "kling-image-v3_0_omni",
+  "video_model": "kling-video-v3_0_omni",
+  "model": "kling-video-v3_0_omni",
+  "aspect_ratio": "9:16",
+  "resolution": "1080p",
+  "source_duration_seconds": 15,
+  "assembled_duration_seconds": 15,
+  "enable_audio": true,
+  "prefer_multi_shots": false,
+  "timeline": "0-15 exterior and door; 15-30 passenger entry; 30-45 cabin activation; 45-60 autonomous low-speed departure",
+  "reference_states": [
+    {
+      "id": "state-00-000",
+      "references": ["outputs/artifacts/cybercab_live_60s_v1/references/user-cybercab-exterior.png"],
+      "prompt": "Vertical 9:16 photorealistic luxury technology showroom live-camera plate. Preserve the exact gold two-seat autonomous coupe from image 1: same body, wheels, glass, butterfly-door seams and proportions. A fictional Asian male technology host in his late forties stands beside the front quarter: short salt-and-pepper hair, rectangular black glasses, charcoal technical field jacket over a plain black crewneck, warm energetic expression, clearly not a public figure. Full vehicle and host visible, camera at chest height, 28mm lens, soft overhead strip lights reflected on gold paint, clean closed showroom, realistic floor shadows. No readable text, logos, UI, captions, prices, watermarks or extra people. The vehicle is stationary and both doors are closed. Commercially rich but physically believable live-stream opening frame."
+    },
+    {
+      "id": "state-15-000",
+      "references": ["outputs/artifacts/cybercab_live_60s_v1/references/user-cybercab-exterior.png", "outputs/artifacts/cybercab_live_60s_v1/reference_states/state-00-000.png"],
+      "prompt": "Create the next continuous 9:16 live-camera boundary state. Image 1 fixes the exact gold Cybercab-like two-seat autonomous coupe; image 2 fixes the same fictional host, showroom, lighting, lens and color grade. Keep every persistent object in the same physical location. The near-side butterfly door is now fully raised and mechanically plausible. The host stands beside the open doorway, one open hand presenting the passenger cabin, enthusiastic but natural, not touching a moving vehicle. Preserve his salt-and-pepper hair, black glasses, charcoal jacket and black crewneck. Show two seats and no steering wheel or pedals. No readable text, logos, UI, captions, prices, watermarks, new props or extra people. Photorealistic continuous live stream, not a cinematic cut."
+    },
+    {
+      "id": "state-30-000",
+      "references": ["outputs/artifacts/cybercab_live_60s_v1/references/user-cybercab-exterior.png", "outputs/artifacts/cybercab_live_60s_v1/reference_states/state-15-000.png"],
+      "prompt": "Create the next continuous vertical 9:16 live-camera boundary state using image 1 for exact gold vehicle identity and image 2 for the same fictional host, open butterfly door, showroom, lens, lighting and color. The camera has moved only slightly closer to the passenger doorway. The same host is seated in the passenger seat with the seat belt visibly fastened, torso and face clear, cheerful engaged expression. The butterfly door remains raised. Interior is a believable minimalist two-seat autonomous cabin with a center touchscreen surface, no steering wheel and no pedals. Preserve body geometry and all background objects; do not invent a desk, case, floor mat or extra product. No readable text, logos, UI, captions, prices or watermarks. Natural documentary live-stream continuity."
+    },
+    {
+      "id": "state-45-000",
+      "references": ["outputs/artifacts/cybercab_live_60s_v1/references/user-cybercab-exterior.png", "outputs/artifacts/cybercab_live_60s_v1/reference_states/state-30-000.png"],
+      "prompt": "Create the next continuous 9:16 interior live-camera boundary state. Image 1 locks the gold vehicle exterior and image 2 locks the same fictional host, cabin materials and showroom. The host remains seated as a belted passenger in the same seat and clothing. The butterfly door is now closed. He gestures confidently toward the center touchscreen while speaking with upbeat energy; the display is blank dark glass with no readable UI because interface graphics will be rendered later in code. Clearly show no steering wheel and no pedals. Preserve face, seat, trim, window view, lighting direction and camera height. No sudden new objects, no desk, no computer case, no floor mat, no extra people, text, logos, captions, prices or watermarks. Photorealistic single live session."
+    },
+    {
+      "id": "state-60-000",
+      "references": ["outputs/artifacts/cybercab_live_60s_v1/references/user-cybercab-exterior.png", "outputs/artifacts/cybercab_live_60s_v1/reference_states/state-45-000.png"],
+      "prompt": "Create the final continuous vertical 9:16 live-camera boundary state. Image 1 locks the exact gold vehicle identity and image 2 locks the same cabin, fictional host, lens and color. The same host remains seated and belted as a passenger, smiling with confident excitement and both hands away from controls. The autonomous car now moves slowly on a private closed demonstration lane visible through the windows; use gentle realistic background motion cues while the cabin and host remain sharp and stable. No steering wheel or pedals. Keep all persistent interior objects unchanged, do not invent props or change the host. No readable text, logos, UI, captions, prices, traffic, public roads, extra people or watermarks. Authentic uninterrupted live demonstration ending frame."
+    }
+  ],
+  "segments": [
+    {
+      "id": "seg-00-15",
+      "start": 0,
+      "end": 15,
+      "first": "outputs/artifacts/cybercab_live_60s_v1/reference_states/state-00-000.png",
+      "tail": "outputs/artifacts/cybercab_live_60s_v1/reference_states/state-15-000.png",
+      "prompt": "单镜头真实直播，严格从图片1连续运动到图片2。虚构科技主播保持同一张脸、服装与身材，金色双座自动驾驶车的外形、轮毂、玻璃和展厅背景完全稳定。主播从车头侧面自然走到乘客门旁，一边兴奋地用普通话介绍：各位看这里，这不是概念图，我们现在就从外观开始，把这台金色双座自动驾驶车的每一个关键细节现场看清楚！随后近侧蝴蝶门平稳抬起。摄影机只做缓慢手持跟随，不切镜，不变焦跳变，不出现新物体。原生同步普通话男声，声音属于虚构主播，不模仿任何真实人物。环境只有轻微展厅底噪。画面内不要生成任何可读文字、Logo、价格、UI、字幕或礼物特效。"
+    },
+    {
+      "id": "seg-15-30",
+      "start": 15,
+      "end": 30,
+      "first": "outputs/artifacts/cybercab_live_60s_v1/reference_states/state-15-000.png",
+      "tail": "outputs/artifacts/cybercab_live_60s_v1/reference_states/state-30-000.png",
+      "prompt": "单镜头真实直播，严格从图片1连续运动到图片2。保持同一虚构科技主播、同一金色车辆、同一抬起的蝴蝶门、同一展厅布景与光线。主播用手示意双座舱，兴奋地用普通话说：蝴蝶门打开以后，进出空间非常直接；重点是这里没有方向盘，也没有踏板，乘员从一开始就是乘客。然后他自然坐入乘客座并系好安全带。动作符合人体与车辆结构，门在本段保持打开。摄影机只缓慢靠近，不切镜，不改变人物或车体，不新增桌子、机箱、地垫或其他道具。原生同步普通话虚构男声，不模仿真实人物。无可读文字、Logo、价格、UI、字幕或礼物特效。"
+    },
+    {
+      "id": "seg-30-45",
+      "start": 30,
+      "end": 45,
+      "first": "outputs/artifacts/cybercab_live_60s_v1/reference_states/state-30-000.png",
+      "tail": "outputs/artifacts/cybercab_live_60s_v1/reference_states/state-45-000.png",
+      "prompt": "单镜头真实直播，严格从图片1连续运动到图片2。相同虚构主播始终坐在同一个乘客座并系好安全带，脸、衣服、座椅、车身与展厅不变。蝴蝶门平稳关闭，摄影机自然转为稳定的车内广角。主播激情但清晰地用普通话说：现在坐稳，安全带已经扣好。所有行程操作都集中在中控屏上，路线、上车确认和出发状态，之后由我们的界面层清楚展示。主播只把手指向空白黑色中控玻璃，不触碰虚构按钮。无方向盘、无踏板。绝不切镜、闪变或突然出现新物体。原生同步普通话虚构男声。画面无任何可读文字、Logo、UI、字幕、价格或礼物特效。"
+    },
+    {
+      "id": "seg-45-60",
+      "start": 45,
+      "end": 60,
+      "first": "outputs/artifacts/cybercab_live_60s_v1/reference_states/state-45-000.png",
+      "tail": "outputs/artifacts/cybercab_live_60s_v1/reference_states/state-60-000.png",
+      "prompt": "单镜头真实直播，严格从图片1连续运动到图片2。保持同一虚构主播、同一座舱、同一安全带位置和相机视角。车辆在封闭演示路线低速自动起步，只有窗外景物产生平滑轻微运动，车内人物和物体稳定，没有驾驶动作、公共道路或其他交通。主播双手离开中控，兴奋地用普通话说：好，车辆已经自己平稳起步。注意我的双手完全离开控制区，我们把真实乘坐过程、空间感和运动状态一次给大家看明白！结尾自然微笑。原生同步普通话虚构男声与很轻的电动车行驶声，不模仿真实人物。不切镜、不闪变、不新增物体。无可读文字、Logo、价格、UI、字幕或礼物特效。"
+    }
+  ],
+  "execution_result": {
+    "reference_states_retained": 5,
+    "camera_sources_retained": 3,
+    "camera_source_30_45": "provider_completed_but_not_retained_after_shared_storage_exhaustion",
+    "camera_source_45_60_semantic_status": "failed_stationary_showroom",
+    "deterministic_review_bridge": "30_to_45_seconds_not_a_provider_replacement",
+    "review_camera_duration_seconds": 60,
+    "hyperframes_status": "lint_check_and_inspect_passed",
+    "final_review_render": "completed",
+    "training_eligible": false
+  },
+  "paid_generation_budget": {"max_calls": 9, "used": 9, "automatic_retry": false, "model_substitution": false},
+  "training_eligible": false
+}

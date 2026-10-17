@@ -1,0 +1,97 @@
+{
+  "schema": "visualagent.native-media-variant-plan.v1",
+  "id": "synthetic-gpu-presenter-live-60s-v5-native-variants",
+  "objective": "Regenerate four independent 60-second live-commerce camera feeds with native orientation-specific framing and language-correct speech.",
+  "execution_status": "blocked_new_bounded_budget_after_cybercab_budget_exhaustion",
+  "provider_operation": "omni_video",
+  "model": "kling-video-v3_0_omni",
+  "segment_design": {
+    "duration_seconds": 60,
+    "boundary_seconds": [0, 15, 30, 45, 60],
+    "segments_per_variant": 4,
+    "source_segment_seconds": 15,
+    "multi_shot": false,
+    "hard_first_frame": true,
+    "hard_last_frame": true,
+    "native_audio": true
+  },
+  "variants": [
+    {
+      "id": "portrait-zh",
+      "orientation": "portrait",
+      "aspect_ratio": "9:16",
+      "speech_language": "zh",
+      "reference_bundle_id": "portrait-zh-boundaries-v1",
+      "camera_bundle_id": "portrait-zh-camera-v1",
+      "share_camera_feed_with": null
+    },
+    {
+      "id": "portrait-en",
+      "orientation": "portrait",
+      "aspect_ratio": "9:16",
+      "speech_language": "en",
+      "reference_bundle_id": "portrait-en-boundaries-v1",
+      "camera_bundle_id": "portrait-en-camera-v1",
+      "share_camera_feed_with": null
+    },
+    {
+      "id": "landscape-zh",
+      "orientation": "landscape",
+      "aspect_ratio": "16:9",
+      "speech_language": "zh",
+      "reference_bundle_id": "landscape-zh-boundaries-v1",
+      "camera_bundle_id": "landscape-zh-camera-v1",
+      "share_camera_feed_with": null
+    },
+    {
+      "id": "landscape-en",
+      "orientation": "landscape",
+      "aspect_ratio": "16:9",
+      "speech_language": "en",
+      "reference_bundle_id": "landscape-en-boundaries-v1",
+      "camera_bundle_id": "landscape-en-camera-v1",
+      "share_camera_feed_with": null
+    }
+  ],
+  "presenter_contract": {
+    "identity": "fictional_energetic_technology_presenter",
+    "voice": "non_imitative_bilingual_male_voice",
+    "public_figure_likeness": false,
+    "public_figure_voice_clone": false,
+    "endorsement_implication": false
+  },
+  "call_estimate": {
+    "reference_image_calls": 20,
+    "camera_video_calls": 16,
+    "total_paid_calls_before_retry": 36
+  },
+  "paid_generation_budget": {
+    "max_calls_without_confirmation": 0,
+    "used": 0,
+    "automatic_retry": false,
+    "model_substitution": false
+  },
+  "current_audit": {
+    "native_portrait_en_media_exists": false,
+    "native_landscape_en_media_exists": false,
+    "existing_english_ui_uses_migrated_chinese_camera_and_audio": true,
+    "cybercab_authorized_calls_remaining": 0,
+    "paid_generation_executed_for_this_plan": false,
+    "next_action_requires_new_explicit_max_calls": true
+  },
+  "execution_guards": {
+    "non_overwriting": true,
+    "sequential_submission": true,
+    "provider_raw_payload_forbidden": true,
+    "credentials_forbidden": true,
+    "runtime_urls_forbidden_in_trajectory": true
+  },
+  "evaluation": {
+    "technical": ["duration", "resolution", "aspect_ratio", "fps", "video_stream", "audio_stream", "boundary_similarity"],
+    "semantic_visual": ["presenter_consistency", "product_geometry", "hands", "set_continuity", "orientation_native_composition", "no_object_pop"],
+    "audio": ["language_matches_variant", "pronunciation", "lip_sync", "voice_consistency", "loudness"],
+    "human": "required"
+  },
+  "training_eligible": false,
+  "human_review": "pending"
+}

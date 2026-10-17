@@ -1,0 +1,123 @@
+{
+  "schema": "visualagent.multifamily-development-design.v1",
+  "state": "planned_not_executed",
+  "seed": "multifamily-development-v1",
+  "selection_rule": "Minimum sha256(seed + family_id) within each category; retain all three capability variants.",
+  "dataset": "data/research/advertising_goal_dependent_briefs_v2.json",
+  "dataset_sha256": "981824ce69538407d533dd5fff888c44d045739f2cb1218f8221a380470d298f",
+  "reference_package_sha256": "037ae49dbe8df8590caad3b705754d059efb2059882e4a029e8cfdd8fbb73c1a",
+  "model": "cb-gpt-5.6-sol",
+  "protocol_version": "interactive-transfer-v3",
+  "max_output_tokens_per_call": 4400,
+  "question_budgets": [
+    0,
+    3
+  ],
+  "conditions": [
+    "general_review",
+    "prerequisite_review"
+  ],
+  "selected_families": {
+    "audio_devices": "earbuds",
+    "bags": "sling",
+    "drinkware": "drink",
+    "home_lighting": "light"
+  },
+  "cases": [
+    {
+      "card_id": "d5f9055d96a8",
+      "family_id": "drink",
+      "category": "drinkware",
+      "capability_status_for_evaluation_only": "supported",
+      "reference_id": "R008"
+    },
+    {
+      "card_id": "c40536b1fd09",
+      "family_id": "drink",
+      "category": "drinkware",
+      "capability_status_for_evaluation_only": "unsupported",
+      "reference_id": "R008"
+    },
+    {
+      "card_id": "cb85ca876984",
+      "family_id": "drink",
+      "category": "drinkware",
+      "capability_status_for_evaluation_only": "unknown",
+      "reference_id": "R008"
+    },
+    {
+      "card_id": "1b9509c27bb0",
+      "family_id": "light",
+      "category": "home_lighting",
+      "capability_status_for_evaluation_only": "supported",
+      "reference_id": "R016"
+    },
+    {
+      "card_id": "30f888f70d22",
+      "family_id": "light",
+      "category": "home_lighting",
+      "capability_status_for_evaluation_only": "unsupported",
+      "reference_id": "R016"
+    },
+    {
+      "card_id": "56206bd538f6",
+      "family_id": "light",
+      "category": "home_lighting",
+      "capability_status_for_evaluation_only": "unknown",
+      "reference_id": "R016"
+    },
+    {
+      "card_id": "95585111788b",
+      "family_id": "sling",
+      "category": "bags",
+      "capability_status_for_evaluation_only": "supported",
+      "reference_id": "R008"
+    },
+    {
+      "card_id": "ad7f6321078b",
+      "family_id": "sling",
+      "category": "bags",
+      "capability_status_for_evaluation_only": "unsupported",
+      "reference_id": "R008"
+    },
+    {
+      "card_id": "b0e58d872634",
+      "family_id": "sling",
+      "category": "bags",
+      "capability_status_for_evaluation_only": "unknown",
+      "reference_id": "R008"
+    },
+    {
+      "card_id": "8faaa7bd7cf3",
+      "family_id": "earbuds",
+      "category": "audio_devices",
+      "capability_status_for_evaluation_only": "supported",
+      "reference_id": "R016"
+    },
+    {
+      "card_id": "1b97a5ea1841",
+      "family_id": "earbuds",
+      "category": "audio_devices",
+      "capability_status_for_evaluation_only": "unsupported",
+      "reference_id": "R016"
+    },
+    {
+      "card_id": "a950ea76dc4c",
+      "family_id": "earbuds",
+      "category": "audio_devices",
+      "capability_status_for_evaluation_only": "unknown",
+      "reference_id": "R016"
+    }
+  ],
+  "max_calls_if_all_executed": 144,
+  "paid_calls_executed": 0,
+  "independent_reviews_completed": 0,
+  "training_eligible": false,
+  "limitations": [
+    "Development families are derived from author-written cards; not independent gold.",
+    "Reference mapping is manual mechanism-level matching, not a retrieval experiment.",
+    "Two sampled-frame references remain independently unreviewed.",
+    "Different question budgets imply different call ceilings; not equal-compute ablation.",
+    "This static design has submitted no batch; future bounded executions must record actual calls."
+  ]
+}

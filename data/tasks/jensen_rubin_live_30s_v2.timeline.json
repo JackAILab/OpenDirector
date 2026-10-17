@@ -1,0 +1,73 @@
+{
+  "schema": "visualagent.live-production-timeline.v1",
+  "duration": 30.0,
+  "disclosure": "AI 合成概念演示 · 非真实直播、代言或产品发布",
+  "scene": {
+    "description": "A clearly synthetic Jensen Huang dramatization presents one dual-fan flagship graphics card in a premium graphite PC-hardware livestream studio. The 30-second single-session narrative answers a viewer power question and explicitly frames Rubin cooling as a fictional concept visualization whose real specifications require official verification.",
+    "subject": "Jensen Huang synthetic dramatization",
+    "product": "dual-fan flagship graphics card concept",
+    "claim_policy": "No unverified benchmark, price, inventory, endorsement or real-product Rubin cooling claim."
+  },
+  "ui_template": {
+    "host_label": "Jensen AI Concept",
+    "template": "vertical_live_v2"
+  },
+  "layout": {
+    "fixed_elements": [
+      {"id": "host_identity", "region": "top-left", "start": 0.0, "end": 30.0, "owner": "code", "pixel_drift_expected": 0},
+      {"id": "action_rail", "region": "right", "start": 0.0, "end": 30.0, "owner": "code", "buttons": ["profile", "like", "cart", "share"], "pixel_drift_expected": 0},
+      {"id": "disclosure", "region": "top", "start": 0.0, "end": 30.0, "owner": "code", "pixel_drift_expected": 0}
+    ],
+    "safe_areas": [
+      {"id": "host_identity", "instruction": "keep face, hands and GPU away from the top-left identity block"},
+      {"id": "comments", "instruction": "keep face, hands and GPU away from the lower-left comment stack"},
+      {"id": "actions", "instruction": "keep all essential physical details away from the fixed right action rail"},
+      {"id": "commerce", "instruction": "keep the lower-right commerce region visually calm but physically populated"}
+    ]
+  },
+  "reference_states": [
+    {"id": "state_00_hook", "time": 0.0, "role": "segment_boundary", "camera_semantics": "direct eye contact, GPU upright at chest, calm opening"},
+    {"id": "state_075_power_question", "time": 7.5, "role": "segment_boundary", "camera_semantics": "turns torso and gaze toward lower-left question, GPU lowered, free palm raised"},
+    {"id": "state_150_rubin_explain", "time": 15.0, "role": "segment_boundary", "camera_semantics": "half-step toward open PC, GPU diagonal at waist, broad cooling-path indication"},
+    {"id": "state_225_tryon_cart", "time": 22.5, "role": "segment_boundary", "camera_semantics": "GPU presented horizontally with both hands, chin lifted for stable AR anchor"},
+    {"id": "state_300_close", "time": 30.0, "role": "segment_boundary", "camera_semantics": "opposite-side diagonal GPU hold, open-palm sign-off, direct closing nod"}
+  ],
+  "tracks": {
+    "camera": [
+      {"id": "cam_hook", "start": 0.0, "end": 7.5, "action": "The synthetic host looks directly into camera and introduces the single GPU with restrained natural speech motion; stable tripod shot and stable dual-fan geometry.", "model_owned": true},
+      {"id": "cam_power_response", "start": 7.5, "end": 15.0, "action": "After acknowledging the lower-left power question with an open palm, the host takes a half-step toward the open PC, lowers the same GPU diagonally and makes a broad cooling-path indication.", "responds_to": "comment_power", "model_owned": true},
+      {"id": "cam_rubin_concept", "start": 15.0, "end": 22.5, "action": "The host traces one clear physical cooling path beside the open PC and then brings the same GPU back toward center; no holograms or graphics appear in the camera plate.", "model_owned": true},
+      {"id": "cam_close", "start": 22.5, "end": 30.0, "action": "The host holds still briefly for a face-tracked overlay, angles the same dual-fan GPU slightly, returns eye contact, and gives a calm closing nod.", "model_owned": true}
+    ],
+    "speech": [
+      {"id": "speech_hook", "start": 0.4, "end": 6.8, "text": "今天用一场 AI 合成概念演示，聊聊旗舰显卡的整机供电和散热。"},
+      {"id": "speech_power", "start": 8.2, "end": 14.6, "text": "看到有人问功耗够不够。够用，但必须按整机配置、供电余量和官方建议一起核算。", "responds_to": "comment_power"},
+      {"id": "speech_rubin", "start": 15.3, "end": 22.0, "text": "这里再加入一个新一代 Rubin 散热设计的概念演示；它不是正式产品信息，真实规格请以官方发布为准。"},
+      {"id": "speech_close", "start": 23.0, "end": 29.2, "text": "别只看单个数字，功耗、散热、线材和机箱空间要放在一起验证。"}
+    ],
+    "comments": [
+      {"id": "comment_hook", "time": 1.3, "duration": 4.2, "username": "tensor_tom", "avatar_id": 3, "text": "这张卡的结构很扎实", "model_owned": false},
+      {"id": "comment_power", "time": 6.6, "duration": 7.5, "username": "watt_guard", "avatar_id": 12, "text": "显卡功耗这么高，电源真的够用吗？", "model_owned": false},
+      {"id": "comment_rubin", "time": 14.8, "duration": 6.0, "username": "thermal_lab", "avatar_id": 18, "text": "Rubin 散热设计是什么思路？", "model_owned": false},
+      {"id": "comment_case", "time": 21.2, "duration": 5.0, "username": "small_case", "avatar_id": 21, "text": "别忘了机箱和线材空间", "model_owned": false},
+      {"id": "comment_close", "time": 26.0, "duration": 3.5, "username": "frame_chaser", "avatar_id": 8, "text": "概念演示很清楚，等官方规格", "model_owned": false}
+    ],
+    "ui": [
+      {"id": "ui_initial", "time": 0.0, "state": {"viewer_count": 126700, "likes": 284900, "cart_open": false}, "model_owned": false},
+      {"id": "ui_count_1", "time": 8.0, "state": {"viewer_count": 127800, "likes": 288400}, "model_owned": false},
+      {"id": "ui_cart_open", "type": "commerce_drawer", "start": 12.0, "end": 18.0, "title": "旗舰显卡概念展示", "subtitle": "AI 概念演示 · 无价格与购买承诺", "model_owned": false},
+      {"id": "ui_count_2", "time": 20.0, "state": {"viewer_count": 129100, "likes": 293800}, "model_owned": false},
+      {"id": "ui_cart_reopen", "type": "commerce_drawer", "start": 24.0, "end": 28.2, "title": "整机验证清单", "subtitle": "供电 · 散热 · 线材 · 空间", "model_owned": false}
+    ],
+    "vfx": [
+      {"id": "vfx_hearts", "type": "heart_burst", "start": 9.4, "end": 11.8, "caused_by": "speech_power", "model_owned": false},
+      {"id": "vfx_rocket", "type": "rocket", "start": 16.8, "end": 19.2, "caused_by": "speech_rubin", "model_owned": false},
+      {"id": "vfx_sports_car", "type": "sports_car", "start": 21.4, "end": 23.7, "caused_by": "comment_case", "model_owned": false},
+      {"id": "vfx_final_hearts", "type": "heart_burst", "start": 27.0, "end": 29.4, "caused_by": "comment_close", "model_owned": false}
+    ],
+    "ar": [
+      {"id": "ar_sunglasses", "type": "face_anchor_sunglasses", "start": 22.8, "end": 26.2, "anchor": "eyes", "owner": "code", "model_owned": false}
+    ],
+    "subtitles": []
+  }
+}

@@ -1,0 +1,59 @@
+{
+  "schema": "visualagent.research-plan.v1",
+  "status": "design_only",
+  "created_date": "2026-10-08",
+  "hypothesis": "Evidence-constrained mechanism transfer improves factuality on new products over matched caption RAG without sacrificing creative utility.",
+  "reference_pilot_target": 24,
+  "brief_pilot_target": 12,
+  "brief_categories_target": 4,
+  "information_conditions": [
+    "complete",
+    "underspecified"
+  ],
+  "planning_conditions": [
+    "direct",
+    "fixed_playbook",
+    "caption_rag",
+    "mechanism_rag",
+    "evidence_constrained_mechanism"
+  ],
+  "clarification_conditions": [
+    "none",
+    "fixed",
+    "generic_missing_information",
+    "mechanism_prerequisite"
+  ],
+  "maximum_questions": 3,
+  "primary_unit": "brief_family",
+  "primary_endpoint": "independently_reviewed_product_fact_violation_rate",
+  "secondary_endpoints": [
+    "plan_executability",
+    "observable_value",
+    "source_copying",
+    "blind_preference",
+    "latency",
+    "cost",
+    "question_count"
+  ],
+  "video_stage": {
+    "state": "not_started",
+    "briefs_target": 12,
+    "conditions_target": 3,
+    "repeats": 2,
+    "videos_target": 72,
+    "model": null,
+    "approved_credits": null
+  },
+  "reference_manifest": null,
+  "brief_manifest": "data/research/advertising_briefs_v1.json",
+  "planning_model": null,
+  "independent_gold_ready": false,
+  "formal_power_analysis_complete": false,
+  "paid_generation_authorized": false,
+  "automatic_retry": false,
+  "training_eligible": false,
+  "results": null,
+  "brief_manifest_status": "authored_synthetic_development_pilot",
+  "counterfactual_variants_per_family": 3,
+  "planning_dry_run_task_count": 360
+}

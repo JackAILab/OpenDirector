@@ -1,0 +1,47 @@
+{
+  "schema": "visualagent.live-production-timeline.v1",
+  "duration": 15.0,
+  "disclosure": "AI 合成演示 · 非真实直播或代言",
+  "scene": {
+    "description": "A clearly synthetic dramatization of Jensen Huang presenting an RTX 5090 in a rich PC hardware livestream studio with layered shelves, an active open PC, desk props, emerald practical lights, and strong foreground-midground-background depth.",
+    "subject": "Jensen Huang synthetic dramatization",
+    "product": "RTX 5090 Founders Edition"
+  },
+  "ui_template": {"host_label": "Jensen AI Demo", "template": "vertical_live_v1"},
+  "layout": {
+    "safe_areas": [
+      {"id": "comments", "instruction": "keep face and GPU details away from the lower-left comment zone"},
+      {"id": "actions", "instruction": "keep essential subject details away from the right action rail"},
+      {"id": "product", "instruction": "keep the lower-right product-card region calm but not empty"}
+    ]
+  },
+  "tracks": {
+    "camera": [
+      {"id": "cam_intro", "start": 0.0, "end": 4.0, "action": "The synthetic host looks into camera, speaks naturally, and holds the GPU vertically at chest height.", "model_owned": true},
+      {"id": "cam_power_response", "start": 4.0, "end": 9.5, "action": "After noticing a power-supply question, the host nods, makes a compact explanatory gesture, and points once toward the active PC power system while keeping the GPU stable and visible.", "responds_to": "comment_power", "model_owned": true},
+      {"id": "cam_close", "start": 9.5, "end": 15.0, "action": "The host turns the GPU slightly to show its dual-fan structure, then returns to camera and gives a confident closing nod.", "model_owned": true}
+    ],
+    "speech": [
+      {"id": "speech_intro", "start": 0.4, "end": 3.8, "text": "今天我们用一场 AI 合成演示，看看这张旗舰显卡。"},
+      {"id": "speech_power", "start": 4.6, "end": 9.0, "text": "看到有人问电源，真实装机一定要按整机配置和官方建议认真核算。", "responds_to": "comment_power"},
+      {"id": "speech_close", "start": 9.8, "end": 14.5, "text": "别只看参数，散热、供电和机箱空间要一起验证。"}
+    ],
+    "comments": [
+      {"id": "comment_hype", "time": 1.2, "duration": 4.0, "username": "frame_chaser", "avatar_id": 3, "text": "5090 终于来了！", "model_owned": false},
+      {"id": "comment_power", "time": 3.4, "duration": 5.0, "username": "pc_master88", "avatar_id": 12, "text": "电源怎么选才稳？", "model_owned": false},
+      {"id": "comment_cooling", "time": 7.3, "duration": 5.0, "username": "thermal_lab", "avatar_id": 18, "text": "想看满载散热测试", "model_owned": false},
+      {"id": "comment_case", "time": 11.0, "duration": 4.0, "username": "small_case", "avatar_id": 21, "text": "机箱兼容性也很关键", "model_owned": false}
+    ],
+    "ui": [
+      {"id": "ui_state_0", "time": 0.0, "state": {"viewer_count": 126700, "likes": 284900}, "model_owned": false},
+      {"id": "ui_state_1", "time": 6.0, "state": {"viewer_count": 127300, "likes": 286400}, "model_owned": false},
+      {"id": "ui_product", "type": "product_card", "start": 8.8, "end": 14.2, "title": "RTX 5090 展示", "subtitle": "AI 演示 · 请核对官方信息", "model_owned": false}
+    ],
+    "vfx": [
+      {"id": "vfx_hearts", "type": "heart_burst", "start": 5.5, "end": 8.2, "caused_by": "speech_power", "model_owned": false},
+      {"id": "vfx_rocket", "type": "rocket", "start": 10.6, "end": 12.5, "caused_by": "cam_close", "model_owned": false}
+    ],
+    "ar": [],
+    "subtitles": []
+  }
+}

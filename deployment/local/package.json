@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "@klingai/cli-cn": "^0.1.4",
+    "gsap": "^3.13.0",
+    "hyperframes": "^0.8.73"
+  }
+}

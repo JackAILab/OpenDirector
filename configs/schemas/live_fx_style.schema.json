@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "visualagent.live-fx-style.v1",
+  "type": "object",
+  "required": ["schema", "id", "assets", "motion_recipes", "qa", "training_eligible"],
+  "properties": {
+    "schema": {"const": "visualagent.live-fx-style.v1"},
+    "id": {"type": "string", "minLength": 1},
+    "assets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "path", "owner", "contains_readable_text"],
+        "properties": {
+          "id": {"type": "string"},
+          "path": {"type": "string"},
+          "owner": {"enum": ["gpt-image-2", "code"]},
+          "contains_readable_text": {"const": false}
+        }
+      }
+    },
+    "motion_recipes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "phases"],
+        "properties": {
+          "id": {"type": "string"},
+          "phases": {
+            "type": "array",
+            "minItems": 5,
+            "maxItems": 5,
+            "items": {
+              "type": "object",
+              "required": ["name", "duration"],
+              "properties": {
+                "name": {"enum": ["anticipate", "burst", "hero", "settle", "dissipate"]},
+                "duration": {"type": "number", "exclusiveMinimum": 0}
+              }
+            }
+          }
+        }
+      }
+    },
+    "qa": {"type": "object"},
+    "training_eligible": {"const": false}
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "schema": "visualagent.camera-segment-batch.v1",
+  "case_id": "jensen_rubin_live_30s_v2",
+  "timeline": "data/tasks/jensen_rubin_live_30s_v2.timeline.json",
+  "model": "kling-video-v3_0",
+  "source_duration_seconds": 8,
+  "assembled_duration_seconds": 7.5,
+  "aspect_ratio": "9:16",
+  "resolution": "1080p",
+  "segments": [
+    {
+      "id": "seg_000_075",
+      "start": 0.0,
+      "end": 7.5,
+      "first": "outputs/artifacts/jensen_rtx5090_live_v2_20260820/camera_references/first-v2.png",
+      "tail": "outputs/artifacts/jensen_rtx5090_live_v2_20260820/camera_references/state-075-dynamic-v2.png",
+      "prompt": "图片1是第0秒，图片2是第7.5秒。同一位明确标注为AI合成概念演示的黄仁勋形象、同一件黑色皮夹克、同一张双风扇旗舰显卡、同一间丰富的石墨色PC硬件直播棚。连续单镜头中，人物先直视镜头自然口播，随后明确注意到左下观众功耗提问：视线转向左下，头和上半身自然转动约25度，重心侧移，把显卡从胸前降低至上腰部并举起另一只手作开放掌回应。动作连贯、自信且幅度清楚，不是原地小点头。显卡双风扇几何和五指稳定。机位保持眼平中景，无切镜、无新人物。左上、右侧、下方安全区保持平静，不生成任何文字、数字、按钮、弹幕、礼物、购物车、墨镜、价格、logo或水印。"
+    }
+  ]
+}

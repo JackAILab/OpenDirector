@@ -1,0 +1,83 @@
+{
+  "schema": "visualagent.omni-native-av-successor-plan.v1",
+  "id": "cybercab-live-60s-v2-omni-native-av",
+  "case_id": "cybercab_live_60s_v1",
+  "objective": "Replace the mixed-lineage review camera with four continuous Kling Omni segments whose picture, speech, room tone and lip motion are generated together.",
+  "status": "generated_pending_continuity_repair_and_review",
+  "model": "kling-video-v3_0_omni",
+  "input_mode": "hard_first_and_last_frames",
+  "parameters": {
+    "duration_seconds_per_segment": 15,
+    "aspect_ratio": "9:16",
+    "resolution": "1080p",
+    "enable_audio": true,
+    "prefer_multi_shots": false
+  },
+  "assembled_duration_seconds": 15,
+  "assembly_output": "outputs/artifacts/cybercab_live_60s_v2/camera/camera_feed_60s-omni-native-av-v2.mp4",
+  "audio_contract": {
+    "native_audio_required": true,
+    "speech_language": "zh-CN",
+    "speaker": "fictional_technology_presenter",
+    "real_person_imitation": false,
+    "external_tts_replacement_allowed": false,
+    "source_video_must_contain_audio_stream": true,
+    "trim_preserve_audio": true,
+    "assembly_include_audio": true,
+    "hyperframes_audio_source": "assembled_camera_feed_same_container"
+  },
+  "segments": [
+    {
+      "id": "seg-00-15-omni-native-av-v2",
+      "start": 0,
+      "end": 15,
+      "first_frame": "outputs/artifacts/cybercab_live_60s_v1/reference_states/state-00-000.png",
+      "last_frame": "outputs/artifacts/cybercab_live_60s_v1/reference_states/state-15-000.png",
+      "prompt": "单镜头真实直播，严格从首帧连续运动到尾帧。保持同一虚构科技主播、同一金色双座自动驾驶车、同一展厅、镜头高度、灯光和色彩。主播从车头侧面自然走到乘客门旁，用有激情但清晰的普通话说：各位看这里，我们现在就从外观开始，把这台金色双座自动驾驶车的关键细节现场看清楚！随后近侧蝴蝶门平稳抬起。摄影机只缓慢手持跟随，不切镜、不突变、不新增物体。原生同步普通话虚构男声与轻微展厅底噪，不模仿任何真实人物。画面内禁止可读文字、Logo、价格、UI、字幕和礼物特效。",
+      "output": "outputs/artifacts/cybercab_live_60s_v2/camera_segments/seg-00-15-omni-native-av-v2.source-15s.mp4"
+    },
+    {
+      "id": "seg-15-30-omni-native-av-v2",
+      "start": 15,
+      "end": 30,
+      "first_frame": "outputs/artifacts/cybercab_live_60s_v1/reference_states/state-15-000.png",
+      "last_frame": "outputs/artifacts/cybercab_live_60s_v1/reference_states/state-30-000.png",
+      "prompt": "单镜头真实直播，严格从首帧连续运动到尾帧。保持同一虚构科技主播、同一金色车辆、同一抬起的蝴蝶门、展厅布景和光线。主播用手示意双座舱，兴奋地用普通话说：蝴蝶门打开以后，进出空间非常直接；重点是这里没有方向盘，也没有踏板，乘员从一开始就是乘客。然后他自然坐入乘客座并系好安全带，门在本段保持打开。摄影机只缓慢靠近，不切镜，不改变人物或车体，不新增桌子、机箱、地垫或其他道具。原生同步普通话虚构男声，不模仿真实人物。画面内禁止可读文字、Logo、价格、UI、字幕和礼物特效。",
+      "output": "outputs/artifacts/cybercab_live_60s_v2/camera_segments/seg-15-30-omni-native-av-v2.source-15s.mp4"
+    },
+    {
+      "id": "seg-30-45-omni-native-av-v2",
+      "start": 30,
+      "end": 45,
+      "first_frame": "outputs/artifacts/cybercab_live_60s_v1/reference_states/state-30-000.png",
+      "last_frame": "outputs/artifacts/cybercab_live_60s_v1/reference_states/state-45-000.png",
+      "prompt": "单镜头真实直播，严格从首帧连续运动到尾帧。相同虚构主播始终坐在同一个乘客座并系好安全带，脸、衣服、座椅、车身与展厅保持不变。蝴蝶门平稳关闭，摄影机自然转为稳定车内广角。主播激情但清晰地用普通话说：现在坐稳，安全带已经扣好。所有行程操作都集中在中控屏上，路线、上车确认和出发状态，之后由我们的界面层清楚展示。主播只把手指向空白黑色中控玻璃。无方向盘、无踏板，绝不切镜、闪变或突然出现新物体。原生同步普通话虚构男声。画面内禁止可读文字、Logo、UI、字幕、价格和礼物特效。",
+      "output": "outputs/artifacts/cybercab_live_60s_v2/camera_segments/seg-30-45-omni-native-av-v2.source-15s.mp4"
+    },
+    {
+      "id": "seg-45-60-omni-native-av-v2",
+      "start": 45,
+      "end": 60,
+      "first_frame": "outputs/artifacts/cybercab_live_60s_v1/reference_states/state-45-000.png",
+      "last_frame": "outputs/artifacts/cybercab_live_60s_v1/reference_states/state-60-000.png",
+      "prompt": "单镜头真实直播，严格从首帧连续运动到尾帧。保持同一虚构主播、同一座舱、同一安全带位置和相机视角。车辆在封闭演示路线低速自动起步，只有窗外景物产生平滑轻微运动，车内人物和物体稳定，没有驾驶动作、公共道路或其他交通。主播双手离开中控，兴奋地用普通话说：好，车辆已经自己平稳起步。注意我的双手完全离开控制区，我们把真实乘坐过程、空间感和运动状态一次给大家看明白！结尾自然微笑。原生同步普通话虚构男声与轻微电动车行驶声，不模仿真实人物。不切镜、不闪变、不新增物体。画面内禁止可读文字、Logo、价格、UI、字幕和礼物特效。",
+      "output": "outputs/artifacts/cybercab_live_60s_v2/camera_segments/seg-45-60-omni-native-av-v2.source-15s.mp4"
+    }
+  ],
+  "estimated_paid_calls": 4,
+  "paid_generation_budget": {
+    "max_calls_without_confirmation": 4,
+    "used": 4,
+    "automatic_retry": false,
+    "model_substitution": false
+  },
+  "promotion_gates": [
+    "four source MP4 files contain both video and audio streams",
+    "native Mandarin speech and lip synchronization pass independent listening review",
+    "all three joins pass continuity review without object pops",
+    "30-45 activation and 45-60 autonomous movement pass semantic review",
+    "HyperFrames uses the assembled Camera Feed as both muted video and separate same-container audio track",
+    "explicit human approval"
+  ],
+  "training_eligible": false
+}

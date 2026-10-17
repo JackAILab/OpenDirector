@@ -1,0 +1,63 @@
+{
+  "schema": "visualagent.live-text-style.v1",
+  "id": "tiktok-live-text-v2",
+  "owner": "code_hyperframes",
+  "canvas": {"width": 1080, "height": 1920, "orientation": "portrait"},
+  "research_basis": {
+    "sampled_at": "2026-08-26",
+    "scope": "public TikTok LIVE screen captures, public mobile UI references, and creator walkthrough thumbnails",
+    "principles_only": true,
+    "copied_brand_assets": false
+  },
+  "hierarchy": {
+    "fixed_order": ["host_identity", "viewer_count", "action_rail", "comment_queue", "composer"],
+    "event_order": ["pinned_question", "commerce_card", "gift_notice"],
+    "max_simultaneous_priority_surfaces": 1,
+    "ordinary_comments_yield_to_priority_surface": true
+  },
+  "safe_areas": {
+    "top_px": 34,
+    "right_rail_width_px": 112,
+    "comment_left_px": 32,
+    "comment_bottom_px": 174,
+    "composer_bottom_px": 28,
+    "protected_subject_zone": {"x": 300, "y": 280, "width": 540, "height": 1120}
+  },
+  "text_roles": [
+    {"id": "host_name", "font_size_px": 24, "weight": 720, "line_height": 1.1, "max_lines": 1},
+    {"id": "viewer_count", "font_size_px": 19, "weight": 650, "line_height": 1.0, "tabular_numbers": true},
+    {"id": "comment_author", "font_size_px": 18, "weight": 650, "line_height": 1.32, "opacity": 0.72},
+    {"id": "comment_body", "font_size_px": 24, "weight": 520, "line_height": 1.32, "max_lines": 2},
+    {"id": "commerce_title", "font_size_px": 28, "weight": 760, "line_height": 1.08, "max_lines": 1},
+    {"id": "composer_hint", "font_size_px": 20, "weight": 450, "line_height": 1.1, "max_lines": 1}
+  ],
+  "comment_queue": {
+    "max_visible": 4,
+    "slot_height_px": 68,
+    "avatar_size_px": 38,
+    "regular_surface": "transparent",
+    "priority_surface": "localized_glass",
+    "author_and_body_flow": "inline",
+    "motion_recipe": "waterfall-entry+nudge-curve",
+    "entry_seconds": 0.22,
+    "shift_seconds": 0.20,
+    "exit_seconds": 0.22
+  },
+  "commerce": {
+    "mode": "compact_pin",
+    "width_px": 472,
+    "height_px": 146,
+    "title_max_lines": 1,
+    "description_max_lines": 2,
+    "forbid": ["invented_price", "stock_claim", "countdown", "purchase_cta"]
+  },
+  "qa": {
+    "require_cjk_font": true,
+    "require_text_shadow_on_camera": true,
+    "forbid_repeated_full_comment_cards": true,
+    "forbid_monospaced_cjk_body": true,
+    "forbid_face_or_product_occlusion": true
+  },
+  "training_eligible": false,
+  "human_review": "pending"
+}

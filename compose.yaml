@@ -1,0 +1,26 @@
+services:
+  studio:
+    build:
+      context: .
+      dockerfile: deployment/local/Dockerfile
+    env_file: .env
+    ports:
+      - "127.0.0.1:30080:30080"
+    volumes:
+      - studio-data:/data
+      - ./assets/library:/assets/library
+      - ./outputs:/app/outputs
+      - ./secrets:/run/secrets:ro
+      - kling-config:/root/.kling
+    shm_size: 1gb
+    init: true
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:30080/healthz', timeout=5)"]
+      interval: 20s
+      timeout: 6s
+      start_period: 30s
+      retries: 3
+volumes:
+  studio-data:
+  kling-config:

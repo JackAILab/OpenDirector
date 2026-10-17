@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>VisualAgent · 四版本预览中心</title>
+  <style>
+    :root { color-scheme: light; --ink:#171814; --paper:#f4f1e8; --card:#fffdf8; --line:#d9d3c5; --lime:#b8ed36; --purple:#6f57d9; }
+    * { box-sizing:border-box; }
+    body { margin:0; min-height:100vh; color:var(--ink); background:radial-gradient(circle at 12% 6%,#fff 0,transparent 32%),radial-gradient(circle at 92% 8%,#e8e3ff 0,transparent 27%),var(--paper); font-family:Inter,"PingFang SC","Noto Sans CJK SC",system-ui,sans-serif; }
+    main { width:min(1180px,calc(100% - 36px)); margin:auto; padding:54px 0 70px; }
+    header { display:flex; justify-content:space-between; align-items:flex-end; gap:28px; margin-bottom:34px; }
+    .eyebrow { margin:0 0 12px; color:#6656b7; font-size:13px; font-weight:800; letter-spacing:.16em; text-transform:uppercase; }
+    h1 { margin:0; max-width:780px; font-size:clamp(34px,6vw,68px); line-height:.98; letter-spacing:-.055em; }
+    .status { flex:0 0 auto; padding:12px 16px; border:1px solid #cad5aa; border-radius:999px; background:#f7ffe6; font-size:14px; font-weight:750; }
+    .status::before { content:""; display:inline-block; width:9px; height:9px; margin-right:8px; border-radius:50%; background:#70a915; box-shadow:0 0 0 5px #dff2b6; }
+    .intro { max-width:720px; margin:0 0 32px; color:#62645d; font-size:17px; line-height:1.65; }
+    .grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px; }
+    .card { position:relative; display:grid; grid-template-columns:170px 1fr; min-height:238px; overflow:hidden; color:inherit; text-decoration:none; border:1px solid var(--line); border-radius:26px; background:rgba(255,253,248,.88); box-shadow:0 18px 45px rgba(41,35,22,.07); transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease; }
+    .card:hover,.card:focus-visible { transform:translateY(-4px); border-color:#aa9fea; box-shadow:0 24px 58px rgba(41,35,22,.13); outline:none; }
+    .thumb { min-height:238px; background:#121511 center/cover no-repeat; }
+    .card[data-layout="portrait"] .thumb { background-size:cover; }
+    .copy { display:flex; flex-direction:column; padding:26px 24px 22px; }
+    .tag { align-self:flex-start; padding:6px 9px; border-radius:7px; background:#ebe7de; color:#686a63; font:750 11px/1 ui-monospace,monospace; letter-spacing:.08em; }
+    h2 { margin:19px 0 7px; font-size:25px; letter-spacing:-.035em; }
+    .meta { margin:0; color:#73756d; font-size:14px; line-height:1.5; }
+    .open { display:flex; align-items:center; justify-content:space-between; margin-top:auto; padding-top:24px; font-weight:800; }
+    .arrow { display:grid; place-items:center; width:34px; height:34px; border-radius:50%; background:var(--lime); font-size:19px; }
+    footer { display:flex; justify-content:space-between; gap:20px; margin-top:28px; padding:18px 20px; border:1px solid var(--line); border-radius:16px; color:#73756d; background:rgba(255,255,255,.48); font-size:13px; }
+    @media (max-width:800px) { header{align-items:flex-start;flex-direction:column}.grid{grid-template-columns:1fr}.card{grid-template-columns:130px 1fr}.thumb{min-height:220px}footer{flex-direction:column} }
+    @media (max-width:460px) { main{width:min(100% - 22px,1180px);padding-top:30px}.card{grid-template-columns:104px 1fr}.copy{padding:21px 17px}.status{font-size:12px} }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <div><p class="eyebrow">VisualAgent · Live UI Review</p><h1>一个入口，查看四个直播版本</h1></div>
+      <div class="status">工作台可审 · 原生媒体待生成</div>
+    </header>
+    <p class="intro">选择任一版本即可进入 VisualAgent 无限画布工作台，查看对应的设置、合成快照、迁移媒体、时间线和审阅状态。</p>
+    <section class="grid" aria-label="四个直播版本">
+      <a class="card" data-layout="portrait" href="../?variant=portrait-zh">
+        <div class="thumb" style="background-image:url('portrait-zh/snapshots/frame-04-at-59.0s.png')"></div>
+        <div class="copy"><span class="tag">9:16 · ZH-CN · LEGACY</span><h2>中文竖屏</h2><p class="meta">UI 可审；当前为旧版中文竖屏媒体，v5 原生 Camera Feed 待生成。</p><span class="open">进入工作台 <i class="arrow">↗</i></span></div>
+      </a>
+      <a class="card" data-layout="portrait" href="../?variant=portrait-en">
+        <div class="thumb" style="background-image:url('portrait-en/snapshots/frame-04-at-59.0s.png')"></div>
+        <div class="copy"><span class="tag">9:16 · EN · PLACEHOLDER</span><h2>English Portrait</h2><p class="meta">UI review only. The current migrated Camera Feed still contains Chinese speech; native English media is pending.</p><span class="open">进入工作台 <i class="arrow">↗</i></span></div>
+      </a>
+      <a class="card" data-layout="landscape" href="../?variant=landscape-zh">
+        <div class="thumb" style="background-image:url('landscape-zh/snapshots/frame-04-at-59.0s.png')"></div>
+        <div class="copy"><span class="tag">16:9 · ZH-CN · PLACEHOLDER</span><h2>中文横屏</h2><p class="meta">UI 可审；当前仍复用竖屏 Camera Feed，16:9 原生媒体待生成。</p><span class="open">进入工作台 <i class="arrow">↗</i></span></div>
+      </a>
+      <a class="card" data-layout="landscape" href="../?variant=landscape-en">
+        <div class="thumb" style="background-image:url('landscape-en/snapshots/frame-04-at-59.0s.png')"></div>
+        <div class="copy"><span class="tag">16:9 · EN · PLACEHOLDER</span><h2>English Landscape</h2><p class="meta">UI review only. It still reuses portrait media with Chinese speech; native 16:9 English media is pending.</p><span class="open">进入工作台 <i class="arrow">↗</i></span></div>
+      </a>
+    </section>
+    <footer><span>预览媒体未重新生成 · No paid model calls</span><span>training_eligible=false · 等待独立审阅与人工批准</span></footer>
+  </main>
+</body>
+</html>

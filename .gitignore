@@ -1,0 +1,15 @@
+.env
+secrets/
+assets/
+outputs/
+**/node_modules/
+**/__pycache__/
+*.pyc
+*.sqlite*
+*.env
+*.key
+*.pem
+*.log
+.venv/
+*.egg-info/
+.pytest_cache/

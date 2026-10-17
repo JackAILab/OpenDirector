@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "visualagent.live-production-timeline.v1",
+  "type": "object",
+  "required": ["schema", "duration", "scene", "tracks"],
+  "properties": {
+    "schema": {"const": "visualagent.live-production-timeline.v1"},
+    "duration": {"type": "number", "exclusiveMinimum": 0},
+    "scene": {"type": "object"},
+    "layout": {"type": "object"},
+    "disclosure": {"type": "string", "minLength": 1},
+    "tracks": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "camera": {"$ref": "#/$defs/events"},
+        "speech": {"$ref": "#/$defs/events"},
+        "comments": {"$ref": "#/$defs/events"},
+        "ui": {"$ref": "#/$defs/events"},
+        "vfx": {"$ref": "#/$defs/events"},
+        "ar": {"$ref": "#/$defs/events"},
+        "subtitles": {"$ref": "#/$defs/events"}
+      }
+    }
+  },
+  "$defs": {
+    "events": {"type": "array", "items": {"$ref": "#/$defs/event"}},
+    "event": {
+      "type": "object",
+      "required": ["id"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "start": {"type": "number", "minimum": 0},
+        "end": {"type": "number", "minimum": 0},
+        "time": {"type": "number", "minimum": 0},
+        "caused_by": {"type": "string"},
+        "responds_to": {"type": "string"},
+        "model_owned": {"type": "boolean"}
+      }
+    }
+  }
+}

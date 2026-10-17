@@ -1,0 +1,12 @@
+{
+  "caseId": "gpu",
+  "plate": "assets/plates/gpu-host-v1.png",
+  "room": "VisualAgent 硬件实验室",
+  "eyebrow": "旗舰硬件 · 15 秒看懂",
+  "title": "性能很强，\n装机更要先看兼容",
+  "factA": "双风扇结构清晰可见",
+  "factB": "电源、散热、空间一起核对",
+  "cta": "查看装机清单",
+  "accent": "#b7f52a",
+  "accent2": "#4de6c1"
+}

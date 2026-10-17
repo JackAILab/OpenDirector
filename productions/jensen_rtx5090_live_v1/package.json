@@ -1,0 +1,13 @@
+{
+  "name": "jensen-rtx5090-live-v1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "lint": "npx --yes hyperframes@0.8.3 lint",
+    "check": "npx --yes hyperframes@0.8.3 check --samples 15 --snapshots",
+    "validate": "npx --yes hyperframes@0.8.3 validate",
+    "inspect": "npx --yes hyperframes@0.8.3 inspect --samples 15",
+    "preview": "npx --yes hyperframes@0.8.3 preview",
+    "render": "npx --yes hyperframes@0.8.3 render"
+  }
+}

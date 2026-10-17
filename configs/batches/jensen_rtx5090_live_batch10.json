@@ -1,0 +1,115 @@
+{
+  "schema": "visualagent.live-batch.v1",
+  "batch_id": "jensen_rtx5090_live_batch10_20260820",
+  "duration_seconds": 15,
+  "fps": 30,
+  "resolution": "1080p",
+  "video_model": "kling-video-v3_0",
+  "image_model": "gp2/gpt-image-2",
+  "submission_cap": 10,
+  "max_credits_per_submission": 120,
+  "max_total_credits": 1200,
+  "disclosure": "AI 合成演示 · 非真实直播或代言",
+  "cases": [
+    {
+      "id": "v01_power",
+      "topic": "整机供电核算",
+      "scene": "premium graphite PC power-lab studio with an open workstation, visible non-readable PSU test instruments, emerald practical lights and layered component shelving",
+      "question": "电源怎么选才稳？",
+      "response_cue": "the host notices the power-supply question, nods, and points once toward the open PC power area",
+      "speech": ["今天用 AI 合成演示，从整机角度看看这张显卡。", "看到有人问电源，实际装机要按整机配置和官方建议认真核算。", "显卡、处理器、供电和散热需要放在一起验证。"],
+      "comments": ["5090 终于来了！", "电源怎么选才稳？", "想看供电规划过程", "整机验证很关键"],
+      "vfx": ["heart_burst", "rocket"]
+    },
+    {
+      "id": "v02_thermal",
+      "topic": "散热与风道验证",
+      "scene": "premium thermal-lab livestream set with a mesh-sided open PC, large case fans, heat-sink silhouettes, warm work lights and layered emerald accents, no readable instruments",
+      "question": "风道应该怎么验证？",
+      "response_cue": "the host notices an airflow question, gives a compact nod, and traces one clear airflow direction beside the open chassis",
+      "speech": ["这场 AI 合成演示把重点放在散热和风道。", "看到风道问题，真实装机要结合机箱结构和实际负载逐项验证。", "进风、排风和部件间距都应该一起检查。"],
+      "comments": ["散热区细节很多", "风道应该怎么验证？", "想看不同机箱布局", "温度要实测才可靠"],
+      "vfx": ["heart_burst", "rocket"]
+    },
+    {
+      "id": "v03_compact_case",
+      "topic": "紧凑机箱兼容性",
+      "scene": "premium compact-PC workshop with two small form factor chassis shells, calipers without readable markings, modular desk trays, graphite acoustic wall and green practical light",
+      "question": "小机箱先量哪里？",
+      "response_cue": "the host notices the compact-case question and indicates GPU length, thickness and cable clearance with three restrained gestures",
+      "speech": ["今天的 AI 合成演示聚焦紧凑机箱装机。", "有人问先量哪里，显卡长度、厚度和线材转弯空间都要核对。", "不要只看一个尺寸，安装路径也需要现场确认。"],
+      "comments": ["小钢炮也想装", "小机箱先量哪里？", "侧板空间别忽略", "安装路径也重要"],
+      "vfx": ["heart_burst", "rocket"]
+    },
+    {
+      "id": "v04_cabling",
+      "topic": "供电线材与接口应力",
+      "scene": "premium cable-management bench with an open PC, neatly routed power leads, connector mockups without text, soft amber key light, emerald edge lights and layered tool panels",
+      "question": "线材弯折怎么留空间？",
+      "response_cue": "the host notices the cable-bend question and demonstrates a broad safe cable arc near the open PC without touching connector pins",
+      "speech": ["这段 AI 合成演示看看供电线材的布置。", "看到弯折问题，接口附近要留出自然走线空间，并核对官方安装说明。", "装好后还要检查侧板压力和连接状态。"],
+      "comments": ["理线区看着很专业", "线材弯折怎么留空间？", "侧板会不会顶到", "连接状态要复查"],
+      "vfx": ["heart_burst", "rocket"]
+    },
+    {
+      "id": "v05_acoustics",
+      "topic": "创作环境噪音验证",
+      "scene": "premium creator workstation acoustic studio with fabric panels, a silent boom microphone kept in background, open PC, editing control surface without text and restrained green lighting",
+      "question": "噪音应该怎么测？",
+      "response_cue": "the host notices the noise question, gestures toward the acoustic panels, then points to a fixed listening position",
+      "speech": ["这场 AI 合成演示换到创作工作台场景。", "有人问噪音，测试时要固定环境、距离和负载条件再比较。", "听感和数据都需要在一致条件下记录。"],
+      "comments": ["这个工作台氛围不错", "噪音应该怎么测？", "背景噪声也要记录", "固定距离才好比较"],
+      "vfx": ["heart_burst", "rocket"]
+    },
+    {
+      "id": "v06_methodology",
+      "topic": "游戏测试方法",
+      "scene": "premium gaming test room with an ultrawide display showing abstract non-readable graphics, controller shelf, open PC and a graphite broadcast desk under emerald practical lighting",
+      "question": "游戏测试先统一什么？",
+      "response_cue": "the host notices the test-method question and counts resolution, settings and run conditions on three fingers while keeping the GPU stable",
+      "speech": ["今天用 AI 合成演示聊聊游戏测试方法。", "看到测试问题，分辨率、画质设置和运行条件要先统一。", "这里只展示流程，不给出未经实测的性能结论。"],
+      "comments": ["想看规范测试流程", "游戏测试先统一什么？", "驱动版本也要记录", "不要只看一次结果"],
+      "vfx": ["heart_burst", "rocket"]
+    },
+    {
+      "id": "v07_creator",
+      "topic": "创作工作流验证",
+      "scene": "premium digital-creation suite with color-neutral monitor glow, camera equipment silhouettes, an open PC, storage modules and layered graphite shelving with restrained emerald accents",
+      "question": "创作软件怎么验证？",
+      "response_cue": "the host notices the creator-workflow question and gestures from the GPU to the workstation display and storage modules in sequence",
+      "speech": ["这段 AI 合成演示放进创作工作流场景。", "有人问软件验证，要按自己的项目、版本和素材规模做兼容性测试。", "显卡只是系统一部分，存储和内存配置也要一起看。"],
+      "comments": ["创作者场景来了", "创作软件怎么验证？", "项目规模差异很大", "整套工作流都要测"],
+      "vfx": ["heart_burst", "rocket"]
+    },
+    {
+      "id": "v08_dual_fan",
+      "topic": "双风扇结构观察",
+      "scene": "premium hardware photography set with a rotating display plinth, macro lighting flags, open PC background, graphite shelving and emerald rim lights, no readable labels",
+      "question": "双风扇结构怎么看？",
+      "response_cue": "the host notices the dual-fan question and slowly angles the same GPU once so both fan openings remain visible and physically coherent",
+      "speech": ["今天的 AI 合成演示重点观察显卡外形结构。", "看到双风扇问题，我们只做外观展示，具体设计请核对官方资料。", "镜头里要持续保持同一张卡和稳定的双风扇几何。"],
+      "comments": ["这个布光很适合看结构", "双风扇结构怎么看？", "保持同一张卡很重要", "外观信息也要核对"],
+      "vfx": ["heart_burst", "rocket"]
+    },
+    {
+      "id": "v09_balance",
+      "topic": "整机配置平衡",
+      "scene": "premium system-integration studio with open PC, CPU cooler silhouettes, memory trays, PSU bay and case panels arranged as a layered build map under warm and emerald lights",
+      "question": "整机平衡先看什么？",
+      "response_cue": "the host notices the system-balance question and points in sequence toward CPU cooling, power and case space",
+      "speech": ["这场 AI 合成演示从整机平衡出发。", "有人问先看什么，处理器、散热、供电和空间都要按用途一起规划。", "配置选择应建立在明确需求和可验证资料上。"],
+      "comments": ["整机地图很直观", "整机平衡先看什么？", "用途不同方案也不同", "资料来源要可靠"],
+      "vfx": ["heart_burst", "rocket"]
+    },
+    {
+      "id": "v10_checklist",
+      "topic": "装机前检查表",
+      "scene": "premium final-build inspection bay with an open completed PC, unlabeled checklist cards, organized tools, anti-static mat, graphite wall and cinematic emerald practical lights",
+      "question": "开机前最后查什么？",
+      "response_cue": "the host notices the final-check question and performs a concise visual check of seating, cabling and clearance around the open PC",
+      "speech": ["最后一段 AI 合成演示做装机前检查。", "看到开机前的问题，要复查安装、连接、空间和散热路径。", "确认无误后再按设备说明完成后续测试。"],
+      "comments": ["收尾检查不能省", "开机前最后查什么？", "接口和卡扣都复查", "按说明逐项确认"],
+      "vfx": ["heart_burst", "rocket"]
+    }
+  ]
+}

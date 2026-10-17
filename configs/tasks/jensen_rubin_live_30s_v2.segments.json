@@ -1,0 +1,55 @@
+{
+  "schema": "visualagent.camera-segment-batch.v1",
+  "case_id": "jensen_rubin_live_30s_v2",
+  "timeline": "data/tasks/jensen_rubin_live_30s_v2.timeline.json",
+  "model": "kling-video-v3_0_omni",
+  "source_duration_seconds": 8,
+  "assembled_duration_seconds": 7.5,
+  "aspect_ratio": "9:16",
+  "resolution": "1080p",
+  "format_contract": {
+    "orientation": "portrait",
+    "aspect_ratio": "9:16",
+    "expected_width": 1080,
+    "expected_height": 1920,
+    "preview_fit": "contain"
+  },
+  "enable_audio": true,
+  "prefer_multi_shots": false,
+  "segments": [
+    {
+      "id": "seg_000_075",
+      "source": "outputs/artifacts/jensen_rubin_live_30s_v2/camera_segments/seg_000_075_omni_retry_02.source-8s.mp4",
+      "start": 0.0,
+      "end": 7.5,
+      "first": "outputs/artifacts/jensen_rtx5090_live_v2_20260820/camera_references/first-v2.png",
+      "tail": "outputs/artifacts/jensen_rtx5090_live_v2_20260820/camera_references/state-075-dynamic-v2.png",
+      "prompt": "图片1是第0秒，图片2是第7.5秒。图像中的男性主播穿着同一件黑色皮夹克，手持同一张双风扇旗舰显卡，保持同一间丰富的石墨色PC硬件直播棚。连续单镜头中，人物先直视镜头自然口播，随后注意到左下观众功耗提问：视线转向左下，头和上半身自然转动约25度，重心侧移，把显卡从胸前降低至上腰部并举起另一只手作开放掌回应。动作连贯、自信且幅度清楚，不是原地小点头。使用普通成熟中文男声，不模仿任何真实人物，清楚说：今天用一场AI合成概念演示，聊聊旗舰显卡的整机供电和散热。显卡双风扇几何和五指稳定。机位保持眼平中景，无切镜、无新人物。左上、右侧、下方安全区保持平静，不生成任何文字、数字、按钮、弹幕、礼物、购物车、墨镜、价格、logo或水印。"
+    },
+    {
+      "id": "seg_075_150",
+      "start": 7.5,
+      "end": 15.0,
+      "first": "outputs/artifacts/jensen_rtx5090_live_v2_20260820/camera_references/state-075-dynamic-v2.png",
+      "tail": "outputs/artifacts/jensen_rtx5090_live_v2_20260820/camera_references/state-150-dynamic-v2.png",
+      "prompt": "图片1是第7.5秒，图片2是第15秒。图像中的同一位男性主播、同一张双风扇旗舰显卡和同一PC硬件直播棚。人物完成左下功耗提问回应后，向右侧开放式主机移动半步并把躯干转向主机；将显卡降低并斜持在腰部、保持两枚风扇清楚可见，同时用另一只手做一次幅度清楚的散热路径说明，目光跟随手势。使用与上一段一致的普通成熟中文男声，不模仿任何真实人物，清楚说：看到有人问功耗够不够。够用，但必须按整机配置、供电余量和官方建议一起核算。手指、手腕和商品几何稳定，眼平中景连续镜头，无切镜。不要生成任何可读文字、数字、UI、弹幕、购物车、礼物、墨镜、价格、logo或水印；右侧和左上固定UI安全区保持干净。"
+    },
+    {
+      "id": "seg_150_225",
+      "start": 15.0,
+      "end": 22.5,
+      "first": "outputs/artifacts/jensen_rtx5090_live_v2_20260820/camera_references/state-150-dynamic-v2.png",
+      "tail": "outputs/artifacts/jensen_rtx5090_live_v2_20260820/camera_references/state-225-dynamic-v2.png",
+      "prompt": "图片1是第15秒，图片2是第22.5秒。图像中的同一位男性主播、同一张双风扇旗舰显卡和同一布景。人物结束开放式主机旁的大幅散热路径说明，转身回到镜头正面，把显卡从腰部斜持自然带到下胸前并用双手水平前送，两枚风扇正对镜头，双肘与身体分开。末尾轻抬下巴、正视镜头并让眼睛与头部稳定约一秒供代码AR锚定。使用与前段一致的普通成熟中文男声，不模仿任何真实人物，清楚说：这里加入一个新一代Rubin散热设计的概念演示；它不是正式产品信息，真实规格请以官方发布为准。连续眼平中景，无切镜。不要生成全息图、火箭、跑车、文字、UI、弹幕、购物车、墨镜、价格、logo或水印；商品风扇数量、五指和手腕结构保持稳定。"
+    },
+    {
+      "id": "seg_225_300",
+      "source": "outputs/artifacts/jensen_rubin_live_30s_v2/camera_segments/seg_225_300_retry_02.source-8s.mp4",
+      "start": 22.5,
+      "end": 30.0,
+      "first": "outputs/artifacts/jensen_rtx5090_live_v2_20260820/camera_references/state-225-dynamic-v2.png",
+      "tail": "outputs/artifacts/jensen_rtx5090_live_v2_20260820/camera_references/state-300-dynamic-v2.png",
+      "prompt": "图片1是第22.5秒，图片2是第30秒。图像中的同一位男性主播、同一张双风扇旗舰显卡和同一直播棚。开头保持脸部与眼睛稳定约一秒供代码AR锚定，随后移动到工作台相对一侧，将显卡从水平前送自然转为斜抱在左前臂下、两枚风扇仍清楚可见；右手抬起做开放掌收尾，重新直视镜头并平静点头。使用与前段一致的普通成熟中文男声，不模仿任何真实人物，清楚说：别只看单个数字，功耗、散热、线材和机箱空间要放在一起验证。动作轮廓清楚但物理自然，连续眼平中景，无切镜。不要生成墨镜、跑车、爱心、文字、数字、UI、弹幕、购物车、价格、logo或水印；保持脸部曝光自然、五指和商品几何一致。"
+    }
+  ]
+}

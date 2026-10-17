@@ -1,0 +1,14 @@
+{
+  "reason": "insufficient_kling_credits",
+  "observed_at": "2026-09-25T17:43:04.528384+00:00",
+  "available_credits": 179,
+  "credits_per_video_from_five_receipts": 180,
+  "remaining_videos": 5,
+  "estimated_remaining_credits": 900,
+  "estimated_top_up_needed": 721,
+  "failed_case": "08_skincare",
+  "failed_run": "b528a4d06ea54e75af7ddb42a5f21b56",
+  "generation_id_received": false,
+  "automatic_retry": false,
+  "training_eligible": false
+}

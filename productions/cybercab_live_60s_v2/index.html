@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=1080,height=1920">
+  <title>VisualAgent Cybercab 60 秒 Omni 原生音画审片直播间</title>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+  <link rel="stylesheet" href="live-room.css">
+</head>
+<body>
+  <main
+    id="cybercab-live-60s-v2"
+    class="composition"
+    data-composition-id="cybercab-live-60s-v2"
+    data-width="1080"
+    data-height="1920"
+    data-start="0"
+    data-duration="60"
+    data-fps="30"
+    data-hf-id="hf-cybercab-root"
+  >
+    <video
+      id="camera-feed"
+      class="camera-feed"
+      src="assets/camera/camera_feed_60s-omni-native-av-v2-departure-repaired.mp4"
+      muted
+      playsinline
+      preload="auto"
+      data-media
+      data-track-index="0"
+      data-start="0"
+      data-duration="60"
+      data-hf-id="hf-cybercab-camera"
+    ></video>
+    <audio
+      id="native-audio-track"
+      src="assets/camera/camera_feed_60s-omni-native-av-v2-departure-repaired.mp4"
+      preload="auto"
+      data-media
+      data-track-index="1"
+      data-start="0"
+      data-duration="60"
+      data-hf-id="hf-cybercab-audio"
+    ></audio>
+
+    <div class="grade" aria-hidden="true"></div>
+    <header class="topbar">
+      <div class="identity">
+        <div class="avatar">VA</div>
+        <div><h1>VisualAgent 汽车体验</h1><p>合成演示 · 封闭场地审片</p></div>
+      </div>
+      <div class="live-pill"><i></i>LIVE</div>
+    </header>
+    <div class="disclosure"><b>AI</b><span>人物与车辆画面为合成内容 · 可读界面由代码生成</span></div>
+    <div class="review-lock">Omni 原生音画审片版 · 未通过独立视觉与人工审核</div>
+
+    <aside class="action-rail" aria-label="直播操作">
+      <div><button type="button">♡</button><span>点赞</span></div>
+      <div><button type="button">↗</button><span>分享</span></div>
+      <div><button type="button">▣</button><span>样车</span></div>
+    </aside>
+
+    <section id="comments" class="comments" aria-label="直播弹幕"></section>
+    <article id="info-card" class="info-card" data-layout-allow-overlap data-layout-allow-overflow>
+      <small>体验说明 · 非销售承诺</small>
+      <h2></h2>
+      <p></p>
+      <b>DEMO</b>
+    </article>
+
+    <div id="gift-stage" class="gift-stage" aria-label="代码生成礼物特效" data-layout-ignore>
+      <div id="rocket" class="gift gift-rocket"><img src="assets/live_fx/rocket-premium-v1.png" alt=""></div>
+      <div id="sports-car" class="gift gift-car"><img src="assets/live_fx/sports-car-premium-v1.png" alt=""></div>
+      <div id="sunglasses" class="gift gift-glasses" aria-hidden="true">
+        <svg viewBox="0 0 360 130"><defs><linearGradient id="lens" x1="0" x2="1"><stop stop-color="#0b0e0d"/><stop offset=".65" stop-color="#38584d"/><stop offset="1" stop-color="#b7f12a" stop-opacity=".55"/></linearGradient></defs><path d="M12 24 0 10M348 24l12-14"/><path fill="url(#lens)" d="M14 25h145v48c0 32-24 48-65 48-46 0-68-23-72-61z"/><path fill="url(#lens)" d="M201 25h145l-8 35c-4 38-26 61-72 61-41 0-65-16-65-48z"/><path d="M159 48c16-10 26-10 42 0"/></svg>
+      </div>
+      <div id="gift-banner" class="gift-banner"><span class="gift-icon">✦</span><div><small></small><strong></strong></div><b></b></div>
+      <div id="impact" class="impact"></div>
+      <i class="speed-line l1"></i><i class="speed-line l2"></i><i class="speed-line l3"></i>
+      <i class="particle p1"></i><i class="particle p2"></i><i class="particle p3"></i><i class="particle p4"></i><i class="particle p5"></i><i class="particle p6"></i><i class="particle p7"></i><i class="particle p8"></i>
+    </div>
+
+    <div id="subtitle" class="subtitle"></div>
+    <footer class="composer"><div>说点什么…</div><button type="button">☺</button><button type="button">♡</button></footer>
+    <div class="continuity-veil" aria-hidden="true"></div>
+  </main>
+  <script>window.__timelines = window.__timelines || {}; window.__timelines["cybercab-live-60s-v2"] = null;</script>
+  <script type="module" src="live-room.js"></script>
+</body>
+</html>

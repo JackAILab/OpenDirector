@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>VisualAgent · 直播版本预览</title>
+  <style>
+    :root { --ink:#171814; --paper:#efede6; --panel:#fffdf8; --purple:#7159db; --lime:#b8ed36; }
+    * { box-sizing:border-box; }
+    html,body { margin:0; min-height:100%; overflow:auto; background:var(--paper); color:var(--ink); font-family:Inter,"PingFang SC",system-ui,sans-serif; }
+    body { display:grid; grid-template-rows:auto 1fr auto; }
+    header { z-index:3; display:flex; align-items:center; gap:16px; min-height:70px; padding:12px 22px; border-bottom:1px solid #d8d3c8; background:rgba(255,253,248,.94); backdrop-filter:blur(18px); }
+    a { color:inherit; text-decoration:none; }
+    .back { padding:9px 13px; border:1px solid #d6d0c3; border-radius:11px; background:white; font-weight:750; }
+    .title { min-width:0; }
+    .title strong { display:block; font-size:18px; }
+    .title span { color:#77786f; font-size:12px; }
+    nav { display:flex; gap:7px; margin-left:auto; overflow:auto; }
+    nav a { white-space:nowrap; padding:9px 11px; border-radius:10px; color:#696b64; font-size:13px; font-weight:700; }
+    nav a.active { color:#211a43; background:#e8e2ff; }
+    .stage { position:relative; display:grid; place-items:center; min-height:0; overflow:hidden; padding:16px; background:radial-gradient(circle at 50% 42%,#3e463c,#101310 68%); }
+    .frame { position:relative; flex:none; overflow:hidden; border:0; border-radius:14px; background:#0b0d0c; box-shadow:0 24px 70px rgba(0,0,0,.32); transform-origin:center center; }
+    iframe { display:block; width:100%; height:100%; border:0; }
+    .loading { position:absolute; color:#eef3e7; font-size:14px; letter-spacing:.05em; }
+    .controls { z-index:3; display:grid; grid-template-columns:auto auto minmax(120px,1fr) auto; align-items:center; gap:12px; min-height:74px; padding:12px 22px; border-top:1px solid #d8d3c8; background:var(--panel); }
+    button { border:0; cursor:pointer; font:750 14px/1 inherit; }
+    .play { min-width:92px; padding:13px 18px; border-radius:999px; background:var(--lime); color:#172000; }
+    .reset { padding:12px 14px; border-radius:999px; background:#e9e6dd; }
+    input[type=range] { width:100%; accent-color:var(--purple); }
+    .time { min-width:96px; color:#5f615b; font:700 13px/1 ui-monospace,monospace; text-align:right; }
+    @media (max-width:700px) { header{padding:10px 12px}.title span,nav{display:none}.controls{grid-template-columns:auto auto 1fr;padding:10px 12px}.time{display:none}.stage{padding:8px} }
+  </style>
+</head>
+<body>
+  <header>
+    <a class="back" href="./">← 四个版本</a>
+    <div class="title"><strong id="title">载入预览</strong><span id="subtitle">旧媒体预览 · 原生版本待生成</span></div>
+    <nav id="nav"></nav>
+  </header>
+  <main class="stage" id="stage"><span class="loading" id="loading">正在载入…</span><div class="frame" id="frame"><iframe id="preview" title="直播版本预览" allow="autoplay"></iframe></div></main>
+  <footer class="controls">
+    <button class="play" id="play" type="button">播放</button>
+    <button class="reset" id="reset" type="button">回到开头</button>
+    <input id="scrub" type="range" min="0" max="60" step="0.01" value="0" aria-label="播放进度">
+    <output class="time" id="time">00:00 / 01:00</output>
+  </footer>
+  <script>
+    const variants={
+      "portrait-zh":{title:"中文竖屏",w:1080,h:1920,status:"旧版中文竖屏 Camera Feed"},
+      "portrait-en":{title:"English Portrait",w:1080,h:1920,status:"占位媒体：当前音轨仍为中文"},
+      "landscape-zh":{title:"中文横屏",w:1920,h:1080,status:"占位媒体：当前仍复用竖屏 Camera Feed"},
+      "landscape-en":{title:"English Landscape",w:1920,h:1080,status:"Placeholder: portrait media with Chinese speech"}
+    };
+    const params=new URLSearchParams(location.search); const key=variants[params.get("v")]?params.get("v"):"portrait-zh"; const current=variants[key];
+    const frame=document.querySelector("#frame"),stage=document.querySelector("#stage"),iframe=document.querySelector("#preview"),play=document.querySelector("#play"),scrub=document.querySelector("#scrub"),time=document.querySelector("#time"),loading=document.querySelector("#loading");
+    document.title=`${current.title} · VisualAgent`; document.querySelector("#title").textContent=current.title; document.querySelector("#subtitle").textContent=`${current.status} · 原生版本待生成`; frame.style.width=`${current.w}px`; frame.style.height=`${current.h}px`;
+    document.querySelector("#nav").innerHTML=Object.entries(variants).map(([id,item])=>`<a class="${id===key?"active":""}" href="viewer.html?v=${id}">${item.title}</a>`).join("");
+    const fit=()=>{const scale=Math.min((stage.clientWidth-24)/current.w,(stage.clientHeight-24)/current.h,1);frame.style.transform=`scale(${scale})`;}; addEventListener("resize",fit); fit();
+    let video,audio,timeline,raf;
+    const format=s=>`${String(Math.floor(s/60)).padStart(2,"0")}:${String(Math.floor(s%60)).padStart(2,"0")}`;
+    const paint=()=>{if(!video)return; const t=video.currentTime||0; scrub.value=String(t); time.textContent=`${format(t)} / 01:00`; if(timeline)timeline.time(t,false); if(!video.paused)raf=requestAnimationFrame(paint); else play.textContent="播放";};
+    iframe.addEventListener("load",()=>{const doc=iframe.contentDocument,win=iframe.contentWindow;video=doc?.querySelector("video");audio=doc?.querySelector("audio");const root=doc?.querySelector(".composition");timeline=root&&win.__timelines?.[root.id];loading.hidden=true;if(video){video.currentTime=0;video.addEventListener("ended",paint);paint();}});
+    iframe.src=`${key}/index.html`;
+    play.addEventListener("click",async()=>{if(!video)return;if(video.paused){try{video.muted=true;await video.play();if(audio){audio.currentTime=video.currentTime;await audio.play();}play.textContent="暂停";cancelAnimationFrame(raf);raf=requestAnimationFrame(paint);}catch(e){play.textContent="点击重试";}}else{video.pause();audio?.pause();play.textContent="播放";}});
+    scrub.addEventListener("input",()=>{if(!video)return;const t=Number(scrub.value);video.currentTime=t;if(audio)audio.currentTime=t;if(timeline)timeline.time(t,false);paint();});
+    document.querySelector("#reset").addEventListener("click",()=>{if(!video)return;video.pause();audio?.pause();video.currentTime=0;if(audio)audio.currentTime=0;if(timeline)timeline.time(0,false);paint();});
+  </script>
+</body>
+</html>

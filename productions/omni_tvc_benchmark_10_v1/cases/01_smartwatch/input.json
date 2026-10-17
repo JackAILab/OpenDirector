@@ -1,0 +1,47 @@
+{
+  "case_id": "01_smartwatch",
+  "title": "智能手表｜从晨光到山脊",
+  "brief": "制作一条原创高质感商业TVC，15秒，16:9横屏，目标1920×1080。真实摄影质感、丰富物理场景、明确产品焦点。使用参考图固定商品外观与人物身份，但不得把参考图作为拼贴画播放。按时序完成三个镜头，动作连续且符合物理。原生环境音和与动作同步的音效；无配乐、无旁白。画面不出现可读文字、品牌标识、字幕、价格、界面卡片或水印。屏幕只显示抽象色彩，无功能或性能承诺。\n商品主体：oval titanium silver smartwatch with a single orange crown on its right side, graphite woven strap, black glass face showing only a blue abstract arc。\n人物主体：a fictional adult East Asian woman with a short dark bob, lavender athletic top and ivory trousers。\n场景：sunlit walnut dressing room opening onto a misty mountain landscape。\n镜头计划：0–4s：微距沿钛金属表壳与编织表带滑行，侧光扫过表冠。4–10s：切到晨光房间，同一位女性扣好左腕表带，抬腕后转身走向窗户。10–15s：动作匹配切到山脊，她迈出两步，镜头从手腕拉远显露晨雾与山线。\n连续性约束：腕表表冠位置、银色表壳与石墨表带恒定；扣表带动作自然；山脊收尾必须有步行动作。\n图片1固定商品外观、材质与人物身份；参考图中的前景放大是摄影透视，商品在人物使用时须为正常实物大小。",
+  "subject": {
+    "product": "oval titanium silver smartwatch with a single orange crown on its right side, graphite woven strap, black glass face showing only a blue abstract arc",
+    "person": "a fictional adult East Asian woman with a short dark bob, lavender athletic top and ivory trousers",
+    "scene": "sunlit walnut dressing room opening onto a misty mountain landscape",
+    "element_id": null,
+    "binding": "portable reference image plus textual subject description; no provider-specific Element created"
+  },
+  "reference_generation": {
+    "provider": "codebuddy",
+    "model": "hunyuan-image-v3.0",
+    "prompt": "Create one premium commercial photography reference photograph, landscape 16:9. Main product: oval titanium silver smartwatch with a single orange crown on its right side, graphite woven strap, black glass face showing only a blue abstract arc. Subject: a fictional adult East Asian woman with a short dark bob, lavender athletic top and ivory trousers. Location: sunlit walnut dressing room opening onto a misty mountain landscape. The product is clearly visible in foreground at about one third of the frame; if a person is specified, show that person naturally behind or beside it so both product geometry and human identity can be referenced. Rich layered physical set, realistic materials and coherent lighting, cinematic art direction, no collage, no split screen, no graphic layout. No readable text, no logos, no watermarks, no numbers; any screen shows abstract color only. This is a fictional product and fictional adult person.",
+    "size": "1024x1024",
+    "n": 1,
+    "automatic_retry": false,
+    "attempts_used": 2
+  },
+  "references": [
+    {
+      "path": "references/attempt-02/codebuddy-2026-09-25T17-15-23-336Z-1.png",
+      "sha256": "923b259a4e8f4e1a24559501b1b289fe45a7628e0c0703fb3953c505212d7d12",
+      "role": "product_subject_and_scene_reference"
+    }
+  ],
+  "generation": {
+    "model": "kling-video-v3_0_omni",
+    "duration_seconds": 15,
+    "aspect_ratio": "16:9",
+    "resolution": "1080p",
+    "enable_audio": true,
+    "prefer_multi_shots": true,
+    "image_count": 1,
+    "input_mode": "omni_single_reference"
+  },
+  "review_criteria": [
+    "腕表表冠位置、银色表壳与石墨表带恒定；扣表带动作自然；山脊收尾必须有步行动作。",
+    "产品身份与几何稳定",
+    "三个镜头有实质动作，不是静态缩放",
+    "视频可完整解码，时长和尺寸正确",
+    "音效与动作对应，无额外说话或音乐"
+  ],
+  "training_eligible": false,
+  "status": "reference_ready"
+}

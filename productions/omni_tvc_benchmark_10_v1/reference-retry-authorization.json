@@ -1,0 +1,8 @@
+{
+  "scope": "additional reference image attempts across this batch",
+  "max_attempts": 10,
+  "used": 2,
+  "codebuddy_preferred": true,
+  "account_image_generation_fallback_authorized": true,
+  "authorized_at": "2026-09-25T17:15:08.549914+00:00"
+}

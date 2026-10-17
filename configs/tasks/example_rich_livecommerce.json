@@ -1,0 +1,20 @@
+{
+  "task_id": "example_rich_livecommerce",
+  "objective": "Generate one rich 9:16 clean live-commerce keyframe for human review.",
+  "prompt_set": "data/prompts/livecommerce_rich_keyframe_v1.json",
+  "reference_images": [],
+  "output_dir": "examples/rich_livecommerce",
+  "model": "gp2/gpt-image-2",
+  "size": "1024x1824",
+  "quality": "high",
+  "quality_config": "configs/quality/livecommerce_keyframe.json",
+  "constraints": {
+    "fictional_presenter_only": true,
+    "clean_plate_not_sparse": true,
+    "deterministic_readable_ui": true,
+    "overwrite": false,
+    "automatic_paid_retry": false,
+    "human_review_required": true,
+    "training_eligible": false
+  }
+}

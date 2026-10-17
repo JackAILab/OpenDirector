@@ -1,0 +1,27 @@
+{
+  "task_id": "jensen_rtx5090_live_v1_20260819",
+  "objective": "Produce a clearly disclosed 15-second synthetic Jensen Huang RTX 5090 live-commerce demonstration through independent camera, audio, UI, comment, VFX and compositing tracks.",
+  "timeline": "data/tasks/jensen_rtx5090_live_v1.timeline.json",
+  "output_dir": "jensen_rtx5090_live_v1_20260819",
+  "image_model": "gp2/gpt-image-2",
+  "video_model": "kling-video-v3_0",
+  "image_size": "1024x1824",
+  "image_quality": "high",
+  "duration_seconds": 15,
+  "aspect_ratio": "9:16",
+  "resolution": "1080p",
+  "fps": 30,
+  "font_path": "outputs/runtime_assets/NotoSansSC-Regular.ttf",
+  "expected_kling_credits": 120,
+  "constraints": {
+    "paid_generation_authorized": false,
+    "public_figure_synthetic_dramatization": true,
+    "persistent_disclosure_required": true,
+    "voice_clone_forbidden": true,
+    "camera_and_ui_separate": true,
+    "overwrite": false,
+    "automatic_paid_retry": false,
+    "human_review_required": true,
+    "training_eligible": false
+  }
+}

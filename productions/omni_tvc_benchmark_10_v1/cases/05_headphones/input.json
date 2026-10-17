@@ -1,0 +1,47 @@
+{
+  "case_id": "05_headphones",
+  "title": "头戴耳机｜城市静下来",
+  "brief": "制作一条原创高质感商业TVC，15秒，16:9横屏，目标1920×1080。真实摄影质感、丰富物理场景、明确产品焦点。使用参考图固定商品外观与人物身份，但不得把参考图作为拼贴画播放。按时序完成三个镜头，动作连续且符合物理。原生环境音和与动作同步的音效；无配乐、无旁白。画面不出现可读文字、品牌标识、字幕、价格、界面卡片或水印。屏幕只显示抽象色彩，无功能或性能承诺。\n商品主体：ivory over-ear headphones, oval cushions, satin silver yokes, narrow padded headband, tiny circular amber indicator on the left earcup。\n人物主体：a fictional adult woman with tied-back dark hair wearing a sand-colored trench coat。\n场景：quiet concrete metro concourse with glass panels and muted daylight。\n镜头计划：0–4s：耳罩皮革微距，摄影机拉到完整耳机，金属支架反射柔光。4–10s：女性双手戴好耳机，闭眼轻呼气，镜头小幅绕至侧脸，背景行人自然行走。10–15s：切到石台上的耳机，柔和城市反射掠过外壳，最后完整产品稳定展示两秒。\n连续性约束：左右耳罩结构一致；戴耳机时手与头带没有穿模；以声音收束体现安静，不凭空改变场景。\n图片1固定商品外观、材质与人物身份；参考图中的前景放大是摄影透视，商品在人物使用时须为正常实物大小。",
+  "subject": {
+    "product": "ivory over-ear headphones, oval cushions, satin silver yokes, narrow padded headband, tiny circular amber indicator on the left earcup",
+    "person": "a fictional adult woman with tied-back dark hair wearing a sand-colored trench coat",
+    "scene": "quiet concrete metro concourse with glass panels and muted daylight",
+    "element_id": null,
+    "binding": "portable reference image plus textual subject description; no provider-specific Element created"
+  },
+  "reference_generation": {
+    "provider": "codebuddy",
+    "model": "hunyuan-image-v3.0",
+    "prompt": "Create one premium commercial photography reference photograph, landscape 16:9. Main product: ivory over-ear headphones, oval cushions, satin silver yokes, narrow padded headband, tiny circular amber indicator on the left earcup. Subject: a fictional adult woman with tied-back dark hair wearing a sand-colored trench coat. Location: quiet concrete metro concourse with glass panels and muted daylight. The product is clearly visible in foreground at about one third of the frame; if a person is specified, show that person naturally behind or beside it so both product geometry and human identity can be referenced. Rich layered physical set, realistic materials and coherent lighting, cinematic art direction, no collage, no split screen, no graphic layout. No readable text, no logos, no watermarks, no numbers; any screen shows abstract color only. This is a fictional product and fictional adult person.",
+    "size": "1024x1024",
+    "n": 1,
+    "automatic_retry": false,
+    "attempts_used": 1
+  },
+  "references": [
+    {
+      "path": "references/codebuddy-2026-09-25T17-07-37-156Z-1.png",
+      "sha256": "70fa3b4786cc2847593e00a7329536932c48c21b9e9e55a4129a6dc819f703a9",
+      "role": "product_subject_and_scene_reference"
+    }
+  ],
+  "generation": {
+    "model": "kling-video-v3_0_omni",
+    "duration_seconds": 15,
+    "aspect_ratio": "16:9",
+    "resolution": "1080p",
+    "enable_audio": true,
+    "prefer_multi_shots": true,
+    "image_count": 1,
+    "input_mode": "omni_single_reference"
+  },
+  "review_criteria": [
+    "左右耳罩结构一致；戴耳机时手与头带没有穿模；以声音收束体现安静，不凭空改变场景。",
+    "产品身份与几何稳定",
+    "三个镜头有实质动作，不是静态缩放",
+    "视频可完整解码，时长和尺寸正确",
+    "音效与动作对应，无额外说话或音乐"
+  ],
+  "training_eligible": false,
+  "status": "reference_ready"
+}

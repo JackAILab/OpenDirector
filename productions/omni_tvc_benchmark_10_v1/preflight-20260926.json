@@ -1,0 +1,21 @@
+{
+  "schema": "visualagent.benchmark-preflight.v1",
+  "checked_at": "2026-09-25T16:55:15.550185+00:00",
+  "kling": {
+    "state": "login_required",
+    "reason": "refresh_token_invalid",
+    "generation_submissions": 0
+  },
+  "codebuddy": {
+    "local_health": "ok",
+    "image_attempts": 1,
+    "image_outputs": 0,
+    "case_id": "01_smartwatch",
+    "upstream_response": "unavailable",
+    "upstream_cost": "unknown",
+    "retry_executed": false
+  },
+  "completed_videos": 0,
+  "required_videos": 10,
+  "training_eligible": false
+}

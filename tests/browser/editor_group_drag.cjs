@@ -1,0 +1,38 @@
+const {clickEditorControl}=require('./editor_controls.cjs');
+// Real media/API fixture. Group drag never submits generation or edits production projects.
+const {chromium}=require('playwright'),assert=require('node:assert/strict'),fs=require('node:fs');
+(async()=>{const browser=await chromium.launch({channel:'chromium',headless:true,args:['--no-sandbox']});try{
+ const page=await browser.newPage({viewport:{width:1512,height:982}}),origin='http://127.0.0.1:30132',headers={Authorization:'Bearer fixture'},out=process.env.EDIT_EVIDENCE||'/tmp/editor-group-drag',errors=[],writes=[];fs.mkdirSync(out,{recursive:true});page.on('pageerror',e=>errors.push(e.message));page.on('request',r=>{if(r.method()==='PUT')writes.push(new URL(r.url()).pathname)});
+ const identity=await(await page.request.get(origin+'/acceptance/identity')).json();assert.equal(identity.fixture,'edit-speech-fixed-model');
+ const project=await(await page.request.post(origin+'/creative/api/projects',{headers,data:{message:'多轨整体移动验收',duration:15}})).json(),api=origin+'/creative/api/projects/'+project.id+'/edit';
+ await page.addInitScript(()=>sessionStorage.setItem('h3_api_key','fixture'));await page.goto(origin+'/creative/editor?project='+project.id);await page.waitForFunction(()=>document.getElementById('status').textContent.includes('项目已载入'));
+ await clickEditorControl(page,'editorMediaToggle');
+ for(const [name,action]of [['red','＋ 画面'],['blue','＋ 音轨']]){await page.locator('#uploadVideo').click();await page.locator('#file').setInputFiles(identity.fixtures+'/'+name+'.mp4');await page.waitForFunction(()=>document.getElementById('status').textContent.includes('素材已导入'));await page.getByText(action,{exact:true}).last().click()}
+ await page.locator('.editor-library-close').click();await clickEditorControl(page,'save');await page.waitForFunction(()=>!working&&!dirty);
+ // Seed known placements through the public edit API, not by changing editor memory.
+ const loaded=await(await page.request.get(api,{headers})).json(),draft=loaded.spec;
+ draft.clips=Array.from({length:4},()=>({...draft.clips[0],start:0,end:3,transition:{kind:'cut',duration:0}}));
+ draft.captions=[{start:1,end:2.5,text:'one two',track:0,words:[{start:0,end:.5,text:'one'},{start:.6,end:1.3,text:' two'}]},{start:3.5,end:4.5,text:'second',track:1},{start:10.5,end:11.5,text:'fixed',track:2}];
+ Object.assign(draft.audio[0],{at:4,start:0,end:3,gain:.4,fade_in:.2,fade_out:.3,muted:true});
+ const saved=await page.request.put(api,{headers,data:{revision:loaded.revision,spec:draft}});assert(saved.ok(),await saved.text());
+ await page.reload();await page.waitForFunction(()=>document.getElementById('status').textContent.includes('项目已载入'));
+ await page.locator('.editor-timeline-resize').focus();for(let i=0;i<15;i++)await page.keyboard.press('ArrowUp');
+ const state=()=>page.evaluate(()=>({spec:structuredClone(spec),past:past.length,dirty,selected:[...selectedTimeline]}));const before=await state();
+ const caption=page.locator('[data-timeline-key="captions:0"]'),second=page.locator('[data-timeline-key="captions:1"]'),audio=page.locator('.clip.audio').first();
+ await caption.click();await second.click({modifiers:['Shift']});await audio.click({modifiers:['Shift']});assert.equal((await state()).selected.length,3);
+ async function dragBy(seconds,{cancel=false,alt=false}={}){const writeCount=writes.length;await caption.scrollIntoViewIfNeeded();const b=await caption.boundingBox(),track=await caption.locator('..').boundingBox(),d=await page.evaluate(()=>duration());if(alt)await page.keyboard.down('Alt');await page.mouse.move(b.x+b.width/2,b.y+b.height/2);await page.mouse.down();await page.mouse.move(b.x+b.width/2+seconds/d*track.width,b.y+b.height/2,{steps:6});assert.equal(await page.locator('.timeline-drag-hint:not([hidden])').count(),1);await page.keyboard.press('Control+s');assert.equal(await page.evaluate(()=>working),false);if(cancel)await page.keyboard.press('Escape');else if(process.env.EDIT_EVIDENCE)await page.screenshot({path:out+'/group-drag.png'});await page.mouse.up();assert.equal(await page.locator('.timeline-drag-hint').count(),0);if(alt)await page.keyboard.up('Alt');assert.equal(writes.length,writeCount)}
+ await dragBy(2.1);let after=await state();assert.equal(after.spec.captions[0].start,3);assert.equal(after.spec.captions[1].start,5.5);assert.equal(after.spec.audio[0].at,6);assert.equal(after.past,before.past+1);assert.equal(after.selected.length,3);
+ assert.deepEqual(after.spec.clips,before.spec.clips);assert.deepEqual(after.spec.captions[0].words,before.spec.captions[0].words);assert.deepEqual(after.spec.captions[2],before.spec.captions[2]);assert.deepEqual({...after.spec.audio[0],at:4},before.spec.audio[0]);
+ await page.evaluate(()=>document.activeElement.blur());await page.keyboard.press('Control+z');assert.deepEqual((await state()).spec,before.spec);await page.keyboard.press('Control+Shift+z');assert.deepEqual((await state()).spec,after.spec);
+ const committed=await state();await dragBy(-1,{cancel:true});assert.deepEqual((await state()).spec,committed.spec);assert.equal((await state()).past,committed.past);
+ await dragBy(.1,{alt:true});let free=await state();assert(Math.abs(free.spec.captions[0].start-3.1)<.01);assert.equal(free.selected.length,3);
+ await page.keyboard.press('Control+z');await dragBy(20);let right=await state();assert.equal(right.spec.audio[0].at,9);assert.equal(right.spec.captions[0].start,6);assert.equal(right.spec.captions[1].start,8.5);
+ await dragBy(-20);let left=await state();assert.equal(left.spec.captions[0].start,0);assert.equal(left.spec.audio[0].at,3);assert.equal(left.spec.captions[1].start,2.5);
+ await clickEditorControl(page,'save');await page.waitForFunction(()=>!working&&!dirty);const persisted=await(await page.request.get(api,{headers})).json();assert.deepEqual(persisted.spec.captions,left.spec.captions);assert.deepEqual(persisted.spec.audio,left.spec.audio);
+ await page.reload();await page.waitForFunction(()=>document.getElementById('status').textContent.includes('项目已载入'));assert.deepEqual((await state()).spec,persisted.spec);
+ const conflict=structuredClone(persisted.spec);conflict.captions.push({start:4,end:5,text:'obstacle',track:0});const seed=await page.request.put(api,{headers,data:{revision:persisted.revision,spec:conflict}});assert(seed.ok(),await seed.text());await page.reload();await page.waitForFunction(()=>document.getElementById('status').textContent.includes('项目已载入'));await page.locator('.editor-timeline-resize').focus();for(let i=0;i<15;i++)await page.keyboard.press('ArrowUp');
+ await caption.click();await second.click({modifiers:['Shift']});await audio.click({modifiers:['Shift']});const beforeConflict=await state();await dragBy(3.1);assert.deepEqual((await state()).spec,beforeConflict.spec);assert.equal((await state()).past,beforeConflict.past);assert.match(await page.locator('#status').textContent(),/同轨字幕会重叠/);assert.deepEqual(errors,[]);
+ const end=await(await page.request.get(origin+'/acceptance/identity')).json();assert.equal(end.model_calls,identity.model_calls);assert.equal(end.paid_calls,false);
+ fs.writeFileSync(out+'/verification.json',JSON.stringify({snap:true,shift_multiselect:true,relative_spacing:true,word_offsets_preserved:true,gain_envelope_mute_preserved:true,undo_redo:true,cancel:true,alt_unsnapped:true,head_tail_bounds:true,saved_reload:true,caption_collision_rollback:true,no_save_during_drag:true,page_errors:errors,paid_calls:0,training_eligible:false},null,2));
+ console.log('PASS multi-track drag: Shift selection, snap, relative timing, words/audio preserved, undo/redo, cancel, Alt, bounds, API save/reload; no provider calls');
+}finally{await browser.close()}})().catch(e=>{console.error(e);process.exitCode=1});

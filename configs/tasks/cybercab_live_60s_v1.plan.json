@@ -1,0 +1,85 @@
+{
+  "schema": "visualagent.live-case-plan.v1",
+  "id": "cybercab-live-60s-v1",
+  "objective": "Create an unofficial disclosed synthetic Cybercab live demonstration in which a fictional presenter enters as a passenger and starts an autonomous ride.",
+  "execution_status": "review_build_complete_semantic_repair_required",
+  "product": {
+    "name": "Tesla Cybercab",
+    "reference_asset_id": "cybercab-user-reference-exterior-v1",
+    "official_fact_sources": [
+      "https://www.tesla.com/support/robotaxi/cybercab",
+      "https://www.tesla.com/robotaxi",
+      "https://www.tesla.com/robotaxi/riderguides/cybercab/en_us"
+    ],
+    "verified_claims": [
+      "golden two-seat autonomous vehicle",
+      "butterfly doors",
+      "center touchscreen",
+      "no steering wheel or pedals"
+    ],
+    "forbidden_claims": [
+      "unverified retail price",
+      "unverified inventory or delivery promise",
+      "manual driving controls",
+      "official Tesla endorsement of this video"
+    ]
+  },
+  "presenter_contract": {
+    "identity": "fictional_technology_presenter",
+    "public_figure_likeness": false,
+    "public_figure_voice_clone": false,
+    "role_in_vehicle": "passenger",
+    "endorsement_implication": false
+  },
+  "format": {
+    "orientation": "portrait",
+    "aspect_ratio": "9:16",
+    "speech_language": "zh",
+    "duration_seconds": 60,
+    "resolution": "1080p"
+  },
+  "story_states": [
+    {"time": 0, "state": "showroom exterior walkaround; vehicle stationary; presenter outside"},
+    {"time": 15, "state": "presenter demonstrates butterfly door opening without touching moving vehicle"},
+    {"time": 30, "state": "presenter seated as passenger with seat belt fastened; no steering wheel or pedals visible"},
+    {"time": 45, "state": "presenter starts ride through center touchscreen; readable screen UI reserved for Code layer"},
+    {"time": 60, "state": "Cybercab moves autonomously at low speed while presenter remains seated and belted"}
+  ],
+  "generation_plan": {
+    "reference_image_calls": 5,
+    "camera_video_calls": 4,
+    "total_paid_calls_before_retry": 9,
+    "image_model": "kling-image-v3_0_omni",
+    "video_model": "kling-video-v3_0_omni",
+    "multi_shot": false,
+    "native_audio": true,
+    "hard_first_and_last_frames": true,
+    "motion_reference_candidate": "single-take passenger-entry-and-seatbelt blocking rehearsal; no public figure"
+  },
+  "code_owned_layers": ["synthetic_disclosure", "comments", "viewer_count", "feature_labels", "official-information CTA", "gift effects", "captions"],
+  "paid_generation_budget": {
+    "max_calls_without_confirmation": 9,
+    "used": 9,
+    "automatic_retry": false,
+    "model_substitution": false
+  },
+  "execution_guards": {
+    "non_overwriting": true,
+    "sequential_submission": true,
+    "no_public_figure_endorsement": true,
+    "no_manual_driving_depiction": true,
+    "provider_raw_payload_forbidden": true,
+    "credentials_forbidden": true
+  },
+  "training_eligible": false,
+  "review_status": {
+    "reference_states": "5_of_5_retained",
+    "camera_segments": "3_of_4_retained",
+    "lost_after_provider_completion": "30_to_45_seconds_shared_storage_exhaustion_no_retry",
+    "deterministic_bridge": "30_to_45_seconds_review_only",
+    "autonomous_departure": "semantic_fail_stationary_showroom",
+    "hyperframes": "lint_and_check_passed",
+    "paid_calls_remaining": 0
+  },
+  "human_review": "pending"
+}

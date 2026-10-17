@@ -1,0 +1,88 @@
+{
+  "schema": "visualagent.live-production-timeline.v1",
+  "duration": 60.0,
+  "disclosure": "AI 合成概念演示 · 非真实直播、代言或产品发布",
+  "scene": {
+    "description": "A disclosed synthetic male hardware host presents one dual-fan flagship GPU in a premium graphite vertical livestream studio, answering power, cooling, cable and chassis-fit questions.",
+    "subject": "synthetic male hardware host",
+    "product": "dual-fan flagship graphics card concept",
+    "claim_policy": "No unverified benchmark, price, inventory, endorsement or real-product cooling claim."
+  },
+  "ui_template": {"host_label": "AI Hardware Concept", "template": "vertical_live_v2"},
+  "layout": {
+    "fixed_elements": [
+      {"id": "host_identity", "region": "top-left", "start": 0.0, "end": 60.0, "owner": "code", "pixel_drift_expected": 0},
+      {"id": "action_rail", "region": "right", "start": 0.0, "end": 60.0, "owner": "code", "buttons": ["profile", "like", "cart", "share"], "pixel_drift_expected": 0},
+      {"id": "disclosure", "region": "top", "start": 0.0, "end": 60.0, "owner": "code", "pixel_drift_expected": 0}
+    ],
+    "safe_areas": [
+      {"id": "host_identity", "instruction": "keep essential physical details away from the top-left identity block"},
+      {"id": "comments", "instruction": "keep essential physical details away from the lower-left comment stack"},
+      {"id": "actions", "instruction": "keep essential physical details away from the fixed right action rail"},
+      {"id": "commerce", "instruction": "keep the lower-right region calm enough for code-owned cards"}
+    ]
+  },
+  "reference_states": [
+    {"id": "state_000", "time": 0.0, "role": "segment_boundary", "camera_semantics": "direct opening with GPU"},
+    {"id": "state_075", "time": 7.5, "role": "segment_boundary", "camera_semantics": "acknowledge lower-left power question"},
+    {"id": "state_150", "time": 15.0, "role": "segment_boundary", "camera_semantics": "explain cooling beside open PC"},
+    {"id": "state_225", "time": 22.5, "role": "segment_boundary", "camera_semantics": "front presentation and AR-ready head"},
+    {"id": "state_300", "time": 30.0, "role": "segment_boundary", "camera_semantics": "transition from system checklist"},
+    {"id": "state_375", "time": 37.5, "role": "segment_boundary", "camera_semantics": "indicate power connector and cable path"},
+    {"id": "state_450", "time": 45.0, "role": "segment_boundary", "camera_semantics": "trace physical case airflow"},
+    {"id": "state_525", "time": 52.5, "role": "segment_boundary", "camera_semantics": "check card length and side-panel clearance"},
+    {"id": "state_600", "time": 60.0, "role": "segment_boundary", "camera_semantics": "upright GPU and direct sign-off"}
+  ],
+  "tracks": {
+    "camera": [
+      {"id": "cam_000_075", "start": 0.0, "end": 7.5, "action": "Introduce the GPU", "model_owned": true},
+      {"id": "cam_075_150", "start": 7.5, "end": 15.0, "action": "Answer the power question", "responds_to": "comment_power", "model_owned": true},
+      {"id": "cam_150_225", "start": 15.0, "end": 22.5, "action": "Explain cooling concept beside the open PC", "model_owned": true},
+      {"id": "cam_225_300", "start": 22.5, "end": 30.0, "action": "Present the GPU and close the first checklist", "model_owned": true},
+      {"id": "cam_300_375", "start": 30.0, "end": 37.5, "action": "Indicate the connector and cable path", "responds_to": "comment_cable", "model_owned": true},
+      {"id": "cam_375_450", "start": 37.5, "end": 45.0, "action": "Trace front-to-rear airflow with an open palm", "responds_to": "comment_airflow", "model_owned": true},
+      {"id": "cam_450_525", "start": 45.0, "end": 52.5, "action": "Check GPU length and side-panel clearance", "responds_to": "comment_clearance", "model_owned": true},
+      {"id": "cam_525_600", "start": 52.5, "end": 60.0, "action": "Return to center and sign off with the GPU upright", "model_owned": true}
+    ],
+    "speech": [
+      {"id": "speech_hook", "start": 0.4, "end": 6.8, "text": "今天用一场 AI 合成概念演示，聊聊旗舰显卡的整机供电和散热。"},
+      {"id": "speech_power", "start": 8.2, "end": 14.6, "text": "看到有人问功耗够不够。够用，但必须按整机配置、供电余量和官方建议一起核算。", "responds_to": "comment_power"},
+      {"id": "speech_cooling", "start": 15.3, "end": 22.0, "text": "这里加入新一代散热设计的概念演示；它不是正式产品信息，真实规格请以官方发布为准。"},
+      {"id": "speech_system", "start": 23.0, "end": 29.2, "text": "别只看单个数字，功耗、散热、线材和机箱空间要放在一起验证。"},
+      {"id": "speech_cable", "start": 30.5, "end": 37.0, "text": "电源够用还不等于连接就稳，接口要插到底，线材弯折和供电余量都要检查。", "responds_to": "comment_cable"},
+      {"id": "speech_airflow", "start": 38.0, "end": 44.6, "text": "散热不是只看显卡风扇，机箱前进后出、冷空气补充和热空气排出要形成完整路径。", "responds_to": "comment_airflow"},
+      {"id": "speech_clearance", "start": 45.5, "end": 52.0, "text": "装机前再确认显卡长度、厚度、侧板距离和线材转弯空间，别让局部挤压破坏稳定性。", "responds_to": "comment_clearance"},
+      {"id": "speech_final", "start": 53.0, "end": 59.3, "text": "最后按官方规格逐项核对，再决定整机方案。今天的内容只是 AI 概念演示，我们下次继续。"}
+    ],
+    "comments": [
+      {"id": "comment_power", "time": 6.6, "duration": 7.5, "username": "watt_guard", "avatar_id": 12, "text": "显卡功耗这么高，电源真的够用吗？", "model_owned": false},
+      {"id": "comment_cooling", "time": 14.8, "duration": 6.0, "username": "thermal_lab", "avatar_id": 18, "text": "新一代散热思路是什么？", "model_owned": false},
+      {"id": "comment_cable", "time": 29.6, "duration": 7.8, "username": "cable_check", "avatar_id": 7, "text": "线材怎么走才更稳？", "model_owned": false},
+      {"id": "comment_airflow", "time": 37.2, "duration": 7.6, "username": "airflow_map", "avatar_id": 16, "text": "机箱风道要怎么配？", "model_owned": false},
+      {"id": "comment_clearance", "time": 44.8, "duration": 7.8, "username": "small_case", "avatar_id": 21, "text": "小机箱放得下吗？", "model_owned": false},
+      {"id": "comment_final", "time": 53.5, "duration": 5.0, "username": "frame_chaser", "avatar_id": 8, "text": "整机清单很实用", "model_owned": false}
+    ],
+    "ui": [
+      {"id": "ui_initial", "time": 0.0, "state": {"viewer_count": 126700, "likes": 284900, "cart_open": false}, "model_owned": false},
+      {"id": "ui_cart_power", "type": "commerce_drawer", "start": 12.0, "end": 18.0, "title": "旗舰显卡概念展示", "subtitle": "AI 概念演示 · 无价格与购买承诺", "model_owned": false},
+      {"id": "ui_cart_checklist", "type": "commerce_drawer", "start": 24.0, "end": 28.2, "title": "整机验证清单", "subtitle": "供电 · 散热 · 线材 · 空间", "model_owned": false},
+      {"id": "ui_cart_cable", "type": "commerce_drawer", "start": 32.0, "end": 36.8, "title": "连接检查", "subtitle": "接口 · 弯折 · 余量", "model_owned": false},
+      {"id": "ui_cart_fit", "type": "commerce_drawer", "start": 47.0, "end": 51.8, "title": "机箱适配", "subtitle": "长度 · 厚度 · 侧板距离", "model_owned": false},
+      {"id": "ui_count_final", "time": 54.0, "state": {"viewer_count": 134800, "likes": 318600}, "model_owned": false}
+    ],
+    "vfx": [
+      {"id": "vfx_hearts", "type": "heart_burst", "start": 9.4, "end": 11.8, "caused_by": "speech_power", "model_owned": false},
+      {"id": "vfx_rocket", "type": "rocket", "start": 16.8, "end": 19.2, "caused_by": "speech_cooling", "model_owned": false},
+      {"id": "vfx_sports_car", "type": "sports_car", "start": 21.4, "end": 23.7, "caused_by": "comment_cooling", "model_owned": false},
+      {"id": "vfx_energy_ring", "type": "energy_ring", "start": 34.0, "end": 36.0, "caused_by": "speech_cable", "model_owned": false},
+      {"id": "vfx_rocket_2", "type": "rocket", "start": 41.0, "end": 43.3, "caused_by": "speech_airflow", "model_owned": false},
+      {"id": "vfx_sports_car_2", "type": "sports_car", "start": 48.6, "end": 51.0, "caused_by": "comment_clearance", "model_owned": false},
+      {"id": "vfx_final_hearts", "type": "heart_burst", "start": 56.0, "end": 59.2, "caused_by": "comment_final", "model_owned": false}
+    ],
+    "ar": [
+      {"id": "ar_sunglasses", "type": "face_anchor_sunglasses", "start": 22.8, "end": 26.2, "anchor": "eyes", "owner": "code", "model_owned": false},
+      {"id": "ar_sunglasses_2", "type": "face_anchor_sunglasses", "start": 54.0, "end": 57.0, "anchor": "eyes", "owner": "code", "model_owned": false}
+    ],
+    "subtitles": []
+  }
+}

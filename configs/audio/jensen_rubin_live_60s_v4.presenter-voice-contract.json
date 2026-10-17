@@ -1,0 +1,62 @@
+{
+  "schema": "visualagent.presenter-voice-contract.v1",
+  "id": "jensen-rubin-live-60s-v4-generic-bilingual-presenter",
+  "execution_status": "design_only_pending_explicit_paid_generation_budget",
+  "paid_call_executed": false,
+  "voice_identity": {
+    "type": "generic_synthetic_presenter",
+    "description": "energetic, mature male hardware presenter with clear diction and natural breath",
+    "real_person_imitation": false,
+    "uploaded_public_figure_voice_used_as_clone_reference": false,
+    "speaker_endorsement_implied": false
+  },
+  "delivery": {
+    "energy": "confident product-demo enthusiasm, not shouting",
+    "pace_words_per_minute": {"zh": 210, "en": 170},
+    "segment_voice_consistency_required": true,
+    "natural_room_tone_required": true,
+    "lip_sync_review_required": true
+  },
+  "scripts": {
+    "zh": [
+      "今天这场 AI 合成概念演示，我们直接拆解旗舰显卡装机最关键的四件事：供电、散热、线材和空间。",
+      "先看供电！别只盯一个功耗数字，整机负载、瞬时余量和官方建议，必须一起核算。",
+      "接着看散热路径：冷空气从哪里进，热量从哪里走，显卡和机箱风道要形成完整回路。",
+      "这是一段新架构散热思路的概念演示，不代表正式规格；真正装机前，请核对官方资料。",
+      "接口一定要插到底，线材不要硬折，还要给接头留下稳定、自然的弯折空间。",
+      "机箱风道不是风扇越多越好，方向、阻力和排热路径配对，整机才会稳定。",
+      "再检查长度、厚度、侧板距离和线材转弯半径，任何一项太紧，后面都会变成隐患。",
+      "最后记住：供电、散热、线材、空间，四项一起过清单，再决定你的整机方案。"
+    ],
+    "en": [
+      "Welcome to this AI-generated concept demo. Today we are breaking down the four checks that matter most: power, cooling, cables, and clearance.",
+      "Start with power. Do not chase one headline number—check total system load, transient headroom, and the official recommendation together.",
+      "Now follow the airflow. Cool air in, heat out, and a clear path through the GPU and the chassis—that is the system you want.",
+      "This is a concept demonstration of next-generation cooling ideas, not an official specification. Verify every real build with official documentation.",
+      "Seat the connector completely, avoid sharp cable bends, and leave enough natural clearance around the plug.",
+      "More fans do not automatically mean better cooling. Direction, resistance, and exhaust have to work as one balanced path.",
+      "Measure card length, thickness, side-panel clearance, and cable bend radius before you commit to the case.",
+      "Here is the final checklist: power, cooling, cables, and space. Validate all four, then lock in the build."
+    ]
+  },
+  "provider_plan": {
+    "camera_model": "kling-video-v3_0_omni",
+    "input_mode": "hard_first_and_tail_frame",
+    "native_audio": true,
+    "prefer_multi_shots": false,
+    "automatic_retry": false,
+    "model_substitution": false,
+    "max_calls_without_confirmation": 0
+  },
+  "review_gates": [
+    "technical audio stream and loudness",
+    "language matches locale",
+    "voice does not imitate or imply a real person",
+    "cross-segment timbre and cadence consistency",
+    "lip-sync and semantic accuracy",
+    "explicit human approval"
+  ],
+  "credential_policy": "Provider credentials are read only from named environment variables by harness/models adapters; values are never committed, documented, logged, or copied into trajectories.",
+  "training_eligible": false,
+  "human_review": "pending"
+}

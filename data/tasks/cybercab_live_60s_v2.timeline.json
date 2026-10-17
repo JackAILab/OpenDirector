@@ -1,0 +1,77 @@
+{
+  "schema": "visualagent.live-production-timeline.v1",
+  "id": "cybercab-live-60s-v2",
+  "duration": 60,
+  "disclosure": "人物、车辆与物理场景为合成画面；弹幕、价格、按钮、字幕和礼物由代码生成。",
+  "scene": {
+    "description": "A disclosed synthetic live demonstration of a gold two-seat autonomous vehicle in a closed showroom and test lane."
+  },
+  "reference_states": [
+    {"id": "state-00-000", "time": 0, "camera_semantics": "展厅外观与虚构主持人同框；车辆静止、车门关闭。"},
+    {"id": "state-15-000", "time": 15, "camera_semantics": "同一展厅与人物，近侧蝶翼门开启，主持人展示乘客入口。"},
+    {"id": "state-30-000", "time": 30, "camera_semantics": "主持人进入乘客座并系好安全带；座舱不出现方向盘和踏板。"},
+    {"id": "state-45-000", "time": 45, "camera_semantics": "车门关闭，主持人指向空白中控；机位在座舱内连续移动。"},
+    {"id": "state-60-000", "time": 60, "camera_semantics": "车辆在封闭演示路线低速移动；窗外景物平滑运动。"}
+  ],
+  "audio_lineage": {
+    "requested_model": "kling-video-v3_0_omni",
+    "requested_native_audio": true,
+    "native_av_source_intervals": [[0, 15], [15, 30], [30, 45], [45, 60]],
+    "native_av_seam_intervals": [[12.5, 17.5], [27.5, 32.5], [42.5, 47.5]],
+    "non_model_bridge_interval": null,
+    "current_review_final_audio": "same_container_native_audio_from_seven_omni_sources",
+    "full_60s_native_av_complete": true,
+    "independent_language_and_lip_sync_review": "pending"
+  },
+  "layout": {
+    "safe_areas": [
+      {"id": "host", "instruction": "Keep upper-left identity area clear"},
+      {"id": "actions", "instruction": "Keep right action rail clear"},
+      {"id": "comments", "instruction": "Keep lower-left comment queue clear"}
+    ]
+  },
+  "tracks": {
+    "camera": [
+      {"id": "camera_exterior", "start": 0, "end": 12.5, "action": "continuous exterior walkaround and butterfly-door opening", "model_owned": true},
+      {"id": "camera_seam_15", "start": 12.5, "end": 17.5, "action": "continuous handheld lateral reposition between actual adjacent source frames", "model_owned": true},
+      {"id": "camera_entry", "start": 17.5, "end": 27.5, "action": "presenter enters as passenger and fastens seat belt", "model_owned": true},
+      {"id": "camera_seam_30", "start": 27.5, "end": 32.5, "action": "continuous camera move from passenger-door position into cabin view", "model_owned": true},
+      {"id": "camera_activation", "start": 32.5, "end": 42.5, "action": "door closes and presenter points to blank center display", "model_owned": true},
+      {"id": "camera_seam_45", "start": 42.5, "end": 47.5, "action": "continuous in-cabin camera pullback and turn", "model_owned": true},
+      {"id": "camera_departure", "start": 47.5, "end": 60, "action": "vehicle begins low-speed autonomous movement on a closed demonstration route", "model_owned": true}
+    ],
+    "speech": [
+      {"id": "speech_open", "start": 0.6, "end": 11.8, "text": "各位看这里，我们现在就从外观开始，把这台金色双座自动驾驶车的关键细节现场看清楚！"},
+      {"id": "speech_entry", "start": 18.0, "end": 27.0, "text": "蝴蝶门打开以后，进出空间非常直接；这里没有方向盘，也没有踏板，乘员从一开始就是乘客。"},
+      {"id": "speech_activation", "start": 33.0, "end": 42.0, "text": "现在坐稳，安全带已经扣好。所有行程操作都集中在中控屏上。"},
+      {"id": "speech_departure", "start": 48.0, "end": 59.2, "text": "好，车辆已经自己平稳起步。注意我的双手完全离开控制区。"}
+    ],
+    "comments": [
+      {"id": "comment_door", "start": 5.2, "end": 11.0, "text": "这个门怎么打开？", "author": "车迷小周", "model_owned": false},
+      {"id": "comment_controls", "start": 20.0, "end": 27.0, "text": "真的没有方向盘吗？", "author": "未来乘客", "model_owned": false},
+      {"id": "comment_safety", "start": 34.0, "end": 41.0, "text": "出发前会确认安全带吗？", "author": "安全观察员", "model_owned": false},
+      {"id": "comment_motion", "start": 50.0, "end": 58.0, "text": "起步平稳吗？", "author": "城市漫游", "model_owned": false}
+    ],
+    "ui": [
+      {"id": "ui_identity", "start": 0, "end": 60, "text": "VisualAgent 汽车体验", "model_owned": false},
+      {"id": "ui_product", "start": 9.0, "end": 14.5, "text": "金色双座自动驾驶体验车", "model_owned": false, "priority_surface": true},
+      {"id": "ui_safety", "start": 33.0, "end": 39.0, "text": "封闭场地 · 乘客体验", "model_owned": false, "priority_surface": true}
+    ],
+    "vfx": [
+      {"id": "gift_rocket", "start": 12.0, "end": 14.6, "style": "rocket", "text": "星际火箭 ×1", "model_owned": false},
+      {"id": "gift_sports_car", "start": 27.0, "end": 29.6, "style": "sports_car", "text": "霓虹跑车 ×1", "model_owned": false},
+      {"id": "gift_sunglasses", "start": 41.0, "end": 43.8, "style": "sunglasses", "text": "酷黑墨镜 ×1", "model_owned": false}
+    ],
+    "ar": [],
+    "subtitles": [
+      {"id": "subtitle_open", "start": 0.6, "end": 11.8, "text": "从外观开始，看清关键细节", "model_owned": false},
+      {"id": "subtitle_entry", "start": 18.0, "end": 27.0, "text": "无方向盘、无踏板，乘员就是乘客", "model_owned": false},
+      {"id": "subtitle_activation", "start": 33.0, "end": 42.0, "text": "确认安全带与行程状态", "model_owned": false},
+      {"id": "subtitle_departure", "start": 48.0, "end": 59.2, "text": "封闭路线低速自动行驶演示", "model_owned": false}
+    ]
+  },
+  "technical_qa": "passed_media_probe_and_hyperframes_checks",
+  "semantic_visual_review": "departure_candidate_passed_contact_sheet; continuity_has_one_fail_and_one_needs_review",
+  "human_review": "pending",
+  "training_eligible": false
+}

@@ -1,0 +1,40 @@
+{
+  "schema": "visualagent.extended-camera-references.v1",
+  "case_id": "jensen_rubin_live_60s_v1",
+  "image_model": "gp2/gpt-image-2",
+  "frame_size": "1024x1824",
+  "reference_images": [
+    "outputs/artifacts/jensen_rtx5090_live_v2_20260820/camera_references/state-300-dynamic-v2.png",
+    "outputs/artifacts/jensen_rtx5090_live_v2_20260820/reference_elements/host.png",
+    "outputs/artifacts/jensen_rtx5090_live_v2_20260820/reference_elements/gpu.png",
+    "outputs/artifacts/jensen_rtx5090_live_v2_20260820/reference_elements/studio.png"
+  ],
+  "constraints": {
+    "overwrite": false,
+    "automatic_paid_retry": false,
+    "human_review_required": true,
+    "training_eligible": false
+  },
+  "states": [
+    {
+      "id": "state-375-cable-v1",
+      "time": 37.5,
+      "prompt": "Use case: identity-preserve. Asset type: 37.5-second 9:16 camera boundary for the same disclosed synthetic hardware livestream. Image 1 is the 30-second continuity anchor; Images 2, 3 and 4 are the identity, exact dual-fan product and physical studio references. Preserve the same male host, natural face exposure, black leather jacket, eye-level camera, rich graphite studio and exactly one dual-fan GPU. Create a distinct cable-check pose: stand at the workbench camera-left, hold the GPU upright at upper-waist height with one hand and use the other open hand to indicate the physical power-connector and cable path near the open PC, gaze following the connector. Natural five-finger hands, credible wrists, both fans visible. No readable text, UI, comments, arrows, gifts, glasses, logos, duplicate GPU, third fan or new person."
+    },
+    {
+      "id": "state-450-airflow-v1",
+      "time": 45.0,
+      "prompt": "Use case: identity-preserve. Asset type: 45-second 9:16 camera boundary for the same disclosed synthetic hardware livestream. Use Image 1 as continuity anchor and Images 2, 3 and 4 as identity, product and studio references. Preserve identity, face texture and exposure, jacket, camera, physical studio and one exact dual-fan GPU. Create a new airflow-explanation silhouette: move beside the open PC at camera-right, hold the GPU diagonally across the lower torso with both fans visible, and sweep the free open palm from the case front toward the rear exhaust while looking at the chassis. Keep both arms readable, natural five fingers and believable anatomy. No generated arrows, text, UI, comments, cart, gifts, glasses, logos, duplicate GPU or third fan."
+    },
+    {
+      "id": "state-525-clearance-v1",
+      "time": 52.5,
+      "prompt": "Use case: identity-preserve. Asset type: 52.5-second 9:16 camera boundary for the same disclosed synthetic hardware livestream. Preserve the same host identity, natural exposure, black leather jacket, eye-level lens, rich studio and exact single dual-fan GPU from the four references. Create a clearly different fit-check pose at the workbench: hold the GPU horizontally just above the open chassis with both hands as if checking card length, cable bend radius and side-panel clearance; turn the torso about 25 degrees toward the case and look at the available space. Both fans visible, five fingers on each visible hand, credible wrists and product geometry. No measurements, text, UI, arrows, gifts, glasses, logos, duplicate GPU, third fan or new person."
+    },
+    {
+      "id": "state-600-summary-v1",
+      "time": 60.0,
+      "prompt": "Use case: identity-preserve. Asset type: 60-second closing 9:16 camera boundary for the same disclosed synthetic hardware livestream. Preserve the same male host, face exposure and texture, jacket, fixed camera, rich graphite studio and one exact dual-fan GPU from the references. Create a confident final silhouette: return to the center behind the workbench, hold the GPU upright at chest height with the long edge parallel to the vertical frame and both fans stacked visibly, look directly into camera, and raise the free hand in a compact open-palm sign-off. Natural five fingers, credible wrist, calm expression. No readable text, UI, cart, comments, gifts, glasses, logos, duplicate GPU, third fan or new person."
+    }
+  ]
+}

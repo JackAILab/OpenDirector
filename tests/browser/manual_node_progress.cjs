@@ -1,0 +1,34 @@
+// Simulated provider observations only; all generation requests are intercepted.
+const {chromium}=require('playwright'),fs=require('fs'),assert=require('assert');
+(async()=>{const browser=await chromium.launch({channel:'chromium',headless:true,args:['--no-sandbox']});try{
+ const page=await browser.newPage({viewport:{width:1600,height:1000}}),base='https://creative.jackailab.com',errors=[],calls=[];
+ page.on('pageerror',e=>errors.push(e.message));
+ await page.request.post(base+'/site/access',{data:{password:fs.readFileSync('/opt/visualstation/creative-runtime/site-access-password.txt','utf8').trim()}});
+ const key=JSON.parse(fs.readFileSync('/var/lib/visualstation-local/public-acceptance-account.json')).api_key;
+ await page.addInitScript(k=>{sessionStorage.setItem('h3_api_key',k);localStorage.setItem('creative-theme','dark')},key);
+ const api=async(path,method='GET',data)=>{const r=await page.request.fetch(base+'/creative/api'+path,{method,headers:{Authorization:'Bearer '+key},data});assert(r.ok(),await r.text());return r.json()};
+ const root=await api('/projects','POST',{message:'并行节点验收','creation_mode':'image'});let polls=0,childRunning=false;
+ const rootView=p=>({...p,image_task:{id:'a'.repeat(32),state:'running',model:'kling-image-v3_0',started_at:Date.now()/1000-10,progress:{phase:'generating',percent:++polls>1?65:25,updated_at:Date.now()/1000}}});
+ await page.route(new RegExp('/creative/api/projects/'+root.id+'$'),async route=>{const r=await route.fetch();await route.fulfill({response:r,json:rootView(await r.json())})});
+ await page.route('**/manual-nodes',async route=>{if(route.request().method()!=='GET')return route.continue();const r=await route.fetch(),body=await r.json();if(childRunning)body.nodes=body.nodes.map(item=>({...item,project:{...item.project,state:'running',film:{state:'generating',job_id:'fixture-only',progress:{percent:48}},interrupted:false}}));await route.fulfill({response:r,json:body})});
+ await page.route('**/budget',async route=>{const r=await route.fetch();await route.fulfill({response:r,json:{...await r.json(),sufficient:true}})});
+ await page.route(/\/creative\/api\/projects\/[^/]+\/(execute|images)$/,async route=>{if(route.request().method()!=='POST')return route.continue();calls.push(route.request().postDataJSON());if(route.request().url().endsWith('/images'))return route.fulfill({status:409,json:{detail:'验收拦截，未提交生成'}});childRunning=true;const id=route.request().url().split('/').at(-2),p=await api('/projects/'+id);return route.fulfill({json:{...p,state:'running',film:{state:'generating',job_id:'fixture-only',progress:{percent:48}}}})});
+ await page.goto(base+'/creative?project='+root.id,{waitUntil:'domcontentloaded'});
+ await page.waitForSelector('.canvas-image-job-progress');assert((await page.locator('.canvas-image-job-progress').textContent()).includes('25%'));
+ await page.locator('#canvasAddMenu summary').click();await page.locator('[data-manual-add=video]').click();await page.waitForSelector('.manual-generation-node');
+ const node=page.locator('.manual-generation-node');await node.locator('textarea').fill('猫咪在森林里行走，固定镜头');await node.getByRole('button',{name:'生成节点 2',exact:true}).click();await page.waitForFunction(()=>document.querySelector('.manual-node-status')?.textContent.includes('48%'));
+ await page.waitForFunction(()=>document.querySelector('.canvas-image-job-progress')?.textContent.includes('65%'));
+ assert.equal(calls.length,1);await page.locator('#canvasFitShortcut').click();await page.screenshot({path:'/tmp/manual-multiple-progress.png'});
+ await page.reload({waitUntil:'domcontentloaded'});await page.waitForSelector('.manual-generation-node');assert((await node.locator('.manual-node-status').textContent()).includes('48%'));
+ console.log('Independent image/video progress, new node while generating, reload: PASS');
+ let p=await api('/projects','POST',{message:'编辑面板验收',creation_mode:'image'});
+ const png=Buffer.from(await page.evaluate(()=>{const c=document.createElement('canvas');c.width=640;c.height=360;const x=c.getContext('2d');x.fillStyle='#406060';x.fillRect(0,0,640,360);x.fillStyle='#e0ac71';x.fillRect(200,70,240,220);return c.toDataURL().split(',')[1]}),'base64');
+ const uploaded=await api('/projects/'+p.id+'/canvas/assets?kind=image&revision='+p.revision,'POST',png);p=uploaded.project;
+ p=await api('/projects/'+p.id+'/canvas','PUT',{revision:p.revision,nodes:[{id:'photo',kind:'image',asset:uploaded.asset.id,label:'测试素材',x:40,y:30}],edges:[],groups:[]});
+ await page.goto(base+'/creative?project='+p.id,{waitUntil:'domcontentloaded'});await page.waitForSelector('.reference-node img[data-preview-state=ready]');await page.locator('.reference-node img').first().click();
+ await page.locator('[data-media-action=adjust]').click();await page.getByRole('button',{name:'背面视角',exact:true}).click();assert.equal(await page.getByRole('slider',{name:'水平环绕',exact:true}).inputValue(),'180');await page.waitForFunction(()=>document.querySelector('.image-adjustment-diagram img')?.naturalWidth>0);await page.screenshot({path:'/tmp/manual-angle-editor.png'});
+ await page.getByRole('button',{name:'生成多角度版本',exact:true}).click();await page.waitForFunction(()=>document.querySelector('.image-adjustment-note')?.textContent.includes('验收拦截'));
+ assert(calls.at(-1).prompt.includes('水平环绕 180 度'));assert.equal(calls.at(-1).source_asset,uploaded.asset.id);
+ await page.waitForFunction(()=>!busy);await page.getByRole('button',{name:'关闭调整面板'}).click();await page.locator('.reference-node img').first().click();await page.locator('[data-media-action=light]').click();await page.getByRole('button',{name:'暖色侧光',exact:true}).click();assert.equal(await page.getByRole('slider',{name:'色温',exact:true}).inputValue(),'3200');await page.screenshot({path:'/tmp/manual-relight-editor.png'});
+ await page.getByRole('button',{name:'生成重打光版本',exact:true}).click();await page.waitForFunction(()=>document.querySelector('.image-adjustment-note')?.textContent.includes('验收拦截'));assert(calls.at(-1).prompt.includes('3200K'));assert.equal(calls.length,3);assert.deepEqual(errors,[]);console.log('Separate camera/relight panels, source and parameters bound, no paid requests: PASS');
+}finally{await browser.close()}})().catch(e=>{console.error(e);process.exitCode=1});

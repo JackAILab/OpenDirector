@@ -1,0 +1,7 @@
+{
+  "name": "generate_image",
+  "model_config": "configs/models/gpt_image_2.json",
+  "output_root": "outputs/artifacts",
+  "overwrite": false,
+  "retry_policy": {"automatic_paid_retry": false, "max_attempts": 1}
+}

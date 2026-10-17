@@ -1,0 +1,11 @@
+{
+  "name": "cybercab-live-60s-v1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "lint": "npx --yes hyperframes@0.8.6 lint .",
+    "check": "npx --yes hyperframes@0.8.6 check . --samples 12 --at-transitions",
+    "inspect": "npx --yes hyperframes@0.8.6 inspect . --samples 12 --at-transitions",
+    "preview": "npx --yes hyperframes@0.8.6 preview . --port 3009 --no-open"
+  }
+}

@@ -1,0 +1,7 @@
+制作一条原创高质感商业TVC，15秒，16:9横屏，目标1920×1080。真实摄影质感、丰富物理场景、明确产品焦点。使用参考图固定商品外观与人物身份，但不得把参考图作为拼贴画播放。按时序完成三个镜头，动作连续且符合物理。原生环境音和与动作同步的音效；无配乐、无旁白。画面不出现可读文字、品牌标识、字幕、价格、界面卡片或水印。屏幕只显示抽象色彩，无功能或性能承诺。
+商品主体：compact graphite action camera, large circular lens at right, small blank black glass panel at left, orange shutter button on top, ribbed rubber sides。
+人物主体：a fictional adult athletic man in a charcoal wetsuit。
+场景：wet volcanic rock beside turquoise surf at first light。
+镜头计划：0–4s：超近景水滴滚过镜头保护玻璃，焦点转到橙色快门。4–10s：相机固定在冲浪板前端，同一名冲浪者压低重心划过真实浪面，摄影机平行跟拍。10–15s：切回湿黑岩上的相机，浪花在背景炸开，缓慢半环绕形成产品英雄镜头。
+连续性约束：镜头始终在机身右侧；相机固定在板上不漂浮；海浪、板与人物运动有因果关系。
+图片1用于固定相机外观与成年男性身份；参考图的近大远小只是摄影透视，实物相机为正常手掌大小，不要生成巨型相机。
