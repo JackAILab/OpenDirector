@@ -2,6 +2,7 @@
 import json
 import httpx
 import math
+import time
 import asyncio
 import hashlib
 from harness.models.video_catalog import model_spec
@@ -74,12 +75,36 @@ class CreativeVideoTool:
 def progress_snapshot(status):
     """Only bounded public counters, never raw provider fields or log text."""
     result={}
-    value=status.get('progress')
-    if type(value) in (int,float) and math.isfinite(value) and 0<=value<=100:
-        result['percent']=round(value)
+    # Providers disagree on the field name and occasionally encode the value
+    # as a numeric string or nest it under a bounded result object.  Normalize
+    # only these known scalar fields; never retain the enclosing payload.
+    candidates=[]
+    for container in (status, status.get('result'), status.get('output')):
+        if not isinstance(container, dict):
+            continue
+        for key in ('progress', 'progress_percent', 'progressPercent', 'task_progress', 'taskProgress'):
+            if key in container:
+                value = container[key]
+                candidates.append(value)
+                # Some video providers return {progress: {percent: 42}}.
+                if isinstance(value, dict):
+                    candidates.extend(value.get(k) for k in ('percent', 'percentage', 'value'))
+    for value in candidates:
+        if isinstance(value, bool) or value is None or value == '':
+            continue
+        try:
+            numeric=float(value)
+        except (TypeError, ValueError):
+            continue
+        if math.isfinite(numeric) and 0<=numeric<=100:
+            result['percent']=round(numeric)
+            break
     stage=status.get('stage')
     if stage in ('queued','preparing','generating','denoising','encoding','decoding','finalizing'):
         result['stage']=stage
+    checked=status.get('checked_at')
+    if type(checked) in (int,float) and math.isfinite(checked) and 0<checked<=time.time()+60:
+        result['checked_at']=int(checked)
     done,total=status.get('steps_completed'),status.get('steps_total')
     if type(done) is int and type(total) is int and 0<=done<=total<=10000 and total>0:
         result.update(steps_completed=done,steps_total=total)
@@ -293,7 +318,7 @@ def input_manifest(project):
     images=[dict(id=r['asset'],asset=r['asset'],role=r['role'],instruction=r['instruction'],sha256=r['sha256'],transport_sha256=r['transport_sha256'],slot=i+1,scope='whole_film') for i,r in enumerate(inputs['references'])] if inputs else ([dict(id=ref['id'],asset=ref.get('source_asset'),role='product',slot=1,scope='whole_film')] if ref else [])
     graph=project.get('canvas',{});connected={e['source'] for e in graph.get('edges',[]) if e.get('target')=='director'}
     actual={r.get('asset') for r in images if r.get('asset')}
-    return dict(request_count=1,mode=mode,images=images,image=(dict(id=ref['id'],role='reference' if mode=='references' else 'first_frame',scope='whole_film') if ref and not inputs else None),
+    return dict(request_count=project['duration']//15 if project.get('generation_mode')=='chaptered_native' else 1,mode=mode,images=images,image=(dict(id=ref['id'],role='reference' if mode=='references' else 'first_frame',scope='whole_film') if ref and not inputs else None),
                 video=[],audio=[],element_ids=[],
                 director_only=[dict(id=n['id'],kind=n['kind'],label=n.get('label',''),asset=n.get('asset')) for n in graph.get('nodes',[]) if n['id'] in connected and n.get('asset') not in actual],
                 beats=[dict(id=s['id'],start=s['start'],end=s['start']+s['duration'],image_ids=[r['id'] for r in images],image_id=images[0]['id'] if len(images)==1 else None,audio_source='prompt') for s in project.get('shots',[])])

@@ -184,6 +184,25 @@ def cli_result(args: list[str]) -> dict:
     raise RuntimeError("Kling 未返回可确认的结果；未重新提交")
 
 
+def provider_progress(result: dict) -> int | None:
+    """Normalize only percentage fields; do not infer progress from elapsed time."""
+    for key in ('progress', 'progress_percent', 'progressPercent', 'task_progress', 'taskProgress'):
+        value = _first(result, (key,))
+        candidates = [value]
+        if isinstance(value, dict):
+            candidates.extend(value.get(field) for field in ('percent', 'percentage', 'value'))
+        for candidate in candidates:
+            if isinstance(candidate, bool) or candidate is None:
+                continue
+            try:
+                number = float(candidate)
+            except (TypeError, ValueError):
+                continue
+            if math.isfinite(number) and 0 <= number <= 100:
+                return round(number)
+    return None
+
+
 def refresh_active() -> None:
     global ACTIVE
     ACTIVE = any(j.get('status') in {'processing','uncertain'} for j in JOBS.values())
@@ -203,19 +222,23 @@ def poll_generation(job_id: str) -> None:
         job = JOBS[job_id]
         # Expose only documented counters and known stages, never provider payloads.
         job['checked_at'] = int(time.time())
-        job['stage'] = 'queued' if state in {'QUEUED', 'PENDING', 'WAITING', 'SUBMITTED'} else 'generating'
-        progress = _first(result, ('progress',))
+        job['stage'] = 'queued' if state in {'QUEUED', 'QUEUING', 'QUEUEING', 'PENDING', 'WAITING', 'SUBMITTED'} else 'generating'
+        progress = provider_progress(result)
         job.pop('progress', None)
-        if type(progress) in (int, float) and math.isfinite(progress) and 0 <= progress <= 100:
-            job['progress'] = round(progress)
+        if progress is not None:
+            job['progress'] = progress
         persist(job_id)
         if JOBS[job_id].pop('error',None) is not None: persist(job_id)
-        if state in {'FAILED','ERROR','CANCELLED','CANCELED','REJECTED'}:
-            JOBS[job_id].update(status='failed',error='供应商确认生成失败；未重试')
+        if state in {'FAIL','FAILED','ERROR','CANCELLED','CANCELED','REJECTED'}:
+            JOBS[job_id].update(status='failed',stage='failed',error='供应商确认生成失败；未重试')
             persist(job_id)
             return
+        successful = state in {'COMPLETED','PARTIAL_COMPLETED','SUCCEED','SUCCEEDED','SUCCESS','FINISHED'}
+        if successful:
+            job['stage'] = 'finalizing'
+            persist(job_id)
         url = _first(result, ('urlWithoutWatermark','url_without_watermark'))
-        if state not in {'COMPLETED','PARTIAL_COMPLETED','SUCCEEDED','SUCCESS','FINISHED'} or not isinstance(url,str):
+        if not successful or not isinstance(url,str):
             return  # A non-terminal poll is not a failed paid generation.
         if not url.startswith(('https://','http://')):
             raise RuntimeError('供应商视频地址无效')

@@ -173,3 +173,16 @@ body.portal{--portal-bg:#121212;--portal-side:#161616;--portal-surface:#212121;-
 @media(max-width:1100px){.portal-community-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.portal-plugin-clients button{padding:10px}.portal-plugin-demo article{padding:24px}.portal-plugin-hero h1{font-size:24px}}
 @media(max-width:760px){.portal .portal-plugin-items{position:static;transform:none;width:100%;box-shadow:none}.portal-plugin-hero{padding:16px 0 26px}.portal-plugin-hero h1{font-size:22px;line-height:1.6}.portal-plugin-steps,.portal-plugin-demo{grid-template-columns:1fr}.portal-plugin-steps article+article{border-left:0;border-top:1px solid var(--portal-border);padding-top:24px;margin-top:24px}.portal-plugin-bar{flex-wrap:wrap}.portal-plugin-feature-tabs{overflow:auto;justify-content:flex-start}.portal-plugin-feature-tabs button{white-space:nowrap}.portal-plugin-examples{padding-top:42px}.portal-community-grid{grid-template-columns:1fr}.portal-remix-steps{grid-template-columns:1fr;gap:16px}.portal-remix-form{margin-top:24px;padding:18px}.portal-plugin-hero .portal-plugin-logos span{width:50px;height:50px}.portal-plugin-hero .portal-plugin-logos span:nth-child(3){width:80px;height:80px}.portal-challenge-art{height:220px}}
 body.portal header.portal-plugin-hero{background:transparent}.portal .portal-plugin-code{font-family:Studio,system-ui,sans-serif}.portal .portal-plugin-note{margin-top:32px}.portal .portal-navigation>.portal-nav-heading{margin-top:28px}.portal-plugin-steps{min-height:280px}
+
+/* Asset navigation uses project covers instead of a native, unbounded project select. */
+.portal .portal-projects{max-width:1600px}
+.portal .portal-project-covers{grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:28px 18px}
+.portal-project-id{font-size:11px;color:var(--portal-muted);white-space:nowrap;font-variant-numeric:tabular-nums}
+.portal-asset-breadcrumb{display:flex;align-items:center;gap:14px;margin:24px 0;min-width:0;font-size:14px}
+.portal-asset-breadcrumb strong{font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:55%}
+.portal-asset-back{white-space:nowrap;color:var(--portal-muted)}
+.portal-asset-breadcrumb>.portal-text{margin-left:auto;white-space:nowrap}
+.portal-asset-preview[role=link]{cursor:pointer}
+.portal-asset-preview[role=link]:focus-visible{outline:2px solid var(--portal-accent);outline-offset:4px}
+.portal-asset-card:hover .portal-asset-preview{box-shadow:0 0 0 1px var(--portal-border)}
+@media(max-width:600px){.portal .portal-project-covers{grid-template-columns:repeat(2,minmax(0,1fr));gap:22px 12px}.portal-project-meta{flex-wrap:wrap;gap:6px}.portal-project-state{margin-left:0}.portal-asset-breadcrumb{flex-wrap:wrap;gap:10px}.portal-asset-breadcrumb strong{max-width:65%}.portal-asset-breadcrumb>.portal-text{margin-left:0}.portal .portal-project-info h3{font-size:13px}}

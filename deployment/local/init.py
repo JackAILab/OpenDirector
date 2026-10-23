@@ -12,3 +12,5 @@ else:
     print('Created .env (0600). Read ADMIN_PASSWORD locally; change ADMIN_EMAIL before startup.')
 (root/'secrets').mkdir(exist_ok=True,mode=0o700)
 (root/'secrets/director-key').touch(mode=0o600,exist_ok=True)
+
+(root/'secrets/kling').mkdir(exist_ok=True,mode=0o700)

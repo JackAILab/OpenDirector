@@ -21,6 +21,14 @@ class ImageReference(BaseModel):
     instruction: str = Field(default='',max_length=240)
 
 
+class ImageDraft(BaseModel):
+    model_config={'extra':'forbid'}
+    revision: int
+    model: str = Field(max_length=100)
+    prompt: str = Field(default='',max_length=4000)
+    references: list[ImageReference] = Field(default_factory=list,max_length=3)
+
+
 class ImageAdjustments(BaseModel):
     model_config={'extra':'forbid'}
     angle: Literal['保留原角度','正面平视','侧面 45 度','俯视特写','低机位仰视'] = '保留原角度'
@@ -53,6 +61,9 @@ class ImagePreview(BaseModel):
     source_asset: str | None = Field(default=None,pattern=r'^[a-f0-9]{32}$')
     references: list[ImageReference] = Field(default_factory=list,max_length=3)
     connect_to_director: bool = True
+    director_reference: bool = False
+    director_context: str = Field(default='',max_length=5000)
+    director_video_credits: int | None = Field(default=None,ge=1,le=10000,strict=True)
     adjustments: ImageAdjustments = Field(default_factory=ImageAdjustments)
     region: ImageRegion | None = None
     control_parameters: dict | None = None
@@ -65,7 +76,30 @@ class ImageStart(ImagePreview):
     input_hash: str | None = Field(default=None,pattern=r'^[a-f0-9]{64}$')
 
 
-def install(gateway):
+class DirectorReferences(BaseModel):
+    model_config={'extra':'forbid'}
+    revision: int
+    references: list[ImageReference] = Field(min_length=1,max_length=6)
+
+
+def install(gateway, execute_video=None):
+    @gateway.app.post('/creative/api/projects/{pid}/director-references')
+    async def attach_references(pid:str,body:DirectorReferences,authorization:str|None=Header(None)):
+        from harness.tools.director_references import attach
+        uid=gateway.require_session(authorization)['id']
+        async with store.lock(pid):
+            p=store.load(pid,uid)
+            if p['revision']!=body.revision or pid in store.RUNNING or p['state'] in ('running','rendering','planning'):
+                raise HTTPException(409,'项目已更新或正在处理，请重新核对参考图')
+            try:attach(p,[r.model_dump() for r in body.references])
+            except (ValueError,OSError) as exc:
+                raise HTTPException(422,str(exc) if isinstance(exc,ValueError) else '参考图片暂不可读取') from exc
+            store.archive_render(p)
+            p.update(state='intake',shots=[],error='')
+            for name in ('run_id','artifact','qa','film','campaign','auto_approval'):p.pop(name,None)
+            p['revision']+=1;store.save(p,uid);store.event(p,'tool','director_reference_bound')
+            return store.present(p)
+
     @gateway.app.get('/creative/image-composer.js',include_in_schema=False)
     def composer_script():return FileResponse(store.ROOT/'tools/agent_studio/image-composer.js',media_type='text/javascript',headers={'Cache-Control':'no-store'})
 
@@ -77,6 +111,25 @@ def install(gateway):
             raise HTTPException(409,'项目已更新或正在处理，请重新核对生成输入')
         if p.get('creation_mode') in ('image','video') and body.connect_to_director:
             raise HTTPException(422,'手动创作结果保留在画布，不会自动转入 Agent')
+        if body.director_reference:
+            from harness.tools.director_references import check_available
+            if not body.connect_to_director:raise HTTPException(422,'Agent 参考生成必须交给导演')
+            try:check_available(p)
+            except ValueError as exc:raise HTTPException(422,str(exc)) from exc
+            if len(p.get('messages',[]))>36:raise HTTPException(422,'对话已满，请新建项目')
+            expected=[{k:r[k] for k in ('asset','role','instruction')} for r in p.get('video_inputs',{}).get('references',[])]
+            if body.source_asset or [r.model_dump() for r in body.references]!=expected:
+                raise HTTPException(409,'Agent 生图须使用当前已绑定参考，请刷新输入；不会忽略商品图片')
+        elif body.director_context:raise HTTPException(422,'补充回答只用于 Agent 参考生成')
+        if body.director_video_credits is not None:
+            from harness.models.video_catalog import model_spec
+            if not body.director_reference or p.get('approval_mode')!='auto' or execute_video is None:
+                raise HTTPException(422,'参考图与成片连续制作需要 Agent 自动审批模式')
+            if p.get('generation_mode') not in ('single_native','chaptered_native'):
+                raise HTTPException(422,'当前制作模式不支持连续制作')
+            required=model_spec(p['provider'],p['model'])['credits_per_5s']*(p['duration']//5)
+            if body.director_video_credits!=required:
+                raise HTTPException(409,'视频预算已变化，请重新确认参考图与成片总费用')
         spec=next((m for m in image_models() if m['id']==body.model),None)
         if not spec or not spec['available']:raise HTTPException(422,'该图片模型当前不可用')
         try:result=prepare_inputs(p,spec,body.prompt,[v.model_dump() for v in body.references],body.source_asset,body.connect_to_director,body.adjustments.model_dump(),body.region.model_dump() if body.region else None,body.control_parameters)
@@ -100,16 +153,38 @@ def install(gateway):
             raise HTTPException(422,'导演最多接收6个图片或视频参考，可取消生成后交给导演')
         return result
 
+    @gateway.app.put('/creative/api/projects/{pid}/images/draft')
+    async def save_image_draft(pid:str,body:ImageDraft,authorization:str|None=Header(None)):
+        uid=gateway.require_session(authorization)['id']
+        async with store.lock(pid):
+            p=store.load(pid,uid)
+            if p.get('creation_mode')!='image':raise HTTPException(422,'请从图片节点保存参考')
+            if p['revision']!=body.revision or pid in store.RUNNING or p['state'] in ('running','rendering','planning') or p.get('image_task',{}).get('state') in ('running','needs_review'):
+                raise HTTPException(409,'项目已更新或任务未结束，请重新打开参考设置')
+            if body.model not in {m['id'] for m in image_models()}:raise HTTPException(422,'未知图片模型')
+            refs=[r.model_dump() for r in body.references]
+            if len({r['asset'] for r in refs})!=len(refs):raise HTTPException(422,'参考图片不能重复')
+            assets=p.get('canvas_assets',{})
+            if any(assets.get(r['asset'],{}).get('kind')!='image' for r in refs):raise HTTPException(422,'参考图片不属于当前项目')
+            draft={'model':body.model,'prompt':body.prompt,'references':refs}
+            if p.get('image_draft')!=draft:
+                p['image_draft']=draft;p['revision']+=1;p['updated_at']=time.time();store.save(p,uid)
+            return store.present(p)
+
     @gateway.app.post('/creative/api/projects/{pid}/images/preview')
     async def preview(pid:str,body:ImagePreview,authorization:str|None=Header(None)):
         uid=gateway.require_session(authorization)['id']
         async with store.lock(pid):
-            p=store.load(pid,uid);return dict(prepared(p,body),credits=1)
+            p=store.load(pid,uid);result=dict(prepared(p,body),credits=1)
+            if body.director_video_credits is not None:
+                result.update(video_credits=body.director_video_credits,total_credits=1+body.director_video_credits)
+            return result
 
     def ledger(c):
         c.execute('CREATE TABLE IF NOT EXISTS creative_image_requests(owner INTEGER, project TEXT, request TEXT, state TEXT, credits INTEGER, PRIMARY KEY(owner,project,request))')
 
-    async def run(pid,uid,task):
+    async def run(pid,uid,task,authorization):
+        completed=False
         try:
             p=store.load(pid,uid)
             with gateway.db() as c:
@@ -153,7 +228,8 @@ def install(gateway):
                 if task.get('connect_to_director',True):
                     graph['edges'].append({'source':node_id,'target':'director'})
                     store.archive_render(p);p.update(state='intake',shots=[],questions=[],error='')
-                    for key in ('run_id','artifact','qa','stop_requested','film'):p.pop(key,None)
+                    for key in ('run_id','artifact','qa','film'):p.pop(key,None)
+                    if not task.get('video_approval'):p.pop('stop_requested',None)
                 draft_id=task.get('transform_draft_id')
                 if draft_id:
                     draft=p.get('image_transform_drafts',{}).get(draft_id)
@@ -171,15 +247,55 @@ def install(gateway):
                 store.save(p,uid);store.event(p,'tool','image_completed')
                 with gateway.db() as c:
                     c.execute("UPDATE creative_image_requests SET state='completed' WHERE owner=? AND project=? AND request=?",(uid,pid,task['id']))
+                completed=True
+            if task.get('director_reference'):
+                from harness.tools.director_references import attach
+                from harness.core.creative_planner import plan
+                from harness.studio.api import direct
+                async with store.lock(pid):
+                    p=store.load(pid,uid)
+                    attach(p,[dict(asset=asset['id'],role='style',instruction='Agent 生成的概念视觉参考；不代表真实产品界面或品牌标识')])
+                    p['messages'].append({'role':'assistant','content':'概念参考图已生成并绑定到视频输入。沿用已有回答继续规划；此图仅作视觉方向，不是真实应用截图或品牌标识。'})
+                    p.update(state='planning',planning_phase='queued',error='')
+                    if not task.get('video_approval'):p.pop('auto_approval',None)
+                    p['revision']+=1;store.save(p,uid);store.event(p,'tool','director_reference_bound')
+                await plan(p,uid,'plan' if task.get('video_approval') else 'interview',direct)
+                if task.get('video_approval'):
+                    latest=store.load(pid,uid);approval=task['video_approval']
+                    if latest.get('stop_requested'):
+                        latest['auto_approval']['state']='stopped';store.save(latest,uid);return
+                    if (latest['state']!='ready' or latest['revision']!=p['revision']
+                            or latest['model']!=approval['model'] or latest['duration']!=approval['duration']
+                            or latest['aspect']!=approval['aspect']
+                            or latest.get('image_task',{}).get('id')!=task['id']):
+                        latest['auto_approval']['state']='needs_review';store.save(latest,uid);return
+                    latest['auto_approval'].update(state='consumed',revision=latest['revision']);store.save(latest,uid)
+                    # Hand over to the same versioned, owned execution gate used
+                    # by the video button. No credentials are saved in the task.
+                    if store.RUNNING.get(pid) is asyncio.current_task():store.RUNNING.pop(pid,None)
+                    try:await execute_video(pid,latest['revision'],approval['credits'],authorization)
+                    except HTTPException as exc:
+                        latest=store.load(pid,uid)
+                        latest['auto_approval']['state']='needs_review'
+                        latest['error']='参考图已保存，自动制作已停止：'+str(exc.detail)
+                        store.save(latest,uid);store.event(latest,'runner','auto_approval_stopped')
         except Exception:
             async with store.lock(pid):
                 p=store.load(pid,uid);task=p.get('image_task') or {};draft_id=task.get('transform_draft_id');draft=p.get('image_transform_drafts',{}).get(draft_id) if draft_id else None
+                if task.get('video_approval') and p.get('auto_approval',{}).get('state') in ('armed','consumed'):
+                    p['auto_approval']['state']='needs_review'
+                if completed:
+                    p['error']=('参考图已保存，后续制作中断，请核对已有视频任务；不会自动重新提交。' if task.get('video_approval') else
+                                '图片已生成并保存在画布，参考绑定或继续规划未完成。请核对视频参考输入后继续；不会再次生图。')
+                    store.save(p,uid);store.event(p,'agent','director_reference_needs_review')
+                    return
                 if isinstance(draft,dict) and draft.get('state')=='applied':draft.update(result_state='needs_review')
                 p['image_task'].update(state='needs_review',error='图片尚未完成或结果待核对；可能已消耗额度，不会自动重试。')
                 p['image_attempts'][-1]=dict(p['image_task']);store.save(p,uid);store.event(p,'tool','image_needs_review')
                 with gateway.db() as c:
                     c.execute("UPDATE creative_image_requests SET state='needs_review' WHERE owner=? AND project=? AND request=? AND state='dispatched'",(uid,pid,task['id']))
-        finally:store.RUNNING.pop(pid,None)
+        finally:
+            if store.RUNNING.get(pid) is asyncio.current_task():store.RUNNING.pop(pid,None)
 
     @gateway.app.post('/creative/api/projects/{pid}/images')
     async def start(pid: str,body: ImageStart,authorization: str|None=Header(None)):
@@ -187,6 +303,11 @@ def install(gateway):
         async with store.lock(pid):
             p=store.load(pid,uid)
             request_body=body.model_dump(exclude={'request_id','approved_credits'})
+            # Keep fingerprints compatible with requests created before these
+            # optional handoff fields existed.
+            if not body.director_reference:request_body.pop('director_reference',None)
+            if not body.director_context:request_body.pop('director_context',None)
+            if body.director_video_credits is None:request_body.pop('director_video_credits',None)
             if body.control_parameters is None:request_body.pop('control_parameters',None)
             if body.region is None:request_body.pop('region',None)
             elif body.region.shape=='rectangle' and not body.region.strokes:
@@ -205,28 +326,40 @@ def install(gateway):
             task={'id':body.request_id,'model':body.model,'prompt':inputs['prompt'],'prepared':inputs,
                   'adjustments':inputs['adjustments'],
                   'request_hash':fingerprint,'connect_to_director':body.connect_to_director,'state':'running','credits':1,'started_at':time.time(),'progress':{'phase':'queued','updated_at':time.time()}}
+            if body.director_reference:task.update(director_reference=True,director_context=body.director_context)
+            if body.director_video_credits is not None:
+                task['video_approval']=dict(model=p['model'],duration=p['duration'],aspect=p['aspect'],credits=body.director_video_credits)
+                p['auto_approval']=dict(task['video_approval'],state='armed',revision=p['revision']+1)
+                p['stop_requested']=False
             if body.transform_draft_id:task['transform_draft_id']=body.transform_draft_id
             if body.source_asset:task['source_asset']=body.source_asset
             elif inputs['references'] and inputs['references'][0].get('reference_id'):
                 task['reference_id']=p['reference']['id']
                 if p['reference'].get('source_asset'):task['reference_asset']=p['reference']['source_asset']
             p.setdefault('image_attempts',[]).append(dict(task));p['image_task']=task;p['revision']+=1;p['updated_at']=time.time()
+            if body.director_reference and body.director_context:
+                p['messages'].append({'role':'user','content':body.director_context})
             # Reservation and debit share ONE database; project persistence is separate.
             # A durable unique request prevents charging again even if the project write fails.
             with gateway.db() as c:
                 ledger(c)
                 existing=c.execute('SELECT state FROM creative_image_requests WHERE owner=? AND project=? AND request=?',(uid,pid,body.request_id)).fetchone()
                 if existing:raise HTTPException(409,'该图片请求已有记录，请核对任务结果，不会重复扣费或提交')
+                if body.director_video_credits is not None:
+                    balance=c.execute('SELECT quota,used FROM users WHERE id=? AND verified=1',(uid,)).fetchone()
+                    if not balance or (balance[0]>=0 and balance[0]-balance[1]<1+body.director_video_credits):
+                        raise HTTPException(402,'积分不足以完成参考图与成片，尚未提交生成')
                 c.execute("INSERT INTO creative_image_requests VALUES(?,?,?,'reserved',1)",(uid,pid,body.request_id))
                 changed=c.execute('UPDATE users SET used=used+1 WHERE id=? AND verified=1 AND (quota<0 OR used+1<=quota)',(uid,))
                 if changed.rowcount!=1:raise HTTPException(402,'图片生成需要1个平台积分，当前余额不足')
             try:
                 store.save(p,uid);store.event(p,'tool','image_requested')
+                if task.get('video_approval'):store.event(p,'runner','reference_film_approved')
             except Exception:
                 # No worker was scheduled: this is a known unsubmitted request, safe to release.
                 with gateway.db() as c:
                     released=c.execute("UPDATE creative_image_requests SET state='not_submitted',credits=0 WHERE owner=? AND project=? AND request=? AND state='reserved'",(uid,pid,body.request_id))
                     if released.rowcount:c.execute('UPDATE users SET used=used-1 WHERE id=?',(uid,))
                 raise HTTPException(503,'图片请求未提交，已释放预留积分，请稍后重新操作') from None
-            store.RUNNING[pid]=asyncio.create_task(run(pid,uid,task))
+            store.RUNNING[pid]=asyncio.create_task(run(pid,uid,task,authorization))
             return store.present(p)

@@ -31,3 +31,21 @@ def test_publish_frozen_sources_lineage_idempotence_and_owner_scope(client,monke
     assert client.post(base,json={'revision':p['revision']}).status_code==409
     (folder/'final.mp4').write_bytes(b'tampered')
     assert client.post(base,json={'revision':current['revision']}).status_code==422
+
+
+def test_catalog_exposes_only_valid_export_identity(monkeypatch):
+    from harness.tools import creative_edit_media as media
+    monkeypatch.setattr(media, 'primary_path', lambda project: Path('primary.mp4'))
+    monkeypatch.setattr(media, 'source_path', lambda project, source: Path(source + '.mp4'))
+    monkeypatch.setattr(media, 'describe', lambda path: dict(sha256='a'*64, duration=60, kind='video', has_audio=True))
+    assets = {
+        'good': {'kind': 'video', 'provenance': {'kind': 'video_edit', 'export_id': 'b'*32, 'private': 'omit'}},
+        'upload': {'kind': 'video', 'provenance': {'kind': 'uploaded', 'export_id': 'b'*32}},
+        'bad': {'kind': 'video', 'provenance': {'kind': 'video_edit', 'export_id': '../untrusted'}},
+    }
+    catalog = media.source_catalog({'canvas_assets': assets})
+    assert catalog['canvas_good']['edit_export_id'] == 'b'*32
+    assert 'edit_export_id' not in catalog['primary']
+    assert 'edit_export_id' not in catalog['canvas_upload']
+    assert 'edit_export_id' not in catalog['canvas_bad']
+    assert 'provenance' not in catalog['canvas_good'] and 'private' not in catalog['canvas_good']

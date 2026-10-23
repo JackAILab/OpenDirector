@@ -21,7 +21,10 @@ def image_bytes(project, aid, mode):
     asset=project.get('canvas_assets',{}).get(aid)
     if not asset or asset.get('kind')!='image':raise ValueError('视频参考图不属于本项目')
     raw=(asset_directory(project,aid)/asset['filename']).read_bytes()
-    if len(raw)>4*1024*1024:raise ValueError('视频参考图过大')
+    # Generated PNGs can exceed 4 MiB while still compressing safely for the
+    # provider envelope. Bound the encoded upload before decoding, then apply
+    # the authoritative pixel and transport limits below.
+    if len(raw)>32*1024*1024:raise ValueError('视频参考图过大')
     with Image.open(io.BytesIO(raw)) as source:
         if source.width*source.height>20_000_000 or min(source.size)<128:raise ValueError('参考图尺寸不适用')
         ratio=source.width/source.height

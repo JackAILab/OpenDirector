@@ -11,10 +11,13 @@
  const rawPrompt=make('details'),rawLabel=make('summary','查看实际提交的完整提示词');rawPrompt.append(rawLabel,filmText);
  const filmActions=make('div',null,'row');filmActions.append(action('复制整片提示词',async()=>{try{await navigator.clipboard.writeText(filmText.value);toast('已复制实际提交的完整提示词')}catch(e){rawPrompt.open=true;filmText.focus();filmText.select();toast('请复制已选中的整片提示词')}}),action('关闭',()=>filmDialog.close()));
  filmDialog.append(make('h2','整片拍摄方案'),filmMeta,filmBrief,make('p','逐段审阅画面、声音和旁白。全部时码作为一次请求生成完整音视频；字幕后期叠加。实际节奏、商品外观和发音仍需审阅。'),filmBeats,rawPrompt,filmActions);document.body.append(filmDialog);
- function openFilmReview(){
+ function openFilmReview(event){
+  const requestedShot=event?.detail?.shot;
+  const chaptered=project?.generation_mode==='chaptered_native';rawLabel.textContent=chaptered?'查看完整分章拍摄方案':'查看实际提交的完整提示词';
+  filmDialog.querySelector(':scope > p:not(.muted)')?.replaceChildren(document.createTextNode(chaptered?'每15秒生成一章；Agent 自动绑定商品与上一章衔接图，再保留音轨剪辑和叠加字幕。实际外观、转场和声音仍需审阅。':'逐段审阅画面、声音和旁白。全部时码作为一次请求生成完整音视频；字幕后期叠加。实际节奏、商品外观和发音仍需审阅。'));
   if(hasDrafts()){toast('请先保存分镜修改，确保提示词与当前版本一致');return}
-  filmText.value=project?.production_prompt||'先请导演生成15秒有声整片方案。';
-  filmMeta.textContent=project?`版本 ${project.revision} · ${project.duration} 秒 · ${project.quote?.label||project.model} · 1 次整片生成`:'尚未形成拍摄方案';
+  filmText.value=project?.production_prompt||'先请导演生成广告方案。';
+  filmMeta.textContent=project?`版本 ${project.revision} · ${project.duration} 秒 · ${project.quote?.label||project.model} · ${project.generation_mode==='chaptered_native'?project.duration/15+' 次章节生成与自动剪辑':'1 次整片生成'}`:'尚未形成拍摄方案';
   filmBrief.replaceChildren(make('h3','这支广告要表达什么'));
   const facts=make('dl');
   for(const [key,label] of [['product','商品'],['audience','受众'],['message','核心主张'],['style','拍摄方向'],['cta','行动号召']])facts.append(make('dt',label),make('dd',project?.brief?.[key]||'待补充'));
@@ -28,13 +31,15 @@
   }
   filmBeats.replaceChildren();
   for(const [i,s] of (project?.shots||[]).entries()){
-   const beat=make('details',null,'film-review-beat');beat.open=i===0;
+   const beat=make('details',null,'film-review-beat');beat.dataset.shot=s.id;beat.open=requestedShot?s.id===requestedShot:i===0;
    beat.append(make('summary',`${s.start}–${s.start+s.duration}s · ${s.title}`));
    for(const [label,value] of [['画面与拍摄',s.prompt],['音乐、音效与旁白',s.audio_prompt],['后期字幕',s.caption||'无字幕'],['创作依据',s.rationale]])beat.append(make('h3',label),make('p',value||'待补充'));
    beat.append(action('修改这段画面与声音',()=>{filmDialog.close();selected=i;document.body.classList.remove('inspector-folded');syncLayout();drawSelection();drawEditor();document.querySelector('.inspector').scrollTop=0;$('shotPrompt').focus()}));filmBeats.append(beat);
   }
   filmDialog.showModal();
+  if(requestedShot)requestAnimationFrame(()=>Array.from(filmBeats.children).find(n=>n.dataset.shot===requestedShot)?.scrollIntoView({block:'start'}));
  }
+ document.addEventListener('creative-open-film-review',openFilmReview);
  const filmReviewButton=action('整片拍摄方案',openFilmReview);bar.append(filmReviewButton);
  const sceneIntentDialog=make('dialog');sceneIntentDialog.id='sceneIntentDialog';const sceneIntentMeta=make('p',null,'scene-intent-meta'),sceneIntentBody=make('div',null,'scene-intent-body');const sceneIntentActions=make('div',null,'row');const sceneIntentContinue=action('进入生成确认',()=>{sceneIntentDialog.close();document.querySelector('#executeButton')?.click()}),sceneIntentClose=action('稍后确认',()=>sceneIntentDialog.close());sceneIntentContinue.className='primary';sceneIntentActions.append(sceneIntentClose,sceneIntentContinue);sceneIntentDialog.append(make('h2','3D 场景已接入导演画布'),sceneIntentMeta,sceneIntentBody,make('p','场景版本已冻结到本次上下文。生成前仍会重新展示 Skill、视频模型、审批方式和平台积分，由你完成最终确认。'),sceneIntentActions);document.body.append(sceneIntentDialog);
  const sceneIntentButton=action('3D 渲染已核对 · 继续确认',()=>{const i=project?.scene_render_intent;if(!i)return;const lock=i.trajectory_sha256?` · 轨迹锁 ${i.trajectory_sha256.slice(0,12)}`:'';sceneIntentMeta.textContent=`场景修订 ${i.scene_revision} · ${i.scene_hash.slice(0,12)}${lock} · ${i.aspect}`;sceneIntentBody.replaceChildren(make('p',`模型：${i.model}`),make('p',`审批：${i.approval_mode==='auto'?'自动审批':'手动审批'}`),make('p',i.trajectory_sha256?'镜头轨迹已随场景版本冻结。':'旧版本场景未记录轨迹锁，重新保存 3D 场景后可补齐。'),make('p','状态：只保存了渲染意图，尚未提交视频生成。'));sceneIntentDialog.showModal()});sceneIntentButton.id='sceneRenderIntent';sceneIntentButton.className='scene-render-intent';sceneIntentButton.hidden=true;bar.append(sceneIntentButton);
@@ -60,9 +65,9 @@
  inlineEditDialog.addEventListener('cancel',event=>{event.preventDefault();requestInlineClose()});
  const openInlineEditor=(options={})=>{
   const sourceTime=typeof options.sourceTime==='number'&&Number.isFinite(options.sourceTime)&&options.sourceTime>=0&&options.sourceTime<=7200?options.sourceTime:undefined;
-  if(inlineSession){inlineEditDialog.showModal();if(options.source&&inlineSession.pid===project?.id){const source=String(options.source).slice(0,80),tool=['retake','speech','assistant'].includes(options.tool)?options.tool:null,bridge=editorBridge();if(bridge?.state().ready){(tool?bridge.openTool(tool,source):bridge.focusSource(source,sourceTime))?.catch(()=>toast('素材暂不可定位，当前剪辑已保留'))}else inlineSession.pending={source,tool,sourceTime}} if(inlineSession.pid!==project?.id)toast('先完成或关闭 '+inlineSession.title+' 的剪辑，再打开当前项目');return true}
+  if(inlineSession){inlineEditDialog.showModal();if(options.source&&inlineSession.pid===project?.id){const source=String(options.source).slice(0,80),tool=['retake','speech','assistant','trim','audio'].includes(options.tool)?options.tool:null,bridge=editorBridge();if(bridge?.state().ready){(tool?bridge.openTool(tool,source):bridge.focusSource(source,sourceTime))?.catch(()=>toast('素材暂不可定位，当前剪辑已保留'))}else inlineSession.pending={source,tool,sourceTime}} if(inlineSession.pid!==project?.id)toast('先完成或关闭 '+inlineSession.title+' 的剪辑，再打开当前项目');return true}
   if(!project){toast('请先创建项目');return false}if(busy){toast('当前制作任务处理中，请稍候');return false}if(hasDrafts()){toast('请先保存或放弃草稿，再打开内嵌剪辑');return false}
-  const query=new URLSearchParams({project:project.id,embedded:'1'});if(options.source)query.set('source',String(options.source).slice(0,80));if(sourceTime!==undefined)query.set('source_at',String(sourceTime));if(['retake','speech','assistant'].includes(options.tool))query.set('tool',options.tool);if(options.canvasAsset)query.set('canvas_asset',String(options.canvasAsset).slice(0,80));inlineSession={pid:project.id,title:project.brief?.product||'当前项目'};inlineEditTitle.textContent='智能剪辑 · '+inlineSession.title;inlineEditFrame.src='/creative/editor?'+query.toString();syncInlineButton();inlineEditDialog.showModal();return true;
+  const query=new URLSearchParams({project:project.id,embedded:'1'});if(options.source)query.set('source',String(options.source).slice(0,80));if(sourceTime!==undefined)query.set('source_at',String(sourceTime));if(['retake','speech','assistant','trim','audio'].includes(options.tool))query.set('tool',options.tool);if(options.canvasAsset)query.set('canvas_asset',String(options.canvasAsset).slice(0,80));inlineSession={pid:project.id,title:project.brief?.product||'当前项目'};inlineEditTitle.textContent='智能剪辑 · '+inlineSession.title;inlineEditFrame.src='/creative/editor?'+query.toString();syncInlineButton();inlineEditDialog.showModal();return true;
  };
  const inlineEdit=action('智能剪辑',()=>openInlineEditor());inlineEdit.id='inlineEditButton';inlineEdit.className='canvas-inline-edit-button';inlineEdit.setAttribute('aria-label','打开内嵌剪辑');syncInlineButton();if(canvasToolbar)canvasToolbar.append(inlineEdit);
  document.addEventListener('creative-open-inline-edit',event=>{openInlineEditor(event.detail||{})});
@@ -77,6 +82,40 @@
  });
  const smartEdit=action('独立剪辑 ↗',()=>{if(!project){toast('请先创建项目');return}if(busy){toast('当前制作任务处理中，请稍候');return}if(hasDrafts()){toast('请先保存或放弃草稿，再进入智能剪辑');return}location.href='/creative/editor?project='+encodeURIComponent(project.id)});smartEdit.id='canvasEditButton';smartEdit.className='canvas-edit-button';smartEdit.setAttribute('aria-label','打开智能剪辑');smartEdit.title='进入字幕、重拍、转场、音频和全片审阅';document.querySelector('.canvas-view-actions')?.append(smartEdit);
  const canvasModeButton=action(expanded?'退出全屏':'全屏画布',()=>openCanvas.click());canvasModeButton.className='canvas-mode-button';bar.append(canvasModeButton);
+ // PenStudio keeps the creation destinations reachable while the canvas is open.
+ // Keep this rail additive: it never owns project state or generation requests.
+ const launchRail=make('aside',null,'canvas-launch-rail');launchRail.setAttribute('aria-label','创作入口');
+ const launchRailToggle=action('展开创作入口',()=>{const expanded=launchRail.classList.toggle('is-expanded');launchRailToggle.textContent=expanded?'收起创作入口':'展开创作入口';launchRailToggle.setAttribute('aria-expanded',String(expanded));launchRailToggle.dataset.icon=expanded?'‹':'›';});launchRailToggle.type='button';launchRailToggle.className='canvas-launch-toggle';launchRailToggle.dataset.icon='›';launchRailToggle.setAttribute('aria-expanded','false');launchRailToggle.title='展开创作入口';launchRail.append(launchRailToggle);
+ const homeLink=document.createElement('a');homeLink.href='/creative/discover';homeLink.textContent='首页';homeLink.dataset.icon='⌂';homeLink.className='canvas-launch-home';homeLink.title='首页';launchRail.append(homeLink);
+ const launchTitle=make('div','创作入口','canvas-launch-title');launchRail.append(launchTitle);
+ const tool=(label,target,icon)=>{const b=action(label,()=>document.getElementById(target)?.click());b.className='canvas-launch-tool';b.dataset.icon=icon;b.title=label;b.setAttribute('aria-label',label);return b};
+ // Keep the canvas navigation and the compact bottom dock in sync. These are
+ // proxies rather than duplicate stateful controls, so selecting a tool in
+ // either place updates the same canvas mode.
+ launchRail.append(tool('选择素材','canvasSelectTool','↖'),tool('平移画布','canvasHandTool','✋'));
+ const nodeLimitReached=()=>Array.isArray(project?.manual_nodes)&&project.manual_nodes.length>=15;
+ const launch=(label,description,fn,disabled=false,icon='•')=>{const b=action(label,()=>{if(!disabled&&nodeLimitReached()&&['视频生成','图片生成'].includes(label)){toast('当前画布已达到 16 个生成节点上限，请新建画布继续创作');return}fn()});b.className='canvas-launch-action';b.dataset.icon=icon;b.disabled=disabled;b.title=disabled?description:label;b.append(make('small',description));return b};
+ launchRail.append(
+   launch('新建项目','从 Director 开始一段新创作',()=>document.getElementById('newButton')?.click(),false,'＋'),
+   // Route the rail through the same node-creation handlers as the canvas
+   // dock. Opening the generic add menu here used to make these two entries
+   // look clickable while doing nothing until a second click.
+   launch('视频生成','在当前项目中打开视频创作设置',()=>{
+    const direct=document.querySelector('[data-manual-add="video"]');
+    if(direct){direct.click();return}
+    document.querySelector('#canvasAddMenu summary')?.click();
+   },false,'▣'),
+   launch('图片生成','打开画布添加菜单中的图片入口',()=>{
+    const direct=document.querySelector('[data-manual-add="image"]');
+    if(direct){direct.click();return}
+    document.querySelector('#canvasAddMenu summary')?.click();
+   },false,'▧'),
+   launch('音频生成','音频模型尚未接入当前项目',()=>{},true,'◒'),
+   launch('剧本生成','剧本 Skill 尚未接入当前项目',()=>{},true,'T'),
+   launch('智能剪辑','在当前画布打开多轨剪辑',()=>inlineEdit.click(),false,'✂'),
+   launch('3D-BOX','布置场景、灯光与镜头轨迹',()=>{if(!project){toast('请先创建项目');return}if(busy){toast('当前制作任务处理中，请稍候');return}if(hasDrafts()){toast('请先保存或放弃草稿，再进入 3D-BOX');return}location.href='/creative/scene?'+new URLSearchParams({project:project.id,return_view:'canvas'})},false,'◇')
+ );
+ document.body.append(launchRail);
  const creativeStatus=action('创作配置 · 尚未载入',()=>{const panel=document.querySelector('.creative-settings');if(!panel){toast('创作设置尚在载入，请稍候');return}document.body.classList.remove('chat-collapsed');const toggle=document.querySelector('#chatToggle');if(toggle){toggle.textContent='收起对话';toggle.setAttribute('aria-expanded','true')}panel.open=true;panel.scrollIntoView({block:'nearest'});});creativeStatus.id='creativeStatusButton';creativeStatus.className='creative-status-chip';creativeStatus.setAttribute('aria-label','打开创作设置');bar.append(creativeStatus);if(openSettingsRequested)setTimeout(()=>creativeStatus.click(),0);
  const productionTask=make('details',null,'production-task-card');productionTask.setAttribute('aria-label','制作任务状态');productionTask.open=false;productionTask.id='productionTask';
  const taskSummary=make('summary',null,'production-task-summary'),taskKicker=make('span','制作任务','production-task-kicker'),taskTitle=make('strong','等待任务','production-task-title'),taskProgress=make('span','','production-task-progress');taskSummary.append(taskKicker,taskTitle,taskProgress);
@@ -91,17 +130,28 @@
  const taskSync=make('p',null,'production-task-sync');
  const taskPanelHead=make('div',null,'production-task-panel-head');taskPanelHead.append(make('strong','制作任务详情'),closeTask);
  taskPanel.append(taskPanelHead,taskSync,taskBody,taskActions);productionTask.append(taskSummary,taskPanel);bar.prepend(productionTask);
+ const liveProgress=make('section',null,'canvas-live-progress');liveProgress.setAttribute('aria-label','实时制作进度');liveProgress.hidden=true;
+ const liveProgressHead=make('div',null,'canvas-live-progress-head'),liveProgressTitle=make('strong','实时制作'),liveProgressLabel=make('span');liveProgressHead.append(liveProgressTitle,liveProgressLabel);
+ const liveProgressList=make('div',null,'canvas-live-progress-list');
+ const liveProgressTrack=make('div',null,'canvas-live-progress-track'),liveProgressFill=make('span'),liveProgressCaption=make('small');liveProgressTrack.setAttribute('role','progressbar');liveProgressTrack.append(liveProgressFill);liveProgress.append(liveProgressHead,liveProgressList,liveProgressCaption,liveProgressTrack);document.body.append(liveProgress);
+const renderManualProgress=detail=>{const d=detail||{};liveProgress.dataset.manual=d.visible?'true':'false';if(!d.visible){liveProgress.hidden=true;liveProgressList.replaceChildren();liveProgressLabel.textContent='';liveProgressCaption.textContent='';liveProgressTrack.removeAttribute('aria-valuenow');liveProgressTrack.removeAttribute('aria-valuetext');liveProgressTrack.removeAttribute('aria-description');liveProgressFill.style.removeProperty('width');return}liveProgress.hidden=false;liveProgressLabel.textContent=d.label||'节点制作中';liveProgressCaption.textContent=d.caption||'正在同步节点进度';liveProgressCaption.setAttribute('aria-label',liveProgressCaption.textContent);const rows=Array.isArray(d.entries)&&d.entries.length?d.entries:[d];liveProgressList.replaceChildren(...rows.slice(0,6).map(row=>{const item=make('div',null,'canvas-live-progress-item'),name=make('span','',row.label||'节点制作中'),value=make('b','',Number.isFinite(row.percent)?Math.round(row.percent)+'%':'同步中');item.append(name,value);return item}));liveProgressTrack.setAttribute('aria-label','生成进度：'+(d.label||'节点制作中'));const determinate=rows.length===1&&Number.isFinite(d.percent)&&!d.interrupted;liveProgressTrack.dataset.determinate=String(determinate);if(determinate){const value=Math.max(0,Math.min(100,Number(d.percent)));liveProgressTrack.setAttribute('aria-valuemin','0');liveProgressTrack.setAttribute('aria-valuemax','100');liveProgressTrack.setAttribute('aria-valuenow',String(value));liveProgressTrack.setAttribute('aria-valuetext',d.label||'节点制作中');liveProgressTrack.removeAttribute('aria-description');liveProgressFill.style.width=value+'%'}else{liveProgressTrack.removeAttribute('aria-valuemin');liveProgressTrack.removeAttribute('aria-valuemax');liveProgressTrack.removeAttribute('aria-valuenow');liveProgressTrack.removeAttribute('aria-valuetext');liveProgressTrack.setAttribute('aria-description',d.label||'节点制作中');liveProgressFill.style.removeProperty('width')}};
+ document.addEventListener('creative-manual-progress',event=>renderManualProgress(event.detail));
+ const manualProgressVisibilityObserver=new MutationObserver(()=>{if(!document.body.classList.contains('workspace-child-generating'))renderManualProgress({visible:false})});manualProgressVisibilityObserver.observe(document.body,{attributes:true,attributeFilter:['class']});
  taskSummary.setAttribute('aria-controls',taskPanel.id);taskSummary.setAttribute('aria-expanded','false');taskTitle.setAttribute('role','status');taskTitle.setAttribute('aria-live','polite');
  productionTask.addEventListener('toggle',()=>taskSummary.setAttribute('aria-expanded',String(productionTask.open)));
  document.addEventListener('pointerdown',event=>{if(productionTask.open&&!productionTask.contains(event.target))productionTask.open=false});
  document.addEventListener('keydown',event=>{if(event.key==='Escape'&&productionTask.open&&!document.querySelector('dialog[open]')){productionTask.open=false;taskSummary.focus()}});
 
  const resolutionLabels={callback_observed_awaiting_poll:'已收到回调，等待轮询确认',polling:'供应商处理中',provider_terminal_confirmed:'供应商已结束，正在核对素材',source_checking:'正在检查成片素材',source_verified:'素材检查完成',provider_terminal_failed:'供应商失败，已停止',provider_terminal_uncertain:'结果待核对'};
- function syncProductionTask(){if(!productionTask)return;const retakes=Object.values(project?.edit_retakes||{});const target=project?.film||project?.shots?.find(s=>s.provider_resolution)||retakes.find(s=>s.provider_resolution);const resolution=target?.provider_resolution||'';const poll=target?.provider_poll||{};const recovery=project?.production_recovery_queue||[];const imageTask=project?.image_task||{};const fallback=project?.interrupted?'服务中断，等待恢复查询':imageTask.state==='running'?'参考图生成中':imageTask.state==='completed'?'参考图已加入画布':imageTask.state==='needs_review'?'参考图待核对':({planning:'导演规划中',ready:'等待制作确认',running:'任务运行中',rendering:'正在合成',completed:'成片待审阅',paused:'制作已暂停',failed:'制作失败'}[project?.state]||'等待任务');const label=resolutionLabels[resolution]||fallback;const progress=poll.progress||target?.progress||{},percent=Number.isFinite(progress.percent)?`${progress.percent}%`:'';
+ function syncProductionTask(){if(!productionTask)return;const retakes=Object.values(project?.edit_retakes||{});const target=project?.film||project?.shots?.find(s=>s.provider_resolution)||retakes.find(s=>s.provider_resolution);const resolution=target?.provider_resolution||'';const poll=target?.provider_poll||{};const recovery=project?.production_recovery_queue||[];const imageTask=project?.image_task||{};const fallback=project?.interrupted?'服务中断，等待恢复查询':imageTask.state==='running'?'参考图生成中':imageTask.state==='completed'?'参考图已加入画布':imageTask.state==='needs_review'?'参考图待核对':({planning:'导演规划中',ready:'等待制作确认',running:'任务运行中',rendering:'正在合成',completed:'成片待审阅',paused:'制作已暂停',failed:'制作失败'}[project?.state]||'等待任务');const label=resolutionLabels[resolution]||fallback;const progress=poll.progress||target?.progress||{},rawPercent=progress.percent,hasPercent=rawPercent!==null&&rawPercent!==''&&Number.isFinite(Number(rawPercent)),numericPercent=hasPercent?Math.max(0,Math.min(100,Number(rawPercent))):null,percent=hasPercent?`${numericPercent}%`:'';
   const stages={queued:'排队中',preparing:'准备画面',generating:'Kling 正在生成',denoising:'生成画面',encoding:'编码视频',decoding:'解码画面',finalizing:'整理成片'};
   const currentLabel=syncFailures?'连接中断 · 正在重连':project?.state==='rendering'?'正在合成成片':project?.state==='completed'?'成片待审阅':project?.state==='paused'?'制作已暂停':project?.state==='failed'?'制作失败':project?.state==='running'&&resolution==='polling'?(stages[progress.stage]||label):label;
   if(taskTitle.textContent!==currentLabel)taskTitle.textContent=currentLabel;
   taskProgress.textContent=syncFailures||project?.state!=='running'?'':percent;taskSync.textContent=syncFailures?'状态暂未同步，正在重试查询。已提交任务不会重复生成。':(lastStatusSync?'上次同步 '+new Date(lastStatusSync).toLocaleTimeString('zh-CN',{hour12:false})+' · 生成期间每 4 秒自动刷新':'等待同步任务状态');productionTask.title=currentLabel+(percent?' · '+percent:'')+' · 点击查看详情';
+  const manualVisible=liveProgress.dataset.manual==='true';
+  const liveVisible=manualVisible||Boolean(project&&(['running','rendering','paused','planning'].includes(project.state)||project.interrupted||imageTask.state==='running'));
+  liveProgress.hidden=!liveVisible;
+  if(liveVisible&&!manualVisible){const liveText=currentLabel+(percent?' · '+percent:'');liveProgressLabel.textContent=liveText;liveProgressCaption.textContent=syncFailures?'已提交任务保留，正在重新连接':(hasPercent?'供应商已返回实时百分比':'供应商未返回百分比，显示同步状态');if(Number.isFinite(progress.checked_at)&&progress.checked_at>0)liveProgressCaption.textContent+=' · 模型状态确认 '+new Date(progress.checked_at*1000).toLocaleTimeString('zh-CN',{hour12:false});liveProgressCaption.setAttribute('aria-label',liveProgressCaption.textContent);liveProgressTrack.setAttribute('aria-label','生成进度：'+liveText);const determinate=hasPercent&&!syncFailures;liveProgressTrack.dataset.determinate=String(determinate);if(determinate){liveProgressTrack.setAttribute('aria-valuemin','0');liveProgressTrack.setAttribute('aria-valuemax','100');liveProgressTrack.setAttribute('aria-valuenow',String(numericPercent));liveProgressTrack.setAttribute('aria-valuetext',liveText);liveProgressTrack.removeAttribute('aria-description');liveProgressFill.style.width=numericPercent+'%'}else{liveProgressTrack.removeAttribute('aria-valuemin');liveProgressTrack.removeAttribute('aria-valuemax');liveProgressTrack.removeAttribute('aria-valuenow');liveProgressTrack.removeAttribute('aria-valuetext');liveProgressTrack.setAttribute('aria-description',liveText);liveProgressFill.style.removeProperty('width')}}
   productionTask.classList.toggle('is-running',!project?.interrupted&&(['running','rendering','planning'].includes(project?.state)||imageTask.state==='running'));
 
   const skill=project?.skill_title||'商品广告导演',version=project?.skill?.version?` · v${project.skill.version}`:'';const model=project?.quote?.label||project?.model||'未选视频模型';const approval=project?.approval_mode==='auto'?'自动':'手动';const refs=project?.canvas?.nodes?.filter(n=>n.kind==='image'||n.kind==='video').length||0;
@@ -147,14 +197,14 @@
  const imageDialog=make('dialog');imageDialog.id='imageDialog';const imageTitle=make('h2','生成一张参考图');imageDialog.append(imageTitle);const imageSummary=make('p'),prompt=make('textarea');
  const imageModel=make('select');imageModel.id='imageDialogModel';imageModel.setAttribute('aria-label','本次图片模型');const imageModelLabel=make('label','本次图片模型');imageModelLabel.append(imageModel);
  const imageSource=make('figure',null,'image-request-source'),imageSourcePreview=make('img'),imageSourceCaption=make('figcaption');imageSource.id='imageRequestSource';imageSourcePreview.alt='本次编辑使用的原图';imageSource.append(imageSourcePreview,imageSourceCaption);imageSource.hidden=true;
- const imageModelNotice=make('p',null,'image-model-notice');imageModelNotice.id='imageModelNotice';imageModelNotice.setAttribute('role','status');prompt.id='imagePrompt';prompt.setAttribute('aria-label','参考图描述');prompt.maxLength=4000;prompt.placeholder='描述商品、材质、场景和光线。文字和字幕会在视频后期添加。';const confirmImage=action('确认生成 · 1 积分',submitImage);confirmImage.className='primary';const imageActions=make('div',null,'row');imageActions.append(action('取消',()=>imageDialog.close()),confirmImage);imageDialog.append(imageSource,imageModelLabel,imageSummary,prompt,imageModelNotice,make('p','生成后加入画布供导演参考；需要约束视频商品外观时，点击该图片上的“设为商品参考”。失败或结果待核对时不会自动重试。'),imageActions);document.body.append(imageDialog);
+ const imageModelNotice=make('p',null,'image-model-notice');imageModelNotice.id='imageModelNotice';imageModelNotice.setAttribute('role','status');prompt.id='imagePrompt';prompt.setAttribute('aria-label','参考图描述');prompt.maxLength=4000;prompt.placeholder='描述商品、材质、场景和光线。文字和字幕会在视频后期添加。';const confirmImage=action('确认生成 · 1 积分',submitImage);confirmImage.className='primary';const imageActions=make('div',null,'row');imageActions.append(action('取消',()=>imageDialog.close()),confirmImage);imageDialog.append(imageSource,imageModelLabel,imageSummary,prompt,imageModelNotice,make('p','生成后加入画布供导演参考；需要约束视频商品外观时，点击该图片上的“设为商品参考”。失败或结果待核对时不会自动重试。'),imageActions);document.body.append(imageDialog);const imageDialogPicker=window.installStudioModelPicker(imageModel);
  let videos=[],images=[],modelsLoaded=false,imageRequest=null,imageSubmitting=false;
  const isLocked=()=>busy||!project||['running','rendering','planning'].includes(project.state)||project.image_task?.state==='running';
  function paintModels(){if(project?.image_task?.state==='running')['sendButton','planButton','executeButton','referenceUploadButton','removeReference','saveShot'].forEach(id=>$(id).disabled=true);if(!modelsLoaded)return;videoSelect.value=project?.model||videos[0]?.id;videoSelect.disabled=isLocked();imageSelect.disabled=isLocked();generateButton.disabled=isLocked();const v=videos.find(m=>m.id===videoSelect.value),i=images.find(m=>m.id===imageSelect.value),credits=v?.credits_per_5s??'费用待读取',capability=v?.single_film?'15 秒有声整片':v?.limitation||'能力待确认';modelNote.textContent=v?`${credits} 积分 / 5 秒 · ${capability}`:'请选择视频模型';generateButton.disabled=isLocked()||!i?.available;openCanvas.disabled=!project;smartEdit.disabled=!project||busy||hasDrafts();smartEdit.title=smartEdit.disabled?(hasDrafts()?'请先保存或放弃草稿，再进入智能剪辑':'请先创建项目'):'进入字幕、重拍、转场、音频和全片审阅';if(canvasGenerate)canvasGenerate.disabled=isLocked()||!project?.shots?.length||!['ready','paused'].includes(project?.state);document.querySelectorAll('.node-image-model').forEach(el=>{el.value=imageSelect.value;el.disabled=isLocked()});document.querySelectorAll('.node-image-generate').forEach(el=>el.disabled=isLocked());
  const t=project?.image_task, imageBusy=t?.state==='running';imageStatus.classList.toggle('is-busy',imageBusy);imageStatus.textContent=t?(imageBusy?'参考图生成中，可离开页面，回来继续查看。':t.state==='completed'?'参考图已加入画布。':t.error||'图片结果待核对，不会自动重试。'):'';document.querySelectorAll('.node-image-generate').forEach(el=>{el.classList.toggle('is-busy',imageBusy);el.textContent=imageBusy?'生成中…':'生成新参考图'});
  }
  videoSelect.onchange=async()=>{const chosen=videoSelect.value;if(!project)return;if(hasDrafts()){toast('请先保存或放弃草稿，再切换模型');paintModels();return}if(!confirm('切换视频模型会保留历史成片，并清除当前待制作方案。需要重新规划和确认预算，是否继续？')){paintModels();return}setBusy(true);try{project=await api('/projects/'+project.id+'/model','PUT',{revision:project.revision,model:chosen});clearMedia();draw();toast('视频模型已切换，请重新出方案。')}catch(e){toast(e.message);await refreshProjectStatus()}finally{setBusy(false)}};
- imageSelect.onchange=()=>{sessionStorage.setItem('creative-image-model',imageSelect.value);paintModels();syncEntry()};
+ imageSelect.onchange=()=>{sessionStorage.setItem('creative-image-model',imageSelect.value);paintModels();syncEntry();syncReferenceActions()};
  function imageRequestIssue(){
   const m=images.find(m=>m.id===imageModel.value);
   if(!m?.available)return '请选择一个已接入的图片模型。';
@@ -164,7 +214,7 @@
   return '';
  }
  function paintImageRequest(){
-  if(!imageRequest)return;const m=images.find(m=>m.id===imageModel.value),issue=imageRequestIssue();imageRequest.model=imageModel.value;
+  imageDialogPicker.sync();if(!imageRequest)return;const m=images.find(m=>m.id===imageModel.value),issue=imageRequestIssue();imageRequest.model=imageModel.value;
   imageModelNotice.textContent=issue||'将按所选模型生成独立版本，原图保留；确认前不会提交。';
   confirmImage.disabled=imageSubmitting||!!issue;
   imageSummary.textContent=(m?.label||'未选择模型')+' · '+project.aspect+' · 1 张 · 1 平台积分'+(imageRequest.source_asset?' · 使用所选原图':m?.mode==='edit'?' · 使用当前商品参考图':'')+(imageRequest.adjustments.angle!=='保留原角度'?' · '+imageRequest.adjustments.angle:'')+(imageRequest.adjustments.light!=='保留原光照'?' · '+imageRequest.adjustments.light:'')+(imageRequest.transform_draft_id?' · 使用已保存变换草稿':'');
@@ -176,7 +226,7 @@
   if(isLocked())return;if(hasDrafts()){toast('请先保存或放弃草稿，再生成参考图');return}
   if(sourceAsset&&project.canvas_assets?.[sourceAsset]?.kind!=='image'){toast('请选择本项目图片');return}
   imageRequest={project:project.id,revision:project.revision,model:imageSelect.value,id:opaqueId(),source_asset:sourceAsset,transform_draft_id:transformDraftId,adjustments:adjustments||{angle:'保留原角度',light:'保留原光照'}};
-  imageModel.replaceChildren(...images.map(m=>{const reason=!m.available?'未接入':sourceAsset&&!['edit','both'].includes(m.mode)?'仅文字生成':'';const option=make('option',m.label+(reason?' · '+reason:''));option.value=m.id;option.disabled=!!reason;return option}));imageModel.value=imageSelect.value;
+  imageModel.replaceChildren(...images.map(m=>{const reason=!m.available?'未接入':sourceAsset&&!['edit','both'].includes(m.mode)?'仅文字生成':'';const option=make('option',m.label+(reason?' · '+reason:''));option.value=m.id;option.disabled=!!reason;option.dataset.disabledReason=reason;option.dataset.description=['edit','both'].includes(m.mode)?'支持参考图编辑':'文字生成图片';return option}));imageModel.value=imageSelect.value;
   imageTitle.textContent=sourceAsset?'修改图片':'生成一张参考图';imageSource.hidden=!sourceAsset;
   if(sourceAsset){const node=project.canvas?.nodes.find(n=>n.asset===sourceAsset),card=[...document.querySelectorAll('.reference-node')].find(c=>c.dataset.nodeId===node?.id),src=card?.querySelector('.canvas-card-body>img')?.getAttribute('src');imageSourceCaption.textContent=node?.label||'所选原图';imageSourcePreview.hidden=!src;if(src)imageSourcePreview.src=src;else imageSourcePreview.removeAttribute('src')}
   prompt.placeholder=sourceAsset?'描述想修改的背景、场景或细节，以及需要保留的部分。':'描述商品、材质、场景和光线。';prompt.value=description||(sourceAsset?'':[project.brief.product,project.brief.style].filter(Boolean).join('，'));paintImageRequest();imageDialog.showModal();prompt.focus();
@@ -230,12 +280,12 @@
   });
  }
  if($('referencePreview'))new MutationObserver(syncComposerReferences).observe($('referencePreview'),{attributes:true,attributeFilter:['src']});
- function inputDescription(){const m=project?.input_manifest;if(!m)return '尚未形成输入清单';return `${({text:'文字生成',first_frame:'首帧',first_last:'首尾帧',references:'多图软参考'})[m.mode]||'视频输入'} · ${(m.images||[]).length} 张实际图片 · 参考音频：无（声音由提示词生成）。导演辅助参考 ${m.director_only.length} 项。${project?.video_inputs_needs_review?'商品信息已变化，请重新核对视频参考。':''}`}
+ function inputDescription(){const m=project?.input_manifest;if(!m)return '尚未形成输入清单';const images=m.images||[],directorOnly=m.director_only||[];return `${({text:'文字生成',first_frame:'首帧',first_last:'首尾帧',references:'多图软参考'})[m.mode]||'视频输入'} · ${images.length} 张实际图片 · 参考音频：无（声音由提示词生成）。导演辅助参考 ${directorOnly.length} 项。${project?.video_inputs_needs_review?'商品信息已变化，请重新核对视频参考。':''}`}
  function syncInputs(){syncComposerReferences();const p=project;inputSummary.textContent=p?.shots?.length?`整片提示词 · ${p.duration}s · 1 次生成 · ${p.input_manifest?.images?.length||0} 张视频参考 · 查看输入`:'整片提示词与参考输入 · 待规划';inputBody.replaceChildren(make('p',inputDescription()),action('查看完整带时码提示词',openFilmReview));
  for(const beat of p?.input_manifest?.beats||[]){inputBody.append(make('p',`${beat.start}–${beat.end}s：${beat.image_ids?.length?'沿用整片已选择的 '+beat.image_ids.length+' 张图片':'文字生成画面'}；声音来自本段 audio prompt；字幕后期叠加。`));}
  const pending=!!p?.reference_needs_review;referenceSummary.textContent=pending?'商品参考待核对 · 商品已变化或尚未确认':'商品参考 · '+(p?.reference?'当前作品独立保存':'未设置');confirmReference.hidden=!pending;confirmReference.disabled=isLocked();document.body.classList.toggle('reference-pending',pending);
  }
- const showApprove=$('executeButton').onclick;$('executeButton').onclick=()=>{if(project?.reference_needs_review){document.body.classList.remove('inspector-folded');referencePanel.open=true;syncLayout();referencePanel.scrollIntoView({block:'nearest'});toast('请核对旧参考是否属于当前商品；不符请移除或更换后重新规划。');return}approvalPrompt.value=project?.production_prompt||'';approvalInputs.textContent=inputDescription();showApprove();approvalPrompt.setSelectionRange(0,0);approvalPrompt.scrollTop=0};
+ const showApprove=$('executeButton').onclick;$('executeButton').onclick=()=>{if(project?.video_inputs_needs_review){$('canvasVideoInputs').click();return}if(project?.reference_needs_review){document.body.classList.remove('inspector-folded');referencePanel.open=true;syncLayout();referencePanel.scrollIntoView({block:'nearest'});toast('请核对旧参考是否属于当前商品；不符请移除或更换后重新规划。');return}approvalPrompt.value=project?.production_prompt||'';approvalInputs.textContent=inputDescription();showApprove();approvalPrompt.setSelectionRange(0,0);approvalPrompt.scrollTop=0};
  const conversation=$('conversation'),director=conversation.closest('.director');let conversationProject=null,conversationTouched=false,conversationPinned=true,conversationResizing=false;
  const jumpLatest=action('↓',()=>{conversation.scrollTop=conversation.scrollHeight;conversation.focus({preventScroll:true});syncConversationJump()});jumpLatest.id='conversationJumpLatest';jumpLatest.hidden=true;jumpLatest.setAttribute('aria-label','回到最新消息');jumpLatest.title='回到最新消息';conversation.tabIndex=-1;director.append(jumpLatest);
  function syncConversationJump(){const gap=conversation.scrollHeight-conversation.clientHeight-conversation.scrollTop;jumpLatest.hidden=!project||gap<60||!!document.activeElement?.closest('.director-question-editor');const d=director.getBoundingClientRect(),c=conversation.getBoundingClientRect();jumpLatest.style.bottom=Math.max(12,d.bottom-c.bottom+12)+'px'}
@@ -260,12 +310,12 @@
   else{const anchor=[...conversation.querySelectorAll('[data-conversation-key]')].find(e=>e.dataset.conversationKey===saved.anchor);conversation.scrollTop=anchor?conversation.scrollTop+anchor.getBoundingClientRect().top-conversation.getBoundingClientRect().top-saved.offset:saved.top}
   syncConversationJump();
  }
- const oldDraw=draw;draw=function(){const saved=captureConversation();oldDraw();paintModels();syncEntry();syncConversationList();syncDirectorContext();syncPromptNode();syncInputs();syncCreativeStatus();restoreConversation(saved)};const oldBusy=setBusy;setBusy=function(value){oldBusy(value);paintModels();syncEntry();syncCreativeStatus();syncComposerReferences()};
+ const oldDraw=draw;draw=function(){const saved=captureConversation();oldDraw();paintModels();syncEntry();syncConversationList();syncDirectorContext();syncPromptNode();syncInputs();syncCreativeStatus();restoreConversation(saved)};const oldBusy=setBusy;setBusy=function(value){oldBusy(value);paintModels();syncEntry();syncCreativeStatus();syncComposerReferences();syncReferenceActions()};
  window.addEventListener('focus',()=>{if(project&&!busy&&!hasDrafts())refreshProjectStatus().then(()=>schedule())});
  let modelCatalogLoading=false;
  document.addEventListener('creative-reload-model-catalog',()=>loadModels());
  function modelCatalogState(state){for(const select of [videoSelect,imageSelect])select.dataset.catalogState=state}
- async function loadModels(){if(modelCatalogLoading)return;modelCatalogLoading=true;modelCatalogState('loading');try{const c=await api('/models');videos=c.models;images=c.image_models||[];catalogStatus.textContent=c.status_note||'模型可选表示已接入；尚未核验供应商实时健康、余额与排队情况。';modelList.replaceChildren();for(const [select,items] of [[videoSelect,videos],[imageSelect,images]])select.replaceChildren(...items.map(m=>{const suffix=m.available===false?' · 未接入':m.provider&&!m.single_film?` · ${m.limitation||'能力待确认'}`:'';const o=make('option',m.label+suffix);o.value=m.id;o.dataset.description=m.description||'';o.disabled=m.available===false||!!m.provider&&!m.single_film;return o}));imageSelect.value=sessionStorage.getItem('creative-image-model')||images[0]?.id;for(const m of [...videos,...images]){const card=make('article');const cost=m.provider?`${m.credits_per_5s??'费用待读取'} 平台积分 / 5 秒`: '1 平台积分 / 张';const capability=m.provider?`${m.audio?'原生音频':'静音视频'} · ${m.single_film?'15 秒整片可用':m.limitation||'能力待确认'}`:`${m.mode==='both'?'文字 / 参考图生成':m.mode==='edit'?'编辑当前商品参考图':'文字生成图片'} · ${m.available?'已接入':m.limitation||'当前不可用'}`;card.append(make('h3',m.label),make('p',m.id),make('p',`${cost} · ${capability}`));card.dataset.model=m.id;const health=make('p',m.service_status==='unchecked'||!m.service_status?'服务状态：实时健康未核验':'服务状态：'+({healthy:'最近检查可用',unavailable:'最近检查不可用'}[m.service_status]||'实时健康未核验'),'muted');health.classList.add('model-health');card.append(health);modelList.append(card)}modelsLoaded=true;decorateImages();paintModels();syncEntry();modelCatalogState('ready')}catch(e){modelCatalogState('error');modelNote.textContent='模型列表读取失败';modelNote.append(action('重新读取',()=>loadModels()))}finally{modelCatalogLoading=false}}
+ async function loadModels(){if(modelCatalogLoading)return;modelCatalogLoading=true;modelCatalogState('loading');try{const c=await api('/models');videos=c.models;images=c.image_models||[];catalogStatus.textContent=c.status_note||'模型可选表示已接入；尚未核验供应商实时健康、余额与排队情况。';modelList.replaceChildren();for(const [select,items] of [[videoSelect,videos],[imageSelect,images]])select.replaceChildren(...items.map(m=>{const suffix=m.available===false?' · 未接入':m.provider&&!m.single_film?` · ${m.limitation||'能力待确认'}`:'';const o=make('option',m.label+suffix);o.value=m.id;o.dataset.description=m.description||'';o.disabled=m.available===false||!!m.provider&&!m.single_film;return o}));imageSelect.value=sessionStorage.getItem('creative-image-model')||images[0]?.id;for(const m of [...videos,...images]){const card=make('article');const cost=m.provider?`${m.credits_per_5s??'费用待读取'} 平台积分 / 5 秒`: '1 平台积分 / 张';const capability=m.provider?`${m.audio?'原生音频':'静音视频'} · ${m.single_film?'15 秒整片可用':m.limitation||'能力待确认'}`:`${m.mode==='both'?'文字 / 参考图生成':m.mode==='edit'?'编辑当前商品参考图':'文字生成图片'} · ${m.available?'已接入':m.limitation||'当前不可用'}`;const title=make('h3');title.className='model-card-title';title.append(window.studioModelLogo(m.id),make('span',m.label));card.append(title,make('p',m.id),make('p',`${cost} · ${capability}`));card.dataset.model=m.id;card.dataset.available=String(m.available!==false);if(m.available===false)card.classList.add('model-unavailable');const health=make('p',m.service_status==='unchecked'||!m.service_status?'服务状态：实时健康未核验':'服务状态：'+({healthy:'最近检查可用',unavailable:'最近检查不可用'}[m.service_status]||'实时健康未核验'),'muted');health.classList.add('model-health');card.append(health);modelList.append(card)}modelsLoaded=true;decorateImages();paintModels();syncEntry();syncReferenceActions();modelCatalogState('ready')}catch(e){modelCatalogState('error');modelNote.textContent='模型列表读取失败';modelNote.append(action('重新读取',()=>loadModels()))}finally{modelCatalogLoading=false}}
  async function checkModelStatus(){
   checkStatusButton.disabled=true;checkStatusButton.textContent='正在检查…';
   try{const result=await api('/model-status');catalogStatus.textContent=result.status_note;
@@ -277,21 +327,107 @@
   }catch(e){catalogStatus.textContent='服务检查失败，请稍后重试。未发起任何生成。'}
   finally{checkStatusButton.disabled=false;checkStatusButton.textContent='重新检查制作服务'}
  }
- const openQuestionEditors=new Set();
+ // Reference answers are executable actions, not just interview option text.
+ const referenceQuestion=q=>/参考图|商品图|产品图|截图|logo|品牌色|素材/i.test(q?.question||'');
+ const asksForImage=text=>/^(?:请|直接|先|就|那|帮我|替我|你|给我|让agent|agent|来|吧|，|,|\s)*(?:生成|生|画|做|设计)(?:一[个张幅份套]|个|张)?(?:参考图|概念图|图片|图|logo|标志)?(?:出来|就行|吧|即可|。|！|!|\s)*$/i.test(text.trim());
+ const directorImageReferences=()=> (project?.video_inputs?.references||[]).map(({asset,role,instruction})=>({asset,role,instruction:instruction||''}));
+ function directorImageLimitation(model,refs){
+  if(!model?.available)return '图片模型暂不可用';
+  if(!refs.length&&model.mode==='edit')return '此图片模型需要参考图，请先上传';
+  if(refs.length&&model.mode==='text')return '此模型仅支持文字生图，请选择支持参考图的模型';
+  if(refs.length>Math.min(3,model.max_references??(model.mode==='edit'?1:0)))return '已绑定参考图超过图片模型上限，请先调整参考输入';
+  if(refs.length&&refs.length<(model.min_edit_references||1))return '此图片模型需要更多参考图';
+  return '';
+ }
+ function generateQuestionReference(question,produce=false){
+  if(!project||isLocked()||hasDrafts())return toast('请先完成当前处理或保存画布草稿');
+  const model=images.find(m=>m.id===imageSelect.value);
+  const references=directorImageReferences(),limitation=directorImageLimitation(model,references);
+  if(limitation)return toast(limitation);
+  const context=[answerText(),$('message').value.trim()].filter(Boolean).join('\n\n');
+  if(context.length>5000)return toast('回答内容过长，请精简后再生成');
+  let videoCredits;
+  if(produce){
+   videoCredits=(videos.find(m=>m.id===project.model)?.credits_per_5s||0)*(project.duration/5);
+   if(project.approval_mode!=='auto'||!videoCredits)return toast('请开启自动审批并读取视频模型费用');
+   if(!confirm(`授权本次连续制作：1 张概念参考图（${model.label}，1 积分）＋1 支 ${project.duration} 秒广告（${project.quote?.label||project.model}，${videoCredits} 积分），总上限 ${1+videoCredits} 积分。Agent 将按现有回答和合理假设规划，自动绑定参考并制作。失败停止，不自动重试或换模型。`))return;
+  }
+  const brief=Object.values(project.brief||{}).filter(v=>typeof v==='string').join('；');
+  const request=`为广告制作一张丰富、清晰的概念视觉参考图。创作背景：${brief||project.messages?.find(m=>m.role==='user')?.content||'商品广告'}。当前需要：${question?.question||'广告视觉方向'}。用户补充：${context}。这是一张新创作的概念参考，不是实际品牌Logo或真实应用截图；表现人物、场景、材质、色彩和光线，屏幕留空，不绘制可读界面、标识或文字，文字将在后期制作。`.slice(0,4000);
+  document.dispatchEvent(new CustomEvent('creative-compose-image',{detail:{direct:true,director_reference:true,model:model.id,prompt:request,references,director_context:context,...(produce?{director_video_credits:videoCredits}:{}),answerKeys:(project.questions||[]).map(answerKey),message:$('message').value}}));
+ }
+ window.handleDirectorReferenceIntent=()=>{
+  if(project?.creation_mode!=='agent')return false;
+  const q=(project.questions||[]).find(q=>referenceQuestion(q)&&asksForImage(answers.get(answerKey(q))||''));
+  const message=$('message').value.trim(),current=(project.questions||[]).find(referenceQuestion);
+  if(q||(asksForImage(message)&&(current||/参考图|概念图|图片|logo/i.test(message)))){generateQuestionReference(q||current);return true}
+  return false;
+ };
+ function openDirectorUpload(question=null){
+  if(!project||isLocked()||hasDrafts())return toast('请先完成当前处理或保存画布草稿');
+  const pid=project.id,dialog=make('dialog');dialog.id='directorReferenceUpload';
+  const label=make('label','图片用途'),role=make('select');role.setAttribute('aria-label','上传图片用途');
+  for(const [value,text]of Object.entries({product:'商品 / 品牌 / 应用截图',person:'人物',scene:'场景',style:'视觉风格'})){const o=make('option',text);o.value=value;role.append(o)}label.append(role);
+  const file=make('input');file.type='file';file.accept='image/png,image/jpeg,image/webp';file.multiple=true;file.setAttribute('aria-label','选择参考图片');
+  const state=make('p','选择图片后会加入画布，并绑定到视频参考输入。');state.setAttribute('role','status');
+  let uploading=false,pending=[];
+  const close=action('关闭',()=>dialog.close()),retry=action('重新绑定已上传的图片',()=>bind());retry.hidden=true;
+  const bind=async()=>{if(uploading||!pending.length)return;uploading=true;setBusy(true);file.disabled=close.disabled=role.disabled=retry.disabled=true;try{
+   if(project?.id!==pid)throw Error('项目已切换，请回到原项目核对图片');
+   project=await api('/projects/'+pid+'/director-references','POST',{revision:project.revision,references:pending});
+   if(question)answers.set(answerKey(question),'参考图已上传并绑定视频输入，请使用当前参考继续创作');
+   pending=[];clearMedia();draw();dialog.close();toast('参考图已加入画布并绑定视频输入；其他回答已保留。');
+  }catch(e){state.textContent=e.message+'。文件已保存，可在画布素材中找到；调整参考设置后可重新绑定。';retry.hidden=false}
+  finally{uploading=false;file.disabled=close.disabled=role.disabled=retry.disabled=false;setBusy(false)}};
+  file.onchange=async()=>{const files=[...file.files];if(!files.length)return;if(files.length>6){state.textContent='一次最多选择六张图片';file.value='';return}if(uploading||pending.length)return;
+   uploading=true;setBusy(true);file.disabled=close.disabled=role.disabled=true;
+   try{for(const [i,item]of files.entries()){
+    if(project?.id!==pid)throw Error('项目已切换');state.textContent=`正在上传 ${i+1}/${files.length}…`;
+    const response=await fetch(`/creative/api/projects/${pid}/canvas/assets?kind=image&revision=${project.revision}`,{method:'POST',headers:{Authorization:'Bearer '+key,'Content-Type':item.type},body:item});
+    const data=await response.json().catch(()=>({}));if(!response.ok)throw Error(typeof data.detail==='string'?data.detail:'上传未完成');
+    if(project?.id!==pid)throw Error('项目已切换，图片保存在原项目');project=data.project;
+    pending.push({asset:data.asset.id,role:role.value,instruction:question?question.question.slice(0,240):''});
+   }}catch(e){state.textContent=e.message;retry.hidden=!pending.length;return}
+   finally{uploading=false;file.disabled=close.disabled=role.disabled=false;file.value='';setBusy(false);draw()}
+   await bind();
+  };
+  dialog.addEventListener('cancel',e=>{if(uploading)e.preventDefault()});dialog.addEventListener('close',()=>dialog.remove());
+  dialog.append(make('h3','上传参考图'),label,file,state,retry,close);document.body.append(dialog);dialog.showModal();
+ }
+ const referenceActions=make('div',null,'director-reference-actions'),referenceImageModel=make('select');referenceImageModel.setAttribute('aria-label','Agent 参考图模型');
+ referenceImageModel.onchange=()=>{imageSelect.value=referenceImageModel.value;imageSelect.onchange()};
+ const uploadAction=action('上传参考图',()=>openDirectorUpload()),generateAction=action('Agent 生图 · 1 积分',()=>generateQuestionReference((project?.questions||[]).find(referenceQuestion)));
+ const produceAction=action('参考图＋成片',()=>generateQuestionReference((project?.questions||[]).find(referenceQuestion),true));
+ const imageInputStatus=make('small');imageInputStatus.setAttribute('role','status');
+ referenceActions.append(uploadAction,referenceImageModel,generateAction,produceAction,imageInputStatus);$('chatForm').prepend(referenceActions);
+ function syncReferenceActions(){referenceActions.hidden=project?.creation_mode!=='agent';
+  const refs=directorImageReferences();
+  referenceImageModel.replaceChildren(...images.map(m=>{const why=directorImageLimitation(m,refs),o=make('option',m.label+(why?' · 不适用':''));o.value=m.id;o.disabled=!!why;o.title=why;return o}));referenceImageModel.value=imageSelect.value;
+  uploadAction.disabled=isLocked();referenceImageModel.disabled=isLocked()||!modelsLoaded;const spec=images.find(m=>m.id===imageSelect.value),limitation=directorImageLimitation(spec,refs);generateAction.disabled=isLocked()||!modelsLoaded||!!limitation;
+  imageInputStatus.textContent=modelsLoaded?(limitation|| (refs.length?`生图将使用 ${refs.length} 张已绑定参考`:'未绑定图片，将按文字生成概念参考')):'正在读取图片模型';
+  produceAction.hidden=project?.approval_mode!=='auto';produceAction.disabled=generateAction.disabled;
+  const cost=(videos.find(m=>m.id===project?.model)?.credits_per_5s||0)*((project?.duration||0)/5);
+  produceAction.textContent='参考图＋成片'+(cost?' · '+(1+cost)+' 积分':'');produceAction.disabled||=!cost;
+ }
+ const openQuestionEditors=new Set(),closedQuestionEditors=new Set();
  function syncQuestionControls(){
-  const currentKeys=new Set((project?.questions||[]).map(answerKey));for(const key of openQuestionEditors)if(!currentKeys.has(key))openQuestionEditors.delete(key);
+  const currentKeys=new Set((project?.questions||[]).map(answerKey));for(const set of [openQuestionEditors,closedQuestionEditors])for(const key of set)if(!currentKeys.has(key))set.delete(key);
   conversation.querySelectorAll(':scope > .question').forEach((card,index)=>{
    const question=project?.questions?.[index],input=card.querySelector('textarea'),choices=card.querySelector('.choices');if(!question||!input||!choices||card.dataset.compactQuestion)return;
    const key=answerKey(question),why=card.querySelector(':scope>p'),editor=make('div',null,'director-question-editor'),toggle=action('',()=>setOpen(editor.hidden,true)),done=action('完成',()=>setOpen(false,true));card.dataset.compactQuestion='true';editor.id='directorQuestionAnswer-'+index;toggle.className='question-answer-toggle';toggle.setAttribute('aria-controls',editor.id);done.className='question-answer-done';
-   const syncAnswer=()=>{const value=input.value.trim();toggle.textContent=value||'回答…';toggle.classList.toggle('has-answer',!!value);toggle.setAttribute('aria-label',(value?'修改回答：':'回答：')+question.question);toggle.disabled=input.disabled;};
-   function setOpen(open,focus=false){editor.hidden=!open;toggle.setAttribute('aria-expanded',String(open));if(open)openQuestionEditors.add(key);else openQuestionEditors.delete(key);if(focus){if(open){input.focus({preventScroll:true});input.setSelectionRange(input.value.length,input.value.length);input.scrollIntoView({block:'nearest'})}else toggle.focus({preventScroll:true})}syncConversationJump()}
-   if(why)editor.append(why);editor.append(choices,input,done);card.append(toggle,editor);syncAnswer();setOpen(openQuestionEditors.has(key));
+   const syncAnswer=()=>{const value=input.value.trim();toggle.textContent=value||'回答…';toggle.classList.toggle('has-answer',!!value);toggle.setAttribute('aria-label',(value?'修改回答：':'回答：')+question.question);toggle.disabled=input.disabled;done.textContent=referenceQuestion(question)&&asksForImage(value)?'生成参考图 · 1 积分':'完成';};
+   done.onclick=()=>{if(referenceQuestion(question)&&asksForImage(input.value))generateQuestionReference(question);else setOpen(false,true)};
+   if(referenceQuestion(question)){const actions=make('div',null,'director-reference-actions');actions.append(action('上传参考图',()=>openDirectorUpload(question)),action('Agent 生成概念参考 · 1 积分',()=>generateQuestionReference(question)));editor.append(actions);
+    [...choices.children].forEach(b=>{if(/^(?:只)?上传/.test(b.textContent))b.onclick=()=>openDirectorUpload(question)});
+   }
+   function setOpen(open,focus=false){if(focus){if(open)closedQuestionEditors.delete(key);else closedQuestionEditors.add(key)}editor.hidden=!open;toggle.setAttribute('aria-expanded',String(open));if(open)openQuestionEditors.add(key);else openQuestionEditors.delete(key);if(focus){if(open){input.focus({preventScroll:true});input.setSelectionRange(input.value.length,input.value.length);input.scrollIntoView({block:'nearest'})}else toggle.focus({preventScroll:true})}syncConversationJump()}
+   if(why)editor.append(why);editor.append(choices,input,done);card.append(toggle,editor);syncAnswer();setOpen(openQuestionEditors.has(key)||(!input.value.trim()&&!closedQuestionEditors.has(key)));
    input.addEventListener('input',syncAnswer);choices.addEventListener('click',e=>{if(e.target.closest('button')){syncAnswer();setOpen(false,true)}});editor.addEventListener('keydown',e=>{if(e.key==='Escape'){e.preventDefault();e.stopPropagation();setOpen(false,true)}});
   });
  }
  function syncDirectorContext(){
   const conversation=$('conversation');conversation.querySelector('.director-context')?.remove();
-  if(!project)return;
+  syncReferenceActions();if(!project)return;
   syncQuestionControls();
   const box=make('section',null,'director-context');box.setAttribute('aria-label','本轮导演创作依据');
   const progress=make('p',null,'director-question-progress');progress.setAttribute('role','status');
@@ -301,6 +437,25 @@
    else if(project.state==='planning')progress.textContent='导演正在整理需求与拍摄方案';
    else if(!total&&!project.shots?.length)progress.textContent='补充商品事实与投放目标，导演将整理关键问题';
   };box.append(progress);updateProgress();
+  const deliveries=project.workspace_deliveries||[];
+  if(deliveries.length){const section=make('section',null,'director-workspace-delivery'),pending=deliveries.filter(item=>item.state==='pending').length,failed=deliveries.filter(item=>item.state==='needs_review').length;
+   section.setAttribute('aria-label','Agent 素材回传主画布');section.append(make('p',`主画布素材：${deliveries.filter(item=>item.state==='delivered').length} 项已同步${pending?' · '+pending+' 项等待同步':''}${failed?' · '+failed+' 项待处理':''}`));
+   if(pending)section.append(make('small','服务器会继续同步已生成素材，可以关闭此页面。'));
+   if(failed){section.append(make('p','请检查主画布空间与来源素材。已生成文件保留在当前项目。'));const retry=action('重新同步素材',async()=>{retry.disabled=true;try{project=await api('/projects/'+project.id+'/workspace-delivery/retry','POST',{revision:project.revision});draw();schedule()}catch(e){toast(e.message)}finally{retry.disabled=false}});retry.disabled=isLocked();section.append(retry)}
+   box.append(section);
+  }
+  const liveInputs=project.video_inputs,liveRefs=liveInputs?.references||[],liveManifest=project.input_manifest;
+  if(liveInputs||liveManifest){
+   const live=make('section',null,'director-live-inputs');live.setAttribute('aria-label','当前画布实际输入');
+   const mode=liveInputs?.mode||liveManifest?.mode||'text';
+   const modeLabel=({text:'文字生成',first_frame:'首帧',first_last:'首尾帧',references:'多图参考'})[mode]||'视频输入';
+   const images=liveManifest?.images?.length||liveRefs.length;
+   const state=project.video_inputs_needs_review||project.reference_needs_review?'待核对':'已同步';
+   const source=liveInputs?.source_project?' · 已绑定视频节点':'';
+   live.append(make('strong','当前画布实际输入'),make('p',`${modeLabel} · ${images} 张图片 · ${state}${source}`));
+   if(liveRefs.length)live.append(make('p',`参考节点已绑定 ${liveRefs.length} 项，生成时将使用这些输入。`));
+   box.append(live);
+  }
   const decisions=project.decisions||[],assumptions=project.assumptions||[];
   if(decisions.length||assumptions.length){const detail=make('details'),summary=make('summary',`本轮创作依据 · ${decisions.length} 项决策${assumptions.length?' · '+assumptions.length+' 项假设待确认':''}`);detail.append(summary);
    for(const d of decisions){const item=make('div',null,'director-basis');item.append(make('strong',d.title),make('p',d.reason));detail.append(item)}
@@ -311,6 +466,7 @@
   if(firstQuestion)firstQuestion.before(box);else{const result=conversation.querySelector('.conversation-film-receipt');if(result)result.before(box);else conversation.append(box)}
   conversation.oninput=updateProgress;conversation.onclick=updateProgress;
  }
+ document.addEventListener('creative-director-context',()=>syncDirectorContext());
  // Message context is a server-recorded snapshot, never inferred from today's inputs.
  const historyPreviewDialog=make('dialog',null,'message-reference-dialog');historyPreviewDialog.id='messageReferenceDialog';
  const historyPreviewTitle=make('strong'),historyPreviewState=make('p'),historyPreviewImage=make('img');historyPreviewImage.alt='历史参考';
@@ -336,7 +492,7 @@
  // Keep execution history separate: historical messages have no event timestamps.
  const executionLog=make('section',null,'conversation-execution');executionLog.id='conversationExecution';executionLog.setAttribute('aria-label','项目执行记录');
  const executionHistory=make('details',null,'conversation-execution-history'),executionSummary=make('summary'),executionRows=make('div'),executionLive=make('div',null,'conversation-execution-live'),executionLabel=make('span'),executionPercent=make('span'),executionMeter=make('progress'),executionNote=make('small');
- executionHistory.open=true;executionHistory.append(executionSummary,executionRows);executionLive.append(executionLabel,executionPercent,executionMeter,executionNote);executionLog.append(executionHistory,executionLive);executionLive.setAttribute('role','status');executionLive.setAttribute('aria-live','polite');executionMeter.max=100;executionMeter.setAttribute('aria-label','视频服务返回的生成进度');
+ executionHistory.open=false;executionHistory.append(executionSummary,executionRows);executionLive.append(executionLabel,executionPercent,executionMeter,executionNote);executionLog.append(executionHistory,executionLive);executionLive.setAttribute('role','status');executionLive.setAttribute('aria-live','polite');executionMeter.max=100;executionMeter.setAttribute('aria-label','视频服务返回的生成进度');
  let executionProject=null,executionDisclosureTouched=false;const executionEntries=new Map();
  executionSummary.addEventListener('click',()=>{executionDisclosureTouched=true});
  const executionKinds={
@@ -359,20 +515,26 @@
  };
  function syncExecutionState(){
   const state=project?.state,active=['planning','running','rendering'].includes(state),imageRunning=project?.image_task?.state==='running';
-  if(!executionDisclosureTouched)executionHistory.open=state!=='completed'||imageRunning;
+  if(!executionDisclosureTouched)executionHistory.open=false;
   executionLive.hidden=!project||(!active&&!imageRunning&&!syncFailures&&!project.interrupted&&!['completed','failed','planning_failed','paused'].includes(state));
   if(state==='completed'&&project.artifact&&!imageRunning&&!syncFailures&&!project.interrupted)executionLive.hidden=true;
   const title=project?.interrupted?'服务中断，等待恢复查询':imageRunning?'参考图生成中':state==='planning_failed'?'方案整理未完成':taskTitle.textContent;
   const label=syncFailures?'连接中断 · 正在重连':title;if(executionLabel.textContent!==label)executionLabel.textContent=label;
   const target=project?.film||project?.shots?.find(s=>s.provider_resolution),value=(target?.provider_poll?.progress||target?.progress||{}).percent;
   const percent=state==='running'&&target?.provider_resolution==='polling'&&!imageRunning&&!syncFailures&&!project?.interrupted&&Number.isFinite(value)&&value>=0&&value<=100?value:null;
-  const percentage=percent===null?'':percent+'%';if(executionPercent.textContent!==percentage)executionPercent.textContent=percentage;executionMeter.hidden=percent===null;if(percent!==null)executionMeter.value=percent;
+  // A provider often reports a task id before it reports a numeric percentage.
+  // Keep the progress surface visible and use the native indeterminate state
+  // instead of making a submitted production look idle.
+  const showProgress=!syncFailures&&!project?.interrupted&&(active||imageRunning);
+  const percentage=percent===null?(showProgress?'同步中':''):percent+'%';if(executionPercent.textContent!==percentage)executionPercent.textContent=percentage;
+  executionMeter.hidden=!showProgress;
+  if(percent!==null){executionMeter.value=percent;executionMeter.setAttribute('aria-valuetext',percentage)}else{executionMeter.removeAttribute('value');executionMeter.removeAttribute('aria-valuenow');executionMeter.setAttribute('aria-valuetext','供应商未返回百分比，正在同步状态')}
   executionLive.classList.toggle('is-running',!syncFailures&&!project?.interrupted&&(active||imageRunning));
   const note=syncFailures?'状态暂未同步；正在查询原任务，不会重复生成。':project?.interrupted?'等待恢复原任务的查询，当前没有新的生成请求。':percent!==null?'视频服务返回的进度':active||imageRunning?'状态会自动刷新':'当前项目状态';if(executionNote.textContent!==note)executionNote.textContent=note;
   executionLog.hidden=!project||(!executionEntries.size&&executionLive.hidden);
  }
  function syncExecutionLog(){
-  if(executionProject!==project?.id){executionProject=project?.id;executionEntries.clear();executionRows.replaceChildren();executionDisclosureTouched=false;executionHistory.open=true}
+  if(executionProject!==project?.id){executionProject=project?.id;executionEntries.clear();executionRows.replaceChildren();executionDisclosureTouched=false;executionHistory.open=false}
   const keys=new Set();for(const [index,event] of (project?.events||[]).entries()){
    const definition=Object.hasOwn(executionKinds,event.code)?executionKinds[event.code]:null;if(!definition)continue;
    const id=String(event.seq??index)+':'+event.code;keys.add(id);let row=executionEntries.get(id);
@@ -381,7 +543,10 @@
   }
   for(const [id,row] of executionEntries)if(!keys.has(id)){row.remove();executionEntries.delete(id)}
   executionSummary.textContent='执行记录 · '+executionEntries.size;executionSummary.title='本项目已记录的操作，按发生顺序显示';executionHistory.hidden=!executionEntries.size;
-  syncExecutionState();conversation.append(executionLog);
+  syncExecutionState();
+  // Keep the live execution surface at the top of the Director conversation,
+  // where it remains visible while the detailed event history grows below it.
+  conversation.prepend(executionLog);
  }
 
  // A view-only completion receipt uses the current artifact and the existing player.
@@ -459,8 +624,32 @@
   try{const r=await fetch(`/creative/api/projects/${cropSession.project}/canvas/assets/${asset}/preview`,{headers:{Authorization:'Bearer '+key},signal:AbortSignal.timeout(15000)});if(!r.ok)throw Error('无法读取原图');const url=URL.createObjectURL(await r.blob());try{const img=new Image();img.src=url;await img.decode();if(ticket!==cropLoad||!reframeDialog.open)return;cropImage=img;setCropDisabled(false);cropReset.click()}finally{URL.revokeObjectURL(url)}}catch(e){if(ticket===cropLoad){reframeStatus.textContent=e.message;setCropDisabled(false)}}
  });
 
+ // Grid slicing is deterministic; keep the source and save independent image nodes.
+ const gridDialog=make('dialog',null,'image-reframe-dialog'),gridStage=make('div',null,'image-reframe-stage'),gridCanvas=make('canvas'),gridStatus=make('p'),gridSelect=make('select'),gridActions=make('div',null,'row');
+ gridCanvas.setAttribute('aria-label','宫格切分预览');gridStatus.setAttribute('role','status');gridSelect.setAttribute('aria-label','宫格排列');
+ for(const [v,t] of [['2x2','2 行 × 2 列 · 4 张'],['2x3','2 行 × 3 列 · 6 张'],['3x3','3 行 × 3 列 · 9 张']]){const o=make('option',t);o.value=v;gridSelect.append(o)}
+ let gridSession=null,gridImage=null,gridSaving=false,gridLoad=0,gridRequest=null;
+ const gridClose=action('取消',()=>gridDialog.close()),gridSave=action('切分并加入画布',async()=>{
+  if(!gridSession||!gridImage||gridSaving)return;
+  if(project?.id!==gridSession.project||project.revision!==gridSession.revision||hasDrafts()||isLocked()){gridStatus.textContent='项目已变化，请重新打开宫格切分';return}
+  const [rows,columns]=gridSelect.value.split('x').map(Number),params={asset:gridSession.asset,rows,columns},signature=JSON.stringify(params);
+  if(gridRequest?.signature!==signature)gridRequest={signature,id:opaqueId()};
+  gridSaving=true;setBusy(true);gridSave.disabled=gridSelect.disabled=gridClose.disabled=true;gridStatus.textContent='正在切分并保存图片…';
+  try{const r=await api('/projects/'+gridSession.project+'/image-grid','POST',{...params,revision:gridSession.revision,request_id:gridRequest.id});if(project?.id===gridSession.project){project=r.project;clearMedia();draw();schedule()}gridDialog.close();toast(`已新增 ${rows*columns} 张宫格图片，保留原图与来源连接`)}
+  catch(e){gridStatus.textContent=e.message+'；未确认成功时可用相同参数重试。'}finally{gridSaving=false;setBusy(false);gridSelect.disabled=gridClose.disabled=false;gridSave.disabled=!gridImage}
+ });gridSave.className='primary';gridStage.append(gridCanvas);gridActions.append(gridClose,gridSave);gridDialog.append(make('h2','宫格切分'),make('p','把原图均匀切成独立图片，从左到右、从上到下编号。不调用生成模型，不消耗积分，原图保留。'),gridSelect,gridStage,gridStatus,gridActions);document.body.append(gridDialog);
+ function paintGrid(){if(!gridImage)return;const [rows,columns]=gridSelect.value.split('x').map(Number),w=gridImage.naturalWidth,h=gridImage.naturalHeight,scale=Math.min(1,640/Math.max(w,h));gridCanvas.width=Math.round(w*scale);gridCanvas.height=Math.round(h*scale);const c=gridCanvas.getContext('2d');c.drawImage(gridImage,0,0,gridCanvas.width,gridCanvas.height);c.strokeStyle='#15d4ec';c.lineWidth=2;c.beginPath();for(let col=1;col<columns;col++){const x=Math.floor(col*w/columns)*scale;c.moveTo(x,0);c.lineTo(x,gridCanvas.height)}for(let row=1;row<rows;row++){const y=Math.floor(row*h/rows)*scale;c.moveTo(0,y);c.lineTo(gridCanvas.width,y)}c.stroke();for(let row=0;row<rows;row++)for(let col=0;col<columns;col++){const x=col*gridCanvas.width/columns+6,y=row*gridCanvas.height/rows+6;c.fillStyle='#111c';c.fillRect(x,y,40,23);c.fillStyle='white';c.font='14px sans-serif';c.fillText(`${row+1}-${col+1}`,x+6,y+16)}
+  const count=rows*columns,capacity=Math.min(32-Object.keys(project.canvas_assets||{}).length,16-(project.canvas?.nodes||[]).length),small=w/columns<16||h/rows<16;gridSave.disabled=gridSaving||small||count>capacity;gridStatus.textContent=small?'每个宫格至少需要 16 × 16 像素':count>capacity?`当前最多还可加入 ${Math.max(0,capacity)} 张图片，请选择较少宫格或先整理画布`:`将新增 ${count} 张图片，每张约 ${Math.floor(w/columns)} × ${Math.floor(h/rows)} 像素`;
+ }
+ gridSelect.onchange=paintGrid;gridDialog.addEventListener('cancel',e=>{if(gridSaving)e.preventDefault()});gridDialog.addEventListener('close',()=>{gridLoad++;gridSession=gridImage=gridRequest=null});
+ document.addEventListener('creative-grid-image',async event=>{const asset=event.detail?.asset;if(isLocked()||hasDrafts()){toast('请先完成当前任务并保存画布草稿');return}if(!project?.canvas_capabilities?.image_grid||project.canvas_assets?.[asset]?.kind!=='image')return;const ticket=++gridLoad;gridSession={project:project.id,revision:project.revision,asset};gridImage=gridRequest=null;gridSelect.value='2x2';gridSave.disabled=true;gridCanvas.width=gridCanvas.height=1;gridStatus.textContent='正在读取原图…';gridDialog.showModal();
+  try{const r=await fetch(`/creative/api/projects/${gridSession.project}/canvas/assets/${asset}/source`,{headers:{Authorization:'Bearer '+key},signal:AbortSignal.timeout(30000)});if(!r.ok)throw Error('无法读取原图');const url=URL.createObjectURL(await r.blob());try{const img=new Image();img.src=url;await img.decode();if(ticket!==gridLoad||!gridDialog.open)return;gridImage=img;paintGrid()}finally{URL.revokeObjectURL(url)}}catch(e){if(ticket===gridLoad)gridStatus.textContent=e.message}
+ });
+
  function decorateImages(){
-  if(!modelsLoaded)return;
+  // Keep node-level image controls available while the catalog is loading or
+  // temporarily unavailable; the model selector is upgraded when the catalog
+  // arrives, but editing entry points must not disappear with it.
   const activeDraft=asset=>Object.values(project?.image_transform_drafts||{}).find(d=>d?.asset===asset&&d.state==='applied');
   const previewImage=(img,angle,light)=>{if(!img)return;const transform={
     '保留原角度':'none','正面平视':'perspective(700px) scale(1.02)','侧面 45 度':'perspective(700px) rotateY(-14deg) rotateZ(-1deg) scale(1.04)','俯视特写':'perspective(700px) rotateX(7deg) scale(1.08) translateY(-3%)','低机位仰视':'perspective(700px) rotateX(-7deg) scale(1.08) translateY(3%)'}[angle]||'none';const filter={
@@ -468,10 +657,11 @@
   document.querySelectorAll('.reference-node').forEach(card=>{
    if(!card.querySelector('img')||card.querySelector('.node-image-controls'))return;
    // Video-reference cards also contain a thumbnail; only images offer image generation.
-   if(card.dataset.kind!=='image')return;
-   const box=make('div',null,'node-image-controls'),label=make('label','图片模型 · 下一次生成'),select=make('select',null,'node-image-model');select.setAttribute('aria-label','此图片节点的生成模型');
-   for(const m of images){const o=make('option',m.label);o.value=m.id;o.disabled=!m.available;select.append(o)}
-   select.value=imageSelect.value;select.onchange=()=>{imageSelect.value=select.value;imageSelect.onchange()};label.append(select);
+   if(card.dataset.kind!=='image'&&!/图片|image/i.test(card.textContent))return;
+   const box=make('div',null,'node-image-controls'),label=make('label','生成 / 编辑模型'),select=make('select',null,'node-image-model'),modelControl=make('span',null,'image-adjustment-model-control'),modelLogo=make('span',null,'studio-provider-logo');label.title='同一模型用于生成图片、局部修改、多角度与重打光';select.setAttribute('aria-label','此图片节点的生成与编辑模型');modelControl.append(modelLogo,select);
+   const imageModels=images.length?images:[{id:imageSelect.value||'kling-image-3',label:'图片模型',available:true}];
+   for(const m of imageModels){const o=make('option',m.label);o.value=m.id;o.disabled=!m.available;select.append(o)}
+   const syncNodeModelLogo=()=>{const logo=window.studioModelLogo?.(select.value);modelControl.querySelector('.studio-provider-logo')?.remove();if(logo){logo.setAttribute('aria-hidden','true');modelControl.prepend(logo)}};select.value=imageSelect.value;select.onchange=()=>{imageSelect.value=select.value;imageSelect.onchange();syncNodeModelLogo()};label.append(modelControl);syncNodeModelLogo();
    const transforms=make('details',null,'image-transforms');transforms.append(make('summary','调整角度与光照'));
    const angle=make('select'),light=make('select');angle.setAttribute('aria-label','图像角度');light.setAttribute('aria-label','图像光照');
    for(const value of ['保留原角度','正面平视','侧面 45 度','俯视特写','低机位仰视'])angle.append(make('option',value));
@@ -485,10 +675,24 @@
    const undo=action('撤销变换草稿',async()=>{const current=activeDraft(node?.asset);if(!current||isLocked())return;undo.disabled=true;setBusy(true);try{const result=await api('/projects/'+project.id+'/image-transforms/drafts/'+current.id+'/undo','POST',{revision:project.revision});project=result.project;clearMedia();draw();schedule();toast('已撤销图片变换草稿')}catch(e){status.textContent=e.message}finally{undo.disabled=false;setBusy(false)}});undo.setAttribute('aria-label','撤销变换草稿');undo.hidden=!draft;
    angle.onchange=renderPreview;light.onchange=renderPreview;transforms.append(make('label','视角'),angle,make('label','光线'),light,status,preview,save,undo);transforms.addEventListener('toggle',()=>document.dispatchEvent(new Event('creative-node-controls-ready')));card.querySelector('.canvas-card-body').append(transforms);renderPreview();
    const edit=action('生成调整版本',()=>{if(!node?.asset)return;const useDraft=activeDraft(node.asset),matches=useDraft&&useDraft.angle===angle.value&&useDraft.light===light.value;openImage(`保持参考图商品结构、颜色和材质一致。视角：${angle.value}。光照：${light.value}。${card.querySelector('textarea')?.value||''}。不生成文字。`,node.asset,{angle:angle.value,light:light.value},matches?useDraft.id:null)});transforms.append(edit);
+   const angleEditor=action('多角度编辑器',()=>node?.asset&&document.dispatchEvent(new CustomEvent('creative-open-image-adjustment',{detail:{asset:node.asset,mode:'angle'}})));angleEditor.setAttribute('aria-label','打开多角度编辑器');
+   const lightEditor=action('重打光',()=>node?.asset&&document.dispatchEvent(new CustomEvent('creative-open-image-adjustment',{detail:{asset:node.asset,mode:'light'}})));lightEditor.setAttribute('aria-label','打开重打光编辑器');
+   transforms.append(angleEditor,lightEditor);
    const generate=action('生成新参考图',()=>openImage(card.querySelector('textarea')?.value||''));generate.className='node-image-generate';const crop=action('裁剪 / 旋转',()=>document.dispatchEvent(new CustomEvent('creative-reframe-image',{detail:{asset:node?.asset}})));const modify=action('修改图片',()=>openImage(card.querySelector('textarea')?.value||'',node?.asset));box.append(modify,crop,label,generate);card.querySelector('.canvas-card-body').prepend(box);
   });paintModels();document.dispatchEvent(new Event('creative-node-controls-ready'));
  }
- document.addEventListener('creative-canvas-painted',decorateImages);
+ document.addEventListener('creative-canvas-painted',()=>{
+  decorateImages();
+  // Canvas thumbnails arrive through blob previews after the graph paint.
+  // Re-run after those previews settle so image-node editing controls are
+  // present in the same render pass users see, without duplicating controls.
+  setTimeout(decorateImages,250);
+  setTimeout(decorateImages,1000);
+ });
+ // The first canvas paint can precede workspace listener registration on a
+ // cold load; perform an initial pass as well.
+ setTimeout(decorateImages,0);
+ setTimeout(decorateImages,750);
  function foldInspectorSections(){
   const inspector=document.querySelector('.inspector');if(!inspector||inspector.dataset.sectionsReady)return;
   const source=details.parentElement;const archive=source?.nextElementSibling;if(!source||!archive)return;

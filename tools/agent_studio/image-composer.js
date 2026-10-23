@@ -11,7 +11,7 @@ export async function openImageComposer(ctx,initialAsset=null,regionMode=false){
   const snapshot=ctx.project(),pid=snapshot.id,revision=snapshot.revision;
   let catalog;opening=true;try{catalog=await ctx.api('/models')}finally{opening=false}
   if(ctx.project()?.id!==pid||ctx.project().revision!==revision||ctx.locked()||ctx.hasDrafts())return;
-  let savedDraft=null;try{savedDraft=JSON.parse(sessionStorage.getItem('manual-image-draft:'+pid)||'null')}catch{}
+  let savedDraft=null;try{savedDraft=JSON.parse(sessionStorage.getItem('manual-image-draft:'+pid)||'null')||snapshot.image_draft}catch{}
   const models=catalog.image_models||[],nodes=snapshot.canvas?.nodes||[],assets=Object.values(snapshot.canvas_assets||{}).filter(a=>a.kind==='image');
   const name=aid=>nodes.find(n=>n.asset===aid)?.label||'画布图片';
   const draftRole=aid=>{const role=nodes.find(n=>n.asset===aid)?.role;return role in roles?role:'reference'};
@@ -25,19 +25,23 @@ export async function openImageComposer(ctx,initialAsset=null,regionMode=false){
   const choices=el('div',null,'image-composer-choices');choices.id='composeImageChoices';library.append(choices);
   if(!assets.length)choices.append(el('p','尚无图片。可先关闭此窗口，在画布添加商品、人物或场景图。'));
   const model=el('select');model.id='composeImageModel';model.setAttribute('aria-label','此次图像生成模型');
-  for(const m of models){const o=el('option',m.label+(m.available?'':' · 暂不可用'));o.value=m.id;o.disabled=!m.available;model.append(o)}
+  for(const m of models){const o=el('option',m.label+(m.available?'':' · 暂不可用'));o.value=m.id;o.disabled=!m.available;o.dataset.description=m.mode==='text'?'文字生图':`参考图编辑 · ${m.min_edit_references||1}–${m.max_references||1} 张参考`;o.dataset.disabledReason='尚未接入';model.append(o)}
   const saved=ctx.initial?.model||savedDraft?.model||snapshot.image_model||ctx.imageModel();if(models.some(m=>m.id===saved))model.value=saved;if(regionMode&&models.find(m=>m.id===model.value)?.mode!=='edit'){const edit=models.find(m=>m.available&&m.region_composite);if(edit)model.value=edit.id}
   const modelLabel=el('label','模型');modelLabel.append(model);editor.append(modelLabel);
   const capability=el('p',null,'image-composer-hint');editor.append(capability);
   const inputs=el('div');inputs.id='composeImageInputs';editor.append(inputs);
   const prompt=el('textarea');prompt.id='composeImagePrompt';prompt.maxLength=4000;prompt.rows=4;prompt.setAttribute('aria-label','此次图像生成要求');prompt.placeholder='例如：保留图 1 的夹克结构，让图 2 的人物穿上它，置于图 3 的场景中。';
-  prompt.value=regionMode?'':ctx.initial?.prompt||savedDraft?.prompt||snapshot.direct_prompt||[snapshot.brief?.product,snapshot.brief?.style].filter(Boolean).join('，');if(regionMode)prompt.placeholder='例如：将选中的墙面改成暖灰色，保留原来的材质和光影。';const promptLabel=el('label','生成要求');promptLabel.append(prompt);editor.append(promptLabel);
-  const connect=el('input');connect.type='checkbox';connect.id='composeImageConnect';connect.checked=false;
+  prompt.value=regionMode?'':ctx.initial?.prompt??savedDraft?.prompt??snapshot.direct_prompt??[snapshot.brief?.product,snapshot.brief?.style].filter(Boolean).join('，');if(regionMode)prompt.placeholder='例如：将选中的墙面改成暖灰色，保留原来的材质和光影。';const promptLabel=el('label','生成要求');promptLabel.append(prompt);editor.append(promptLabel);
+  const connect=el('input');connect.type='checkbox';connect.id='composeImageConnect';connect.checked=!!ctx.initial?.director_reference;
   const connection=el('label',null,'image-composer-connect');connection.hidden=snapshot.creation_mode!=='agent';connection.append(connect,el('span','生成后交给导演，重新整理拍摄方案'));editor.append(connection);
   const reviewBox=el('section',null,'image-composer-review');reviewBox.id='composeImageReview';reviewBox.hidden=true;
   const message=el('p',null,'image-composer-message');message.id='composeImageMessage';message.setAttribute('role','status');
   const footer=el('div',null,'image-composer-footer'),preview=button('核对生成输入',previewInput),confirm=button('确认生成 · 1 积分',submit,'primary');preview.id='composeImagePreview';confirm.id='composeImageConfirm';confirm.hidden=true;
-  footer.append(message,preview,confirm);form.append(library,editor);dialog.append(head,intro,form,reviewBox,footer);document.body.append(dialog);
+  const draftEnabled=!regionMode&&!initialAsset&&snapshot.creation_mode==='image';
+  const keep=button('保存参考并返回画布',async()=>{if(submitting||loading)return;loading=true;controls();message.textContent='正在保存参考…';try{const result=await ctx.api('/projects/'+pid+'/images/draft','PUT',{revision,model:model.value,prompt:prompt.value,references:selected.map(v=>({...v}))});ctx.accepted(result);try{sessionStorage.removeItem('manual-image-draft:'+pid)}catch{}dialog.close();ctx.toast('参考已保存到项目，尚未生成图片。')}catch(e){message.textContent=e.message||'保存失败，请保留窗口后重试。'}finally{loading=false;if(!closed)controls()}});keep.id='composeImageKeepDraft';keep.hidden=!draftEnabled;keep.title='将图片顺序、用途和生成要求保存到项目；不提交生成';
+  if(draftEnabled)intro.append(el('span',' 返回前点击保存参考；已保存的输入可在其他设备恢复，核对生成时才提交。'));
+
+  footer.append(message,keep,preview,confirm);form.append(library,editor);dialog.append(head,intro,form,reviewBox,footer);document.body.append(dialog);const modelPicker=window.installStudioModelPicker?.(model);
 
   async function thumbnail(aid,img){
     try{if(!previews.has(aid))previews.set(aid,ctx.preview(aid));const url=await previews.get(aid);if(!closed)img.src=url}catch{img.alt='图片暂不可读取'}
@@ -69,12 +73,13 @@ export async function openImageComposer(ctx,initialAsset=null,regionMode=false){
   for(const a of (regionMode?[]:assets)){const b=button('',()=>{if(submitting||loading)return;const index=selected.findIndex(v=>v.asset===a.id);if(index>=0)selected.splice(index,1);else{if(selected.length>=3){message.textContent='最多选择三张图片，可先移除一张。';return}selected.push({asset:a.id,role:draftRole(a.id),instruction:''})}invalidate();drawInputs()});b.dataset.asset=a.id;const img=el('img');img.alt=name(a.id);b.append(img,el('span',name(a.id)));choices.append(b);choiceButtons.set(a.id,b);thumbnail(a.id,img)}
   function invalidReason(){if(regionMode){if(!regionReady)return '正在读取原图…';if(regionGesture)return '请完成区域选择。';if(!models.find(m=>m.id===model.value)?.region_composite)return '所选模型不支持此局部修改流程。';if(!initialAsset||!assets.some(a=>a.id===initialAsset))return '原图不属于当前项目。';if(!Number.isInteger(region.feather)||region.feather<0||region.feather>32||(regionShape==='rectangle'&&(Object.values(region).some(v=>!Number.isFinite(v))||region.x<0||region.y<0||region.width<=0||region.height<=0||region.x+region.width>1.00000001||region.y+region.height>1.00000001)))return '选框必须在图片内，边缘过渡为 0–32 整数像素。';if(regionShape==='brush'){if(!models.find(m=>m.id===model.value)?.region_brush)return '所选模型不支持手绘选区。';if(maskEmpty)return '请先涂抹需要修改的区域。'}else if(region.width*regionImage.naturalWidth<16||region.height*regionImage.naturalHeight<16)return '选区至少需要 16 × 16 像素。'}const m=models.find(m=>m.id===model.value);if(!m?.available)return '所选模型暂不可用，请选择可用模型。';if(m.mode==='text'&&selected.length)return '当前模型只接受文字。请改选参考图编辑模型，或明确移除已选图片。';if(m.mode==='edit'&&!selected.length)return '请从画布图片中选择至少一张参考图。';if(selected.length&&selected.length<(m.min_edit_references||1))return '此模型参考生成至少需要两张图片。';if(selected.length>(m.max_references??1))return '已选图片超过所选模型的输入上限。';if(prompt.value.trim().length<2)return '请填写具体的生成要求。';return ''}
   function controls(){
-    const m=models.find(m=>m.id===model.value);capability.textContent=regionMode?'单张原图 · 选区外保留 · 生成 1 张新素材':['edit','both'].includes(m?.mode)?`支持 1–${m.max_references??1} 张参考 · ${snapshot.aspect} · 生成 1 张`:`文字生图 · ${snapshot.aspect} · 生成 1 张`;
+    const m=models.find(m=>m.id===model.value);capability.textContent=regionMode?'单张原图 · 选区外保留 · 生成 1 张新素材':['edit','both'].includes(m?.mode)?`支持 ${m.min_edit_references||1}–${m.max_references??1} 张参考 · ${snapshot.aspect} · 生成 1 张`:`文字生图 · ${snapshot.aspect} · 生成 1 张`;
     if(regionMode){brushControls.brush.dataset.boundary=String(!m?.region_brush);brushControls.undo.dataset.boundary=String(!strokes.length);brushControls.redo.dataset.boundary=String(!strokeFuture.length);brushControls.clear.dataset.boundary=String(!strokes.length)}
-    preview.disabled=submitting||loading||!!invalidReason();confirm.disabled=submitting||loading||!review;close.disabled=submitting;
-    dialog.querySelectorAll('input,textarea,select,#composeImageChoices button,#composeImageInputs button,#imageRegionTools button').forEach(n=>n.disabled=submitting||loading||!!regionGesture||n.dataset.boundary==='true');
+    keep.disabled=submitting||loading;preview.disabled=submitting||loading||!!invalidReason();confirm.disabled=submitting||loading||!review;close.disabled=submitting;
+    dialog.querySelectorAll('input,textarea,select,#composeImageChoices button,#composeImageInputs button,#imageRegionTools button').forEach(n=>n.disabled=submitting||loading||!!regionGesture||n.dataset.boundary==='true');modelPicker?.sync();
   }
-  function invalidate(){if(!regionMode&&!initialAsset&&snapshot.creation_mode==='image'){try{sessionStorage.setItem('manual-image-draft:'+pid,JSON.stringify({model:model.value,prompt:prompt.value,references:selected}))}catch{}}review=null;reviewBox.hidden=true;confirm.hidden=true;preview.hidden=false;message.textContent=invalidReason()||'核对输入后确认一次生成，失败不自动重试。';controls()}
+  function saveDraft(){if(!draftEnabled)return false;try{sessionStorage.setItem('manual-image-draft:'+pid,JSON.stringify({model:model.value,prompt:prompt.value,references:selected}));document.dispatchEvent(new CustomEvent('creative-image-input-change',{detail:{project:pid}}));return true}catch{return false}}
+  function invalidate(){saveDraft();review=null;reviewBox.hidden=true;confirm.hidden=true;preview.hidden=false;message.textContent=invalidReason()||'核对输入后确认一次生成，失败不自动重试。';controls()}
   function drawInputs(){
     inputs.replaceChildren();inputs.append(el('h3',`本次输入 · ${selected.length}/3`));
     for(const [aid,b] of choiceButtons){const i=selected.findIndex(v=>v.asset===aid);b.setAttribute('aria-pressed',String(i>=0));b.setAttribute('aria-label',(i>=0?`移除图片 ${i+1}：`:'选择图片：')+name(aid))}
@@ -90,7 +95,7 @@ export async function openImageComposer(ctx,initialAsset=null,regionMode=false){
     });controls();
   }
   model.onchange=invalidate;prompt.oninput=invalidate;connect.onchange=invalidate;
-  function body(){return {revision,model:model.value,prompt:prompt.value.trim(),...(regionMode?{source_asset:initialAsset,region:regionShape==='brush'?{x:0,y:0,width:1,height:1,feather:region.feather,shape:'brush',strokes:structuredClone(strokes)}:{...region}}:{references:selected.map(v=>({...v}))}),connect_to_director:connect.checked}}
+  function body(){return {revision,model:model.value,prompt:prompt.value.trim(),...(regionMode?{source_asset:initialAsset,region:regionShape==='brush'?{x:0,y:0,width:1,height:1,feather:region.feather,shape:'brush',strokes:structuredClone(strokes)}:{...region}}:{references:selected.map(v=>({...v}))}),connect_to_director:connect.checked,...(ctx.initial?.director_reference&&connect.checked?{director_reference:true,director_context:ctx.initial.director_context||''}:{})}}
   async function previewInput(){
     if(invalidReason()||loading||submitting)return;
     if(ctx.project()?.id!==pid||ctx.project().revision!==revision||ctx.hasDrafts()){message.textContent='项目已变化，请关闭窗口后重新选择输入。';return}
@@ -108,6 +113,7 @@ export async function openImageComposer(ctx,initialAsset=null,regionMode=false){
     if(!review||submitting||loading)return;
     if(ctx.project()?.id!==pid||ctx.project().revision!==revision||ctx.hasDrafts()){invalidate();message.textContent='项目已变化，请重新打开并核对输入。';return}
     submitting=true;controls();ctx.busy(true);message.textContent='正在提交这一次生成…';
+    if(ctx.initial?.director_reference)ctx.initial.request_id=review.request_id;
     try{const p=await ctx.api('/projects/'+pid+'/images','POST',{...review.body,input_hash:review.input_hash,request_id:review.request_id,approved_credits:1});ctx.accepted(p);dialog.close();ctx.toast('图片生成已提交，完成后会自动放入画布。')}
     catch(e){
       // Query this project after an uncertain response; never resubmit a POST automatically.
@@ -116,7 +122,7 @@ export async function openImageComposer(ctx,initialAsset=null,regionMode=false){
     }finally{submitting=false;ctx.busy(false)}
   }
   dialog.addEventListener('cancel',e=>{if(submitting)e.preventDefault()});
-  dialog.addEventListener('close',()=>{closed=true;previews.forEach(p=>p.then(URL.revokeObjectURL).catch(()=>{}));previews.clear();dialog.remove();if(active===dialog)active=null});
+  dialog.addEventListener('close',()=>{closed=true;modelPicker?.destroy();previews.forEach(p=>p.then(URL.revokeObjectURL).catch(()=>{}));previews.clear();dialog.remove();if(active===dialog)active=null});
   drawInputs();invalidate();dialog.showModal();prompt.focus({preventScroll:true});dialog.scrollTop=0;if(ctx.initial?.focusAsset){const row=[...inputs.querySelectorAll('article')].find(r=>r.dataset.asset===ctx.initial.focusAsset);if(row){row.classList.add('reference-input-focus');row.querySelector('select')?.focus({preventScroll:true});row.scrollIntoView({block:'nearest'})}}if(ctx.initial?.review&&!invalidReason())await previewInput();
 }
 
@@ -124,7 +130,7 @@ export async function openImageComposer(ctx,initialAsset=null,regionMode=false){
 export async function generateManualImage(ctx){
  if(opening||ctx.locked()||ctx.hasDrafts())return;
  const snapshot=ctx.project();if(snapshot?.creation_mode!=='image')throw Error('请从手动图片工作台生成');
- const pid=snapshot.id;let saved={};try{saved=JSON.parse(sessionStorage.getItem('manual-image-draft:'+pid)||'{}')}catch{}
+ const pid=snapshot.id;let saved=snapshot.image_draft||{};try{saved=JSON.parse(sessionStorage.getItem('manual-image-draft:'+pid)||'null')||saved}catch{}
  const draft={revision:snapshot.revision,model:ctx.initial?.model||saved.model||snapshot.image_model,prompt:(ctx.initial?.prompt||saved.prompt||snapshot.direct_prompt||'').trim(),references:ctx.initial?.references??saved.references??[],connect_to_director:false};
  if(draft.prompt.length<2){ctx.toast('请填写图片生成要求');return}
  opening=true;ctx.busy(true);let submitted=false;
@@ -137,4 +143,25 @@ export async function generateManualImage(ctx){
   const result=await ctx.api('/projects/'+pid+'/images','POST',{...draft,input_hash:checked.input_hash,request_id:crypto.randomUUID().replaceAll('-',''),approved_credits:checked.credits});
   ctx.accepted(result);ctx.toast('图片生成已提交，结果将返回画布');
  }catch(e){if(submitted){try{ctx.accepted(await ctx.api('/projects/'+pid))}catch{}}ctx.toast(e.message)}finally{opening=false;ctx.busy(false)}
+}
+
+// Explicit Agent reference action: one selected model, one image, one credit.
+// The server owns result binding and planning continuation after submission.
+export async function generateDirectorReference(ctx){
+ if(opening||ctx.locked()||ctx.hasDrafts())return;
+ const snapshot=ctx.project();if(snapshot?.creation_mode!=='agent')return;
+ const pid=snapshot.id,draft={revision:snapshot.revision,model:ctx.initial.model,prompt:ctx.initial.prompt,
+  references:ctx.initial.references||[],connect_to_director:true,director_reference:true,director_context:ctx.initial.director_context||''};
+ if(ctx.initial.director_video_credits!==undefined)draft.director_video_credits=ctx.initial.director_video_credits;
+ opening=true;ctx.busy(true);let submitted=false;
+ try{
+  const checked=await ctx.api('/projects/'+pid+'/images/preview','POST',draft);
+  if(checked.credits!==1)throw Error('图片费用已变化，请重新核对');
+  if(draft.director_video_credits!==undefined&&(checked.video_credits!==draft.director_video_credits||checked.total_credits!==1+draft.director_video_credits))throw Error('连续制作费用已变化，请重新核对');
+  if(ctx.project()?.id!==pid||ctx.project().revision!==snapshot.revision)throw Error('项目已变化，请重新核对');
+  submitted=true;ctx.initial.request_id=crypto.randomUUID().replaceAll('-','');
+  ctx.accepted(await ctx.api('/projects/'+pid+'/images','POST',{...draft,input_hash:checked.input_hash,request_id:ctx.initial.request_id,approved_credits:1}));
+  ctx.toast(draft.director_video_credits!==undefined?'Agent 已接手：生成参考图、绑定、规划并制作成片；失败会停止。':'Agent 正在生成参考图，完成后自动加入画布、绑定视频参考并继续规划。');
+ }catch(e){if(submitted){try{ctx.accepted(await ctx.api('/projects/'+pid))}catch{}}ctx.toast(e.message)}
+ finally{opening=false;ctx.busy(false)}
 }

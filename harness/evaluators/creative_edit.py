@@ -1,5 +1,6 @@
 """Fail closed on unsupported edits; this checks contracts, not editorial quality."""
 from harness.tools.creative_edit import validate_edit
+from harness.tools.creative_edit_observe import observation_metadata
 
 
 def evaluate_edit_proposal(raw, original, catalog, observations):
@@ -29,5 +30,5 @@ def evaluate_edit_proposal(raw, original, catalog, observations):
         if not isinstance(frames,list) or len(frames)>24 or any(not isinstance(f,str) or f not in known for f in frames): raise ValueError('建议引用了未知采样')
         clean.append({'text':text.strip(),'frames':frames})
     return {'spec':spec,'summary':summary.strip(),'reasons':clean,
-            'observations':[{k:f[k] for k in ('id','source','time')} for f in observations],
+            'observations':[observation_metadata(f) for f in observations],
             'qa':{'contract':'passed','semantic':'pending','human':'pending','training_eligible':False}}

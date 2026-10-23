@@ -11,7 +11,7 @@ services:
       - ./assets/library:/assets/library
       - ./outputs:/app/outputs
       - ./secrets:/run/secrets:ro
-      - kling-config:/root/.kling
+      - ./secrets/kling:/root/.kling
     shm_size: 1gb
     init: true
     restart: unless-stopped
@@ -23,4 +23,3 @@ services:
       retries: 3
 volumes:
   studio-data:
-  kling-config:

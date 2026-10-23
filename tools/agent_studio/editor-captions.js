@@ -4,7 +4,7 @@
  */
 'use strict';
 window.EditCaptions = (() => {
-  const defaults={preset:'box',size:'medium',motion:'none'};
+  const defaults={preset:'box',size:'medium',motion:'none',align:'center'};
   const appearance=c=>({...defaults,...c.appearance});
   const visible=(spec,c)=>(spec.caption_visibility||[true,true,true])[c.track??0];
   const baseColor=c=>appearance(c).preset==='accent'?'#f7db74':'#fff';
@@ -37,7 +37,7 @@ window.EditCaptions = (() => {
   }
   function style(slot,effect,c,width,height){
     const a=appearance(c),g=geometry(c,width,height),box=a.preset==='box';
-    Object.assign(slot.style,{position:'absolute',padding:'0',background:'transparent',borderRadius:'0',left:'8%',width:'84%',bottom:g.bottom+'%',textAlign:'center',pointerEvents:'none',fontFamily:'Studio,system-ui',fontSize:g.font+'px',lineHeight:'1.4',fontWeight:box?'600':'700',whiteSpace:'pre-wrap',overflowWrap:'anywhere'});
+    Object.assign(slot.style,{position:'absolute',padding:'0',background:'transparent',borderRadius:'0',left:a.align==='left'?'6%':a.align==='right'?'54%':'8%',width:a.align==='center'?'84%':'40%',bottom:g.bottom+'%',textAlign:a.align,pointerEvents:'none',fontFamily:'Studio,system-ui',fontSize:g.font+'px',lineHeight:'1.4',fontWeight:box?'600':'700',whiteSpace:'pre-wrap',overflowWrap:'anywhere'});
     Object.assign(effect.style,{display:'inline-block',maxWidth:'100%',boxSizing:'border-box',width:box?'100%':'auto',padding:box?'.24em .34em':'.06em .16em',borderRadius:'.24em',background:box?'#0009':'transparent',color:a.preset==='accent'?'#f7db74':'#fff',textShadow:box?'none':'.025em .035em .08em #000,0 0 .1em #000',transformOrigin:'50% 100%'});
   }
   function mountTimeline(tl,captions,width,height){

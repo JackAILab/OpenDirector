@@ -42,8 +42,8 @@ def validate_graph(graph, assets):
             raise ValueError('参考节点标识无效或重复')
         ids.add(key)
         kind = n.get('kind')
-        if kind not in ('text', 'image', 'video'):
-            raise ValueError('请选择文字、图片或视频参考')
+        if kind not in ('text', 'image', 'video', 'audio'):
+            raise ValueError('请选择文字、图片、视频或音轨')
         text, label = n.get('text', ''), n.get('label', '')
         if not isinstance(text, str) or len(text) > 4000 or not isinstance(label, str) or len(label) > 80:
             raise ValueError('参考说明过长')
@@ -64,6 +64,8 @@ def validate_graph(graph, assets):
         source = edge.get('source')
         if source not in ids or edge.get('target') != 'director' or source in linked:
             raise ValueError('参考只能连接到创作导演，不能重复连接')
+        if next(n for n in clean if n['id']==source)['kind']=='audio':
+            raise ValueError('音轨暂支持播放和下载，尚未接入导演音频理解')
         linked.add(source); links.append({'source':source, 'target':'director'})
     if sum(n['kind'] != 'text' for n in clean if n['id'] in linked) > 6:
         raise ValueError('每次最多使用 6 个图片或视频参考')
@@ -111,7 +113,7 @@ def image_bytes(raw):
 
 
 def save_asset(project, raw, kind, *, max_bytes=MAX_CANVAS_UPLOAD, max_duration=60, preserve_pixels=False):
-    if kind not in ('image','video') or not raw or len(raw) > max_bytes:
+    if kind not in ('image','video','audio') or not raw or len(raw) > max_bytes:
         raise ValueError(f'支持 {max_bytes//(1024*1024)} MB 以内的图片或视频')
     aid = secrets.token_hex(16); directory = asset_directory(project, aid)
     directory.mkdir(parents=True,mode=0o700)
@@ -125,6 +127,15 @@ def save_asset(project, raw, kind, *, max_bytes=MAX_CANVAS_UPLOAD, max_duration=
                     ImageOps.exif_transpose(source).convert('RGB').save(directory/filename,'PNG')
             else:(directory/filename).write_bytes(frames[0])
             duration = None
+        elif kind == 'audio':
+            filename = 'source.m4a'; source = directory/filename; source.write_bytes(raw)
+            probe = subprocess.run([os.environ['CREATIVE_FFPROBE'],'-v','error','-protocol_whitelist','file,pipe','-format_whitelist','mov','-show_streams','-show_format','-of','json',str(source)],capture_output=True,check=True,timeout=20)
+            meta=json.loads(probe.stdout)
+            audio=next(s for s in meta['streams'] if s['codec_type']=='audio')
+            duration=float(meta['format']['duration'])
+            if any(s['codec_type']=='video' for s in meta['streams']) or not math.isfinite(duration) or not .1 <= duration <= max_duration or not 1 <= int(audio.get('channels',0)) <= 8:
+                raise ValueError('音轨格式或时长无效')
+            frames=[]
         else:
             filename = 'source.mp4'; source = directory/filename; source.write_bytes(raw)
             probe = subprocess.run([os.environ['CREATIVE_FFPROBE'],'-v','error','-protocol_whitelist','file,pipe','-format_whitelist','mov','-show_streams','-show_format','-of','json',str(source)],capture_output=True,check=True,timeout=20)
@@ -161,6 +172,11 @@ def _asset_metadata(path, kind, mtime_ns, size):
          '-format_whitelist', 'mov', '-show_streams', '-show_format', '-of', 'json', path],
         capture_output=True, check=True, timeout=20)
     meta = json.loads(result.stdout)
+    if kind == 'audio':
+        audio = next(stream for stream in meta['streams'] if stream['codec_type'] == 'audio')
+        duration = float(meta['format']['duration'])
+        if not math.isfinite(duration) or duration <= 0: raise ValueError('音轨时长无效')
+        return {'kind':kind,'duration':duration,'channels':int(audio['channels']),'sample_rate':int(audio['sample_rate'])}
     video = next(stream for stream in meta['streams'] if stream['codec_type'] == 'video')
     width, height = int(video['width']), int(video['height'])
     rotation = next((item['rotation'] for item in video.get('side_data_list', [])
@@ -170,12 +186,12 @@ def _asset_metadata(path, kind, mtime_ns, size):
     duration = float(meta['format']['duration'])
     if width <= 0 or height <= 0 or not math.isfinite(duration) or duration <= 0:
         raise ValueError('素材规格无效')
-    return {'kind': kind, 'width': width, 'height': height, 'duration': duration}
+    return {'kind': kind, 'width': width, 'height': height, 'duration': duration, 'has_audio': any(s['codec_type']=='audio' for s in meta['streams'])}
 
 
 def asset_metadata(project, aid):
     asset = project.get('canvas_assets', {}).get(aid)
-    if not asset or asset.get('kind') not in ('image', 'video'):
+    if not asset or asset.get('kind') not in ('image', 'video', 'audio'):
         raise ValueError('找不到参考文件')
     directory = asset_directory(project, aid).resolve()
     path = (directory / asset['filename']).resolve()
@@ -194,6 +210,7 @@ def director_inputs(project):
     notes, images = [], []
     for node in graph['nodes']:
         if node['id'] not in linked: continue
+        if node['kind']=='audio': raise ValueError('音轨尚未接入导演音频理解')
         notes.append({'kind':node['kind'],'label':node['label'],'role':node.get('role','reference'),'instruction':node['text']})
         if node['kind'] == 'text': continue
         asset=project.get('canvas_assets',{})[node['asset']]

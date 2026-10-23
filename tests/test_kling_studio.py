@@ -38,11 +38,20 @@ def test_ambiguous_submission_never_becomes_refundable_failure(setup,monkeypatch
     assert adapter.ACTIVE
 
 
-def test_only_confirmed_terminal_error_releases_worker(setup,monkeypatch):
+@pytest.mark.parametrize('state', ['FAIL', 'fail', 'FAILED', 'ERROR', 'CANCELLED', 'CANCELED', 'REJECTED'])
+def test_only_confirmed_terminal_error_releases_worker(setup,monkeypatch,state):
     adapter.JOBS['kling_test']['generation_id']='gen_123'
-    monkeypatch.setattr(adapter,'cli_result',lambda args:{'body':{'status':'FAILED'}})
+    calls=[]
+    def query(args):
+        calls.append(args[1])
+        return {'status':200,'body':{'generations':[{'status':state,'works':[{'status':'SENSITIVE_RESULT'}]}]}}
+    monkeypatch.setattr(adapter,'cli_result',query)
     adapter.poll_generation('kling_test')
     assert adapter.JOBS['kling_test']['status']=='failed'
+    assert adapter.JOBS['kling_test']['stage']=='failed'
+    assert json.loads(adapter.state_path('kling_test').read_text())['status']=='failed'
+    assert calls==['query_tasks']
+    assert not (setup/'kling_test.mp4').exists()
     assert not adapter.ACTIVE
 
 @pytest.mark.parametrize('model',['kling-video-v2_5','kling-video-v3_0','kling-video-v3_0_omni'])
@@ -72,7 +81,16 @@ def test_image_request_uses_selected_model_and_local_reference(setup,model):
 
 @pytest.mark.parametrize('provider,expected', [
     ({'status': 'QUEUED'}, {'stage': 'queued'}),
+    ({'status': 'queuing'}, {'stage': 'queued'}),
+    ({'status': 'queueing'}, {'stage': 'queued'}),
+    ({'status': 'succeed'}, {'stage': 'finalizing'}),
     ({'status': 'PROCESSING', 'progress': 43}, {'stage': 'generating', 'progress': 43}),
+    ({'status': 'PROCESSING', 'progress': '43'}, {'stage': 'generating', 'progress': 43}),
+    ({'status': 'PROCESSING', 'taskProgress': {'percent': '27'}}, {'stage': 'generating', 'progress': 27}),
+    ({'status': 'PROCESSING', 'progress': None, 'progress_percent': 0}, {'stage': 'generating', 'progress': 0}),
+    ({'status': 'PROCESSING', 'progress': 101}, {'stage': 'generating'}),
+    ({'status': 'PROCESSING', 'task_progress': '-1'}, {'stage': 'generating'}),
+
     ({'status': 'PROCESSING', 'progress': float('nan')}, {'stage': 'generating'}),
     ({'status': 'PROCESSING', 'progress': True}, {'stage': 'generating'}),
     ({'status': 'PROCESSING', 'progress': {'private': 'secret'}}, {'stage': 'generating'}),
@@ -94,3 +112,21 @@ def test_live_poll_is_single_read_and_projects_safe_progress(setup, monkeypatch,
     assert saved['status'] == 'processing'
     assert 'private' not in str(saved) and 'secret' not in str(saved)
     assert adapter.ACTIVE
+
+
+@pytest.mark.parametrize('state', ['succeed', 'succeeded', 'success', 'completed', 'partial_completed'])
+def test_cli_success_alias_finalizes_existing_job(setup, monkeypatch, state):
+    import io
+    adapter.JOBS['kling_test']['generation_id']='gen_123'
+    calls=[]
+    def query(args):
+        calls.append(args[1])
+        return {'body':{'status':state,'urlWithoutWatermark':'https://example.invalid/video'}}
+    monkeypatch.setattr(adapter,'cli_result',query)
+    monkeypatch.setattr(adapter.urllib.request,'urlopen',lambda *a,**k:io.BytesIO(b'x'*2048))
+    adapter.poll_generation('kling_test')
+    assert calls==['query_tasks']
+    assert adapter.JOBS['kling_test']['status']=='completed'
+    assert adapter.JOBS['kling_test']['progress']==100
+    assert (setup/'kling_test.mp4').read_bytes()==b'x'*2048
+    assert not adapter.ACTIVE

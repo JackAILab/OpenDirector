@@ -47,6 +47,8 @@ def _prepare(project, body):
 
 def install(gateway):
     install_reframe(gateway)
+    from harness.studio.image_grid_api import install as install_grid
+    install_grid(gateway)
     @gateway.app.post('/creative/api/projects/{pid}/image-transforms/preview')
     async def preview(pid: str, body: ImageTransformPreview, authorization: str | None = Header(None)):
         uid = gateway.require_session(authorization)['id']

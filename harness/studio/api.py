@@ -20,7 +20,7 @@ from harness.tools.creative_render import render, probe
 from harness.tools.creative_reference import MAX_UPLOAD, save_reference, reference_path
 from harness.tools.creative_canvas import MAX_CANVAS_UPLOAD, validate_graph, input_signature, save_asset, asset_directory, asset_metadata
 
-from harness.studio.store import (ROOT, DATA, RUNNING, connection, load, save, event, present, lock,
+from harness.studio.store import (ROOT, DATA, RUNNING, connection, load, save, remove, event, present, lock,
                                   archive_render, apply_provider_callback)
 from harness.core.creative_runner import production
 from harness.tools.creative_message_context import record_message_context
@@ -31,7 +31,7 @@ class Create(BaseModel):
     provider: Literal['kling','minimax-h3'] = 'kling'
     model: str | None = None
     aspect: Literal['16:9','9:16','1:1'] = '16:9'
-    duration: int = Field(default=15,ge=3,le=30)
+    duration: int = Field(default=15,ge=3,le=60)
     skill_id: str = 'ad-video'
     skill_version: int | None = Field(default=None,ge=1,le=100)
     approval_mode: Literal['manual','auto'] = 'manual'
@@ -88,9 +88,14 @@ class Start(BaseModel):
     approved_credits: int = Field(ge=0,le=100)
 
 
+class DeliveryRetry(BaseModel):
+    model_config={'extra':'forbid'}
+    revision: int
+
+
 class Edit(BaseModel):
     revision: int
-    shots: list[dict] = Field(min_length=2,max_length=4)
+    shots: list[dict] = Field(min_length=2,max_length=12)
 
 
 class CanvasEdit(BaseModel):
@@ -114,6 +119,8 @@ class Review(BaseModel):
 
 def install(gateway):
     app = gateway.app
+    from harness.core.creative_workspace_delivery import install as install_workspace_delivery
+    install_workspace_delivery(app)
     from harness.studio.management_api import install as install_management
     install_management(gateway)
     from harness.studio.templates import install as install_templates
@@ -127,7 +134,8 @@ def install(gateway):
     from harness.studio.library_api import install as install_library
     install_library(gateway)
     from harness.studio.image_api import install as install_images
-    install_images(gateway)
+    install_images(gateway, execute_video=lambda pid,revision,credits,auth:
+                   execute(pid,Start(revision=revision,approved_credits=credits),auth))
     from harness.studio.image_transform_api import install as install_image_transforms
     install_image_transforms(gateway)
     from harness.studio.video_inputs_api import install as install_video_inputs
@@ -235,6 +243,9 @@ def install(gateway):
     @app.get('/creative/login',include_in_schema=False)
     def login_page(): return FileResponse(ROOT/'tools/agent_studio/login.html',headers={'Cache-Control':'no-store'})
 
+    @app.get('/creative/report',include_in_schema=False)
+    def report_page(): return FileResponse(ROOT/'tools/agent_studio/report.html',headers={'Cache-Control':'no-store'})
+
     @app.get('/creative',include_in_schema=False)
     def creative_page(): return FileResponse(ROOT/'tools/agent_studio/index.html',headers={'Cache-Control':'no-store'})
 
@@ -258,6 +269,12 @@ def install(gateway):
                 'image_models':image_models(),
                 'status_note':'可选表示已接入当前制作合同；此目录未检查供应商实时健康、余额或排队情况。',
                 'pricing_note':'平台积分，非供应商灵感值；每开始 5 秒计费一次'}
+
+    @app.get('/creative/campaign.js',include_in_schema=False)
+    def campaign_script(): return FileResponse(ROOT/'tools/agent_studio/campaign.js',media_type='text/javascript',headers={'Cache-Control':'no-store'})
+
+    @app.get('/creative/agent-workbench.js',include_in_schema=False)
+    def agent_workbench_script(): return FileResponse(ROOT/'tools/agent_studio/agent-workbench.js',media_type='text/javascript',headers={'Cache-Control':'no-store'})
 
     @app.get('/creative/workspace.js',include_in_schema=False)
     def workspace_script(): return FileResponse(ROOT/'tools/agent_studio/workspace.js',media_type='text/javascript',headers={'Cache-Control':'no-store'})
@@ -289,7 +306,8 @@ def install(gateway):
                 raise HTTPException(409,'项目已更新或正在处理，请结束后再切换模型')
             spec=next((m for m in MODELS if m['id']==body.model),None)
             if not spec or not spec.get('single_film'):raise HTTPException(422,'该模型尚不支持已验证的 15 秒有声整片路径')
-            if p.get('model')==body.model and p.get('generation_mode')=='single_native':return present(p)
+            if p.get('model')==body.model and p.get('generation_mode') in ('single_native','chaptered_native'):return present(p)
+            if p.get('generation_mode')=='chaptered_native':raise HTTPException(409,'多章节项目请在视频参考窗口更换模型，保留当前时长')
             if p.get('video_inputs') and p['model']!=body.model:
                 raise HTTPException(409,'请在视频参考窗口同时选择模型与参考模式，避免丢弃已确认图片')
             archive_render(p)
@@ -325,6 +343,25 @@ def install(gateway):
             p['revision']+=1;save(p,uid);event(p,'task','creative_settings_changed')
             return present(p)
 
+    @app.patch('/creative/api/projects/{pid}/agent-duration')
+    async def agent_duration(pid: str, body: dict, authorization: str|None=Header(None)):
+        uid=owner(authorization)
+        async with lock(pid):
+            p=load(pid,uid)
+            if set(body) != {'revision','duration'} or type(body['duration']) is not int or body['duration'] not in (15,30,60):
+                raise HTTPException(422,'请选择 15、30 或 60 秒')
+            if p.get('creation_mode','agent')!='agent' or p['revision']!=body['revision'] or pid in RUNNING or p['state'] in ('planning','running','rendering'):
+                raise HTTPException(409,'项目正在处理或已变化，请稍后再改时长')
+            if p.get('campaign') or p.get('film',{}).get('job_id'):
+                raise HTTPException(409,'已提交制作，请新建项目选择另一时长；原作品保留')
+            if body['duration']>15 and p['model'] not in ('kling-video-v4_0','kling-video-v3_0_omni'):
+                raise HTTPException(422,'多章节需先明确选择 Kling 4.0 或 O3')
+            p.update(duration=body['duration'], generation_mode='single_native' if body['duration']==15 else 'chaptered_native',
+                     state='intake', shots=[], questions=[], error='')
+            p.pop('auto_approval',None);p['revision']+=1;save(p,uid)
+            event(p,'task','agent_duration_changed')
+            return present(p)
+
     @app.post('/creative/api/projects')
     async def create(body: Create, authorization: str|None=Header(None)):
         uid=owner(authorization)
@@ -332,7 +369,9 @@ def install(gateway):
         except ValueError as exc: raise HTTPException(422,str(exc))
         if body.creation_mode=='video':
             if not spec.get('manual_available') or body.duration not in spec['manual_durations']:raise HTTPException(422,'所选模型不支持此手动生成时长')
-        elif not spec.get('single_film') or body.duration!=15:raise HTTPException(422,'Agent 需要已接入的 15 秒有声视频模型')
+        elif not spec.get('single_film') or body.duration not in (15,30,60):raise HTTPException(422,'Agent 支持 15、30、60 秒有声广告')
+        if body.creation_mode=='agent' and body.duration>15 and spec['id'] not in ('kling-video-v4_0','kling-video-v3_0_omni'):
+            raise HTTPException(422,'30/60 秒需要支持多图参考的 Kling 4.0 或 O3，系统不会自动换模型')
         from harness.studio.templates import find_skill
         skill=find_skill(body.skill_id,uid,body.skill_version)
         p={'generation_mode':'single_native','id':secrets.token_hex(12),'state':'intake','revision':0,'messages':[{'role':'user','content':body.message}],
@@ -341,6 +380,7 @@ def install(gateway):
            'skill_id':skill['id'],'skill_title':skill['title'],'skill':skill,'approval_mode':body.approval_mode}
         record_message_context(p)
         p['creation_mode']=body.creation_mode
+        if body.creation_mode=='agent' and body.duration>15:p['generation_mode']='chaptered_native'
         if body.creation_mode=='image':
             from harness.models.studio_image import image_models
             image_spec=next((m for m in image_models() if m['id']==(body.image_model or 'kling-image-v3_0')),None)
@@ -400,7 +440,10 @@ def install(gateway):
             raise HTTPException(404,'关联工作区不存在')
         graph=parent.get('canvas',{'nodes':[],'edges':[]})
         linked={e['source'] for e in graph.get('edges',[]) if e.get('target')=='director'}
-        return {'project':parent['id'],'references':[
+        # Only this Agent's saved input selection is evidence of model input.
+        # Nearby manual video nodes may belong to a different creative task.
+        live_inputs=child.get('video_inputs') if isinstance(child.get('video_inputs'),dict) else None
+        return {'project':parent['id'],'live_inputs':live_inputs,'references':[
             {'id':n['id'],'kind':n['kind'],'label':n.get('label') or {'image':'图片参考','video':'视频参考','text':'文字参考'}.get(n['kind'],'参考')}
             for n in graph.get('nodes',[]) if n['id'] in linked]}
 
@@ -412,6 +455,37 @@ def install(gateway):
             child=load(node['project'],uid)
             if child.get('manual_parent')==pid:result.append({'node':node,'project':present(child)})
         return {'nodes':result}
+
+    @app.delete('/creative/api/projects/{pid}/manual-nodes/{child_id}')
+    async def delete_manual_node(pid: str, child_id: str, authorization: str | None = Header(None)):
+        """Delete a selected, independently-created canvas node and its child record."""
+        uid = owner(authorization)
+        if pid == child_id:
+            raise HTTPException(422, '主节点不能从这里删除')
+        async with lock(pid):
+            parent = load(pid, uid)
+            entry = next((n for n in parent.get('manual_nodes', []) if n.get('project') == child_id), None)
+            try:
+                child = load(child_id, uid)
+            except HTTPException:
+                parent['manual_nodes'] = [n for n in parent.get('manual_nodes', []) if n.get('project') != child_id]
+                save(parent, uid)
+                event(parent, 'tool', 'manual_node_deleted')
+                return {'project': present(parent), 'deleted': child_id}
+            # A stale browser tab may retain a card after a parent refresh
+            # rewrites manual_nodes. The child's ownership marker is enough
+            # to safely clean up that orphaned card.
+            if not entry and child.get('manual_parent') != pid:
+                raise HTTPException(404, '画布节点不存在')
+            if child.get('manual_parent') != pid:
+                raise HTTPException(409, '节点不属于当前画布')
+            if child_id in RUNNING or child.get('state') in ('running', 'rendering', 'planning') or (child.get('film') or {}).get('state') not in (None, 'planned', 'completed', 'failed'):
+                raise HTTPException(409, '任务正在处理，暂不能删除')
+            parent['manual_nodes'] = [n for n in parent.get('manual_nodes', []) if n.get('project') != child_id]
+            save(parent, uid)
+            remove(child_id, uid)
+            event(parent, 'tool', 'manual_node_deleted')
+            return {'project': present(parent), 'deleted': child_id}
 
     @app.post('/creative/api/projects/{pid}/manual-nodes/{child_id}/result')
     async def import_manual_result(pid:str,child_id:str,authorization:str|None=Header(None)):
@@ -428,6 +502,18 @@ def install(gateway):
                 save(parent,uid)
                 event(parent,'tool','manual_result_imported')
             return {'project':present(parent),'node':node}
+
+    @app.post('/creative/api/projects/{pid}/workspace-delivery/retry')
+    async def retry_workspace_delivery(pid:str,body:DeliveryRetry,authorization:str|None=Header(None)):
+        from harness.studio import store
+        uid=owner(authorization)
+        async with lock(pid):
+            p=load(pid,uid)
+            if p['revision']!=body.revision:raise HTTPException(409,'项目已更新，请刷新后重新同步')
+            with store.connection() as c:
+                c.execute("UPDATE workspace_deliveries SET state='pending',code='',next_attempt=0,updated_at=? WHERE owner=? AND project=? AND state<>'delivered'",
+                          (time.time(),uid,pid))
+            return present(p)
 
     @app.post('/creative/api/projects/{pid}/manual-nodes/{child_id}/reference')
     async def import_manual_reference(pid:str,child_id:str,body:ManualNodeReference,authorization:str|None=Header(None)):
@@ -491,7 +577,8 @@ def install(gateway):
         # RUNNING is owned by this event loop. Do not yield between the stored
         # snapshot and its runtime observation; worker completion must not make
         # an older snapshot look interrupted. Keep UI enrichment off the loop.
-        snapshot = load(pid, owner(authorization))
+        uid=owner(authorization)
+        snapshot = load(pid, uid)
         runtime_active = pid in RUNNING
         return await asyncio.to_thread(present, snapshot, runtime_active=runtime_active)
 
@@ -547,12 +634,39 @@ def install(gateway):
             p['revision']+=1;save(p,uid);event(p,'tool','canvas_asset_uploaded')
             return {'project':present(p),'asset':asset}
 
+    @app.post('/creative/api/projects/{pid}/canvas/assets/{aid}/frame')
+    async def canvas_video_frame(pid: str, aid: str, revision: int, at: float=0, position: str="current",
+                                 authorization: str|None=Header(None)):
+        from harness.tools.creative_video_frame import extract_frame
+        uid=owner(authorization)
+        async with lock(pid):
+            p=load(pid,uid)
+            if p['revision']!=revision or pid in RUNNING or p['state'] in ('running','rendering','planning'):
+                raise HTTPException(409,'项目已变化或正在制作，请稍后重新取帧')
+            try: asset,node=await asyncio.to_thread(extract_frame,p,aid,at,position)
+            except ValueError as exc: raise HTTPException(422,str(exc)) from exc
+            p['revision']+=1;save(p,uid);event(p,'tool','video_frame_extracted')
+            return {'project':present(p),'asset':asset,'node':node}
+
+    @app.post('/creative/api/projects/{pid}/canvas/assets/{aid}/split-audio')
+    async def canvas_split_audio(pid: str, aid: str, revision: int, authorization: str|None=Header(None)):
+        from harness.tools.creative_audio_split import split_audio
+        uid=owner(authorization)
+        async with lock(pid):
+            p=load(pid,uid)
+            if p['revision']!=revision or pid in RUNNING or p['state'] in ('running','rendering','planning'):
+                raise HTTPException(409,'项目已变化或正在制作，请稍后重新分离')
+            try: assets,nodes=await asyncio.to_thread(split_audio,p,aid)
+            except ValueError as exc: raise HTTPException(422,str(exc)) from exc
+            p['revision']+=1;save(p,uid);event(p,'tool','video_audio_separated')
+            return {'project':present(p),'assets':assets,'nodes':nodes}
+
     @app.post('/creative/api/projects/{pid}/canvas/assets/{aid}/preview-session')
     def canvas_preview_session(pid: str, aid: str, authorization: str|None=Header(None)):
         from harness.studio import media_access
         uid=owner(authorization)
         p=load(pid,uid);asset=p.get('canvas_assets',{}).get(aid)
-        if not asset or asset.get('kind')!='video': raise HTTPException(404,'找不到视频文件')
+        if not asset or asset.get('kind') not in ('video','audio'): raise HTTPException(404,'找不到媒体文件')
         source=f'/creative/api/projects/{pid}/canvas/assets/{aid}/source'
         response=JSONResponse({'source':source},headers={'Cache-Control':'private, no-store'})
         response.set_cookie(media_access.COOKIE,media_access.issue(uid,pid,aid),max_age=media_access.TTL,
@@ -567,10 +681,11 @@ def install(gateway):
         p=load(pid,uid);asset=p.get('canvas_assets',{}).get(aid)
         if not asset: raise HTTPException(404,'找不到参考文件')
         if view == 'metadata':
-            try: return JSONResponse(asset_metadata(p, aid), headers={'Cache-Control': 'private, no-store'})
+            try: return JSONResponse({**asset_metadata(p, aid), 'can_extract_frame': asset['kind']=='video', 'frame_positions': ['current','first','last'] if asset['kind']=='video' else []}, headers={'Cache-Control': 'private, no-store'})
             except ValueError as exc: raise HTTPException(422, str(exc)) from exc
+        if view=='preview' and asset['kind']=='audio': raise HTTPException(404,'音轨无图片预览')
         path=asset_directory(p,aid)/('frame-0.jpg' if view=='preview' else asset['filename'])
-        return FileResponse(path,media_type=('image/png' if path.suffix=='.png' else 'image/jpeg') if view=='preview' or asset['kind']=='image' else 'video/mp4',headers={'Cache-Control':'private, no-store'})
+        return FileResponse(path,media_type=('image/png' if path.suffix=='.png' else 'image/jpeg') if view=='preview' or asset['kind']=='image' else ('audio/mp4' if asset['kind']=='audio' else 'video/mp4'),headers={'Cache-Control':'private, no-store'})
 
     @app.get('/creative/api/projects/{pid}/reference')
     def reference_image(pid: str,authorization: str|None=Header(None)):
@@ -647,16 +762,18 @@ def install(gateway):
         uid=owner(authorization)
         async with lock(pid):
             p=load(pid,uid)
+            if any(c.get('state') in ('submitting','generating') for c in p.get('campaign',{}).get('chapters',[])):
+                raise HTTPException(409,'仍有章节任务尚未核对，请先恢复查询，不能重新规划产生重复付费任务')
             if p.get('creation_mode') in ('image','video'):raise HTTPException(409,'这是手动创作项目，请在画布节点直接生成；Agent 创作请新建独立项目')
             if body.request_id and p.get('planning_request_id')==body.request_id: return present(p)
             if p['revision']!=body.revision: raise HTTPException(409,'方案已更新，请刷新后操作')
             if p['state'] in ('running','rendering') or pid in RUNNING: raise HTTPException(409,'制作中，请等待或停止后再修改')
-            if p.get('generation_mode')!='single_native':
+            if p.get('generation_mode') not in ('single_native','chaptered_native'):
                 raise HTTPException(409,'这是旧版分段项目；请在模型选择器选择 Kling 3.0 或 O3，转为 15 秒有声整片后重新规划。')
             if body.auto_approve_credits is not None:
                 if p.get('approval_mode')!='auto' or body.mode!='plan' or not body.background:
                     raise HTTPException(422,'自动审批只能用于已开启自动模式的一次后台规划')
-                required=model_spec(p['provider'],p.get('model'))['credits_per_5s']*3
+                required=model_spec(p['provider'],p.get('model'))['credits_per_5s']*(p['duration']//5)
                 if body.auto_approve_credits<required:raise HTTPException(400,'授权预算不足以制作当前所选模型的整片')
             if p.get('manual_parent'):
                 parent=load(p['manual_parent'],uid)
@@ -708,6 +825,8 @@ def install(gateway):
             p=load(pid,uid)
             if pid in RUNNING or p['state'] not in ('ready','completed') or p['revision']!=body.revision: raise HTTPException(409,'当前方案不可编辑，请先修改需求生成新一版')
             if len(body.shots)!=p['duration']//5 or sorted(s.get('id','') for s in body.shots)!=sorted(s['id'] for s in p['shots']): raise HTTPException(400,'镜头列表不合法')
+            if p.get('campaign'):
+                raise HTTPException(409,'多章节制作方案已锁定，请在智能剪辑编辑成片，或重新规划新版本')
             old={s['id']:s for s in p['shots']}
             if p.get('generation_mode')=='single_native' and p.get('film',{}).get('job_id') and [s['id'] for s in body.shots]!=[s['id'] for s in p['shots']]:
                 raise HTTPException(409,'整片已生成，不能重排源画面；请通过导演创建新版本。')
@@ -766,8 +885,17 @@ def install(gateway):
             if p['revision']!=body.revision: raise HTTPException(409,'方案已更新，请重新确认')
             if p['state'] not in ('ready','paused','running','rendering'): raise HTTPException(409,'请先完成创作方案')
             if any(s['state']=='failed' for s in p['shots']): raise HTTPException(409,'失败镜头需明确创建新一版')
-            if p.get('generation_mode')!='single_native':raise HTTPException(409,'旧版分段制作已停用；请切换模型并重新规划为15秒有声整片。')
+            if p.get('generation_mode') not in ('single_native','chaptered_native'):raise HTTPException(409,'旧版分段制作已停用；请切换模型并重新规划为15秒有声整片。')
             from harness.tools.creative_video import film_prompt
+            if p.get('generation_mode')=='chaptered_native':
+                from harness.tools.creative_campaign import validate_plan
+                if p.get('manual_parent') and not p.get('campaign'):
+                    parent=load(p['manual_parent'],uid)
+                    extra=p['duration']//15*2+len([a for a in p.get('canvas_assets',{}) if a not in parent.get('canvas_assets',{})])
+                    if len(parent.get('canvas',{}).get('nodes',[]))+extra>16 or len(parent.get('canvas_assets',{}))+extra>32:
+                        raise HTTPException(422,'请先整理主画布，为章节、衔接帧和成片保留空间')
+                try: validate_plan(p)
+                except (ValueError,RuntimeError) as exc: raise HTTPException(422,str(exc))
             try: film_prompt(p)
             except RuntimeError as exc:raise HTTPException(422,str(exc))
             if not p.get('film',{}).get('job_id') and p.get('video_inputs'):
@@ -783,6 +911,10 @@ def install(gateway):
             account=dict(gateway.require_session(authorization))
             if account.get('quota',-1)>=0 and account['quota']-account.get('used',0)<required:
                 raise HTTPException(402,'当前积分不足以完成本版全部新镜头，请先补充积分或调整方案；尚未提交生成。')
+            if p.get('generation_mode')=='chaptered_native':
+                from harness.tools.creative_campaign import freeze
+                try: freeze(p,body.approved_credits)
+                except (ValueError,RuntimeError) as exc:raise HTTPException(409,str(exc))
             if not p.get('run_id'): p['run_id']=secrets.token_hex(12)
             p['state']='running';p['stop_requested']=False;p['error']='';save(p,uid);event(p,'runner','execution_approved')
             RUNNING[pid]=asyncio.create_task(production(app,p,uid,authorization))
@@ -802,6 +934,9 @@ def install(gateway):
         if version: path=DATA/version['artifact']
         elif asset=='final' and p.get('artifact'): path=DATA/p['artifact']
         elif asset=='film' and p.get('film',{}).get('state')=='completed': path=DATA/'artifacts'/p['run_id']/'film.mp4'
+        elif p.get('generation_mode')=='chaptered_native' and any(s['id']==asset and s['state']=='completed' for s in p['shots']):
+            shot=next(s for s in p['shots'] if s['id']==asset)
+            path=DATA/'artifacts'/p['run_id']/('chapter_'+str(shot['start']//15+1)+'.mp4')
         elif any(s['id']==asset and s['state']=='completed' for s in p['shots']): path=DATA/'artifacts'/p['run_id']/('film.mp4' if p.get('generation_mode')=='single_native' else asset+'.mp4')
         else: raise HTTPException(404,'视频尚未就绪')
         if not path.is_file(): raise HTTPException(404,'视频文件暂不可用')

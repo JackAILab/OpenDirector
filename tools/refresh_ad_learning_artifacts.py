@@ -5,7 +5,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 ROOT=Path('/var/lib/visualstation-local/creative/learning')
-DB=Path('/assets/library')
+DB=Path('/assets/library/learning/analyses.sqlite3')
 
 def main():
     ap=argparse.ArgumentParser();ap.add_argument('--output-dir',type=Path,default=ROOT);ap.add_argument('--limit',type=int,default=24);args=ap.parse_args()

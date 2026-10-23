@@ -374,3 +374,6 @@ body:not(.canvas-expanded) .previewarea{min-height:180px}
 #imageDialog textarea{width:100%;box-sizing:border-box}
 
 .inline-editor-actions{display:flex;align-items:center;gap:8px;flex-shrink:0}.canvas-inline-edit-button.has-session:before{content:'';display:inline-block;width:6px;height:6px;margin-right:7px;border-radius:50%;background:#59d9ef}
+
+/* Reference actions remain available in the expanded Director conversation. */
+.director-reference-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:8px 0}.director-reference-actions[hidden]{display:none}.director-reference-actions select{max-width:220px}#directorReferenceUpload{max-width:560px;width:calc(100vw - 40px)}#directorReferenceUpload label,#directorReferenceUpload input{display:block;margin:12px 0;width:100%}

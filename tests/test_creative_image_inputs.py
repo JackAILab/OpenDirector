@@ -386,3 +386,186 @@ def test_omitted_controls_preserve_legacy_input_hash(image_client):
     old=c.post(url+'/images/preview',json=body).json()
     explicit=c.post(url+'/images/preview',json={**body,'control_parameters':None}).json()
     assert old==explicit and 'control_parameters' not in old
+
+
+def test_director_upload_binds_real_video_inputs_and_preserves_questions(image_client):
+    c,seen,db=image_client
+    p=c.post('/creative/api/projects',json={'message':'应用广告参考上传','model':'kling-video-v4_0'}).json()
+    url='/creative/api/projects/'+p['id']
+    raw=io.BytesIO();Image.new('RGB',(300,400),'red').save(raw,'PNG')
+    r=c.post(url+'/canvas/assets',params={'revision':p['revision'],'kind':'image'},content=raw.getvalue()).json()
+    p=r['project'];aid=r['asset']['id']
+    saved=store.load(p['id'],1);saved['questions']=[dict(id='brand',question='请上传应用截图',why='核对外观',options=['上传'])];store.save(saved,1)
+    body={'revision':p['revision'],'references':[dict(asset=aid,role='product',instruction='用户提供的应用界面') ]}
+    assert c.post(url+'/director-references',json=body,headers={'Authorization':'Bearer two'}).status_code==404
+    result=c.post(url+'/director-references',json=body);assert result.status_code==200,result.text
+    after=result.json();assert after['questions']==saved['questions']
+    assert after['video_inputs']['references'][0]['asset']==aid
+    assert after['input_manifest']['mode']=='references'
+    assert len(after['input_manifest']['images'])==1 and len(after['canvas']['edges'])==1
+    assert after['duration']==15 and not seen
+    assert c.post(url+'/director-references',json=body).status_code==409
+    bad={**body,'revision':after['revision'],'references':[dict(asset='0'*32,role='style',instruction='')]}
+    assert c.post(url+'/director-references',json=bad).status_code==422
+    assert c.get(url).json()['canvas']==after['canvas']
+
+
+def test_agent_reference_generation_uses_bound_product_pixels_and_retains_video_anchor(image_client):
+    c,seen,db=image_client
+    p=c.post('/creative/api/projects',json={'message':'黑瓶概念广告','model':'kling-video-v4_0'}).json();url='/creative/api/projects/'+p['id']
+    raw=io.BytesIO();Image.new('RGB',(300,400),'black').save(raw,'PNG')
+    uploaded=c.post(url+'/canvas/assets',params={'revision':p['revision'],'kind':'image'},content=raw.getvalue()).json()
+    source=uploaded['asset']['id'];refs=[dict(asset=source,role='product',instruction='保持黑色瓶体与几何形状')]
+    bound=c.post(url+'/director-references',json=dict(revision=uploaded['project']['revision'],references=refs))
+    assert bound.status_code==200,bound.text
+    p=bound.json()
+    body=dict(revision=p['revision'],model='hunyuan-image-v2.0-general-edit',prompt='黑瓶置于金色物理场景，无文字',
+              director_reference=True,references=refs)
+    # A text-only fallback or silently omitted product must fail before charging.
+    assert c.post(url+'/images/preview',json={**body,'references':[]}).status_code==409
+    assert c.post(url+'/images/preview',json={**body,'model':'hunyuan-image-v3.0'}).status_code==422
+    assert c.post(url+'/images/preview',json={**body,'references':[dict(refs[0],role='style')]}).status_code==409
+    assert not seen
+    review=c.post(url+'/images/preview',json=body);assert review.status_code==200,review.text
+    assert review.json()['references'][0]['asset']==source
+    assert c.post(url+'/images',json=dict(body,input_hash=review.json()['input_hash'],request_id='b'*32,approved_credits=1)).status_code==200
+    for _ in range(200):
+        after=c.get(url).json()
+        if after['state']=='ready':break
+        time.sleep(.02)
+    assert after['state']=='ready',after.get('error')
+    assert len(seen)==1 and seen[0]['bytes']==[raw.getvalue()]
+    result=after['image_task']['asset']
+    assert after['canvas_lineage'][result]['sources']==[source]
+    assert [(r['asset'],r['role']) for r in after['video_inputs']['references']]==[(source,'product'),(result,'style')]
+    with db() as conn:assert conn.execute('SELECT used FROM users').fetchone()[0]==1
+
+
+def test_director_reference_generates_once_then_binds_and_resumes_on_server(image_client,monkeypatch):
+    c,seen,db=image_client;contexts=[]
+    original=api.direct
+    async def director(p,mode):
+        contexts.append((p['video_inputs'],list(p['messages'])))
+        return await original(p,mode)
+    monkeypatch.setattr(api,'direct',director)
+    p=c.post('/creative/api/projects',json={'message':'应用广告需要概念图','model':'kling-video-v4_0'}).json();url='/creative/api/projects/'+p['id']
+    model=next(m['id'] for m in image_api.image_models() if m['mode'] in ('text','both'))
+    body=dict(revision=p['revision'],model=model,prompt='暖色概念场景，无文字',connect_to_director=True,director_reference=True,director_context='直接帮我生成一个；双方选择后显示匹配成功')
+    review=c.post(url+'/images/preview',json=body);assert review.status_code==200,review.text
+    paid={**body,'input_hash':review.json()['input_hash'],'request_id':'c'*32,'approved_credits':1}
+    result=c.post(url+'/images',json=paid);assert result.status_code==200,result.text
+    for _ in range(150):
+        after=c.get(url).json()
+        if after['state']=='ready':break
+        time.sleep(.02)
+    assert after['state']=='ready',after.get('error')
+    assert after['image_task']['state']=='completed' and len(seen)==len(contexts)==1
+    aid=after['image_task']['asset'];assert contexts[0][0]['references'][0]['asset']==aid
+    assert contexts[0][0]['references'][0]['role']=='style'
+    assert any(m['content']==body['director_context'] for m in contexts[0][1])
+    assert len(after['input_manifest']['images'])==1
+    assert not after.get('film') and not after.get('auto_approval')
+    assert c.post(url+'/images',json=paid).status_code==200 and len(seen)==1
+    assert c.post(url+'/images',json={**paid,'director_context':'更换回答'}).status_code==409
+    with db() as conn:assert conn.execute('SELECT used FROM users').fetchone()[0]==1
+
+
+def test_director_binding_failure_keeps_generated_asset_without_retry(image_client,monkeypatch):
+    from harness.tools import director_references
+    c,seen,db=image_client
+    p=c.post('/creative/api/projects',json={'message':'创建概念图','model':'kling-video-v4_0'}).json();url='/creative/api/projects/'+p['id']
+    def fail(*args):raise ValueError('cannot bind')
+    monkeypatch.setattr(director_references,'attach',fail)
+    model=next(m['id'] for m in image_api.image_models() if m['mode'] in ('text','both'))
+    body=dict(revision=p['revision'],model=model,prompt='丰富的概念场景',director_reference=True,request_id='d'*32,approved_credits=1)
+    assert c.post(url+'/images',json=body).status_code==200
+    for _ in range(100):
+        after=c.get(url).json()
+        if after.get('error'):break
+        time.sleep(.02)
+    assert after['image_task']['state']=='completed' and len(seen)==1
+    assert after['image_task']['asset'] in after['canvas_assets']
+    assert '不会再次生图' in after['error']
+
+
+def test_concept_reference_policy_requires_completed_bound_image():
+    from harness.agents.creative_policy import director_system
+    p={'image_task':{'director_reference':True,'state':'completed','asset':'a'},'video_inputs':{'references':[{'asset':'a'}]}}
+    assert '不要再次以缺少 Logo' in director_system(p,'广告合同')
+    p['video_inputs']['references']=[]
+    assert director_system(p,'广告合同')=='广告合同'
+    p['video_inputs']['references']=[{'asset':'a'}];p['image_task']['state']='needs_review'
+    assert director_system(p,'广告合同')=='广告合同'
+
+
+@pytest.mark.parametrize('duration',[15,60])
+def test_reference_to_film_runs_on_server_once_with_bound_budget(image_client,monkeypatch,duration):
+    c,seen,db=image_client;produced=[];modes=[]
+    with db() as conn:conn.execute('UPDATE users SET quota=100')
+    original=api.direct
+    async def direct(p,mode):
+        modes.append(mode);result=await original(p,mode)
+        result['shots']=[dict(result['shots'][0],id='s'+str(i),start=i*5) for i in range(duration//5)]
+        return result
+    async def production(app,p,uid,auth):
+        produced.append(dict(model=p['model'],duration=p['duration'],references=p['video_inputs']['references'],approval=p['auto_approval']))
+        p['state']='completed';store.save(p,uid);store.RUNNING.pop(p['id'],None)
+    monkeypatch.setattr(api,'direct',direct);monkeypatch.setattr(api,'production',production)
+    p=c.post('/creative/api/projects',json=dict(message='请自动制作概念广告',model='kling-video-v4_0',duration=duration,approval_mode='auto')).json()
+    url='/creative/api/projects/'+p['id'];credits=4*(duration//5)
+    model=next(m['id'] for m in image_api.image_models() if m['mode'] in ('text','both'))
+    body=dict(revision=p['revision'],model=model,prompt='丰富的物理场景，不含文字',director_reference=True,director_video_credits=credits)
+    preview=c.post(url+'/images/preview',json=body);assert preview.status_code==200,preview.text
+    assert preview.json()['total_credits']==1+credits
+    paid=dict(body,input_hash=preview.json()['input_hash'],request_id='e'*32,approved_credits=1)
+    result=c.post(url+'/images',json=paid);assert result.status_code==200,result.text
+    for _ in range(250):
+        if produced:break
+        time.sleep(.02)
+    latest=c.get(url).json()
+    assert len(produced)==1,latest.get('error')
+    assert len(seen)==1 and modes==['plan']
+    assert produced[0]['references'][0]['asset']==latest['image_task']['asset']
+    assert produced[0]['approval']['credits']==credits and produced[0]['approval']['state']=='consumed'
+    assert produced[0]['model']==p['model'] and produced[0]['duration']==duration
+    assert c.post(url+'/images',json=paid).status_code==200
+    assert c.post(url+'/images',json={**paid,'director_video_credits':credits+1}).status_code==409
+    assert len(seen)==len(produced)==1
+
+
+@pytest.mark.parametrize('stop,broken',[(True,False),(False,True)])
+def test_reference_continuation_stop_and_planning_failure_never_submit_video(image_client,monkeypatch,stop,broken):
+    c,seen,db=image_client;produced=[]
+    with db() as conn:conn.execute('UPDATE users SET quota=100')
+    original=api.direct
+    async def direct(p,mode):
+        if broken:raise ValueError('invalid director response')
+        if stop:
+            current=store.load(p['id'],1);current['stop_requested']=True;store.save(current,1)
+        return await original(p,mode)
+    async def production(*args):produced.append(True)
+    monkeypatch.setattr(api,'direct',direct);monkeypatch.setattr(api,'production',production)
+    p=c.post('/creative/api/projects',json=dict(message='自动制作广告',model='kling-video-v4_0',approval_mode='auto')).json();url='/creative/api/projects/'+p['id']
+    model=next(m['id'] for m in image_api.image_models() if m['mode'] in ('text','both'))
+    body=dict(revision=p['revision'],model=model,prompt='物理场景，不含文字',director_reference=True,director_video_credits=12,request_id='f'*32,approved_credits=1)
+    assert c.post(url+'/images',json=body).status_code==200
+    for _ in range(250):
+        latest=c.get(url).json()
+        if latest.get('auto_approval',{}).get('state') in ('stopped','needs_review'):break
+        time.sleep(.02)
+    assert latest['auto_approval']['state']==('stopped' if stop else 'needs_review')
+    assert latest['image_task']['state']=='completed' and latest['image_task']['asset'] in latest['canvas_assets']
+    assert len(seen)==1 and not produced
+
+
+def test_reference_continuation_rejects_missing_authority_budget_and_balance_before_image(image_client):
+    c,seen,db=image_client
+    p=c.post('/creative/api/projects',json=dict(message='生成广告',model='kling-video-v4_0')).json();url='/creative/api/projects/'+p['id']
+    model=next(m['id'] for m in image_api.image_models() if m['mode'] in ('text','both'))
+    body=dict(revision=p['revision'],model=model,prompt='概念场景',director_reference=True,director_video_credits=12,request_id='a'*32,approved_credits=1)
+    assert c.post(url+'/images',json=body).status_code==422
+    current=store.load(p['id'],1);current['approval_mode']='auto';store.save(current,1)
+    assert c.post(url+'/images',json={**body,'director_video_credits':11}).status_code==409
+    assert c.post(url+'/images',json=body).status_code==402
+    assert not seen and 'image_task' not in store.load(p['id'],1)
+    with db() as conn:assert conn.execute('SELECT used FROM users').fetchone()[0]==0

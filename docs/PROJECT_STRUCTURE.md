@@ -13,7 +13,8 @@
 | `harness/library/`、`harness/learning/` | 广告参考索引、审核和学习资产流程 | 可选素材库 |
 | `tools/agent_studio/` | 首页、登录、统一画布/故事板、编辑器、管理页 | 默认网页 |
 | `tools/agent_studio/scene/` | Three.js 场景编辑器源码与固定 npm lock | Docker 构建时生成 bundle |
-| `tools/asset_studio/` | 独立资产审阅站源码 | 可选独立工程，不由默认 Compose 启动 |
+| `tools/asset_studio/` | 另一套 React/vinext 资产审阅前端与公共字体 | 可选独立工程，不由默认 Compose 启动 |
+| `tools/agent_studio/library.html` | 当前广告参考库页面 | 独立入口 `/creative/library`，不是创作首页栏目 |
 | `productions/`、`presentations/` | 案例工程与演示工程的可编辑源码 | 媒体由 ModelScope 恢复 |
 | `configs/`、`data/` | 工具/模型/任务契约、小型配置与提示词 | 不含线上密钥 |
 | `tests/` | Python 和浏览器回归 | 部分测试需要专用服务 |
@@ -25,10 +26,13 @@
 ## 素材与本机状态
 
 - **showcase**：生产/演示工程引用的图像、视频、音频、字体，恢复原相对路径。只包含当前实际存在的文件，不补造历史遗失素材。
-- **library**：广告参考素材与一致性 SQLite 索引快照。保留来源与原作者信息；私有存放，不把第三方作品改成开源许可证。
+- **library**：广告参考素材与一致性 SQLite 索引快照。本次快照含 10,692 条参考记录、7,838 条本地媒体引用，对应 6,353 个唯一文件（约 186.56 GB）；其余记录仅有来源/元数据，不能视为已下载视频。保留来源与原作者信息；私有存放，不把第三方作品改成开源许可证。
+- **learning**：分析数据库一致性快照、证据帧、候选策略与参考 Skill 发布数据；恢复到 `assets/library/learning` 和 `assets/library/skills`，保留原审核状态，不自动授予训练资格。排除分析尝试日志。
 - **不发布**：线上账户和积分数据库、用户私有创作项目、密码和 API keys、认证 cookie、模型 CLI 登录状态、供应商临时日志、缓存下载片段与依赖安装目录。
 - **自行安装**：Python/npm 依赖、FFmpeg、Chromium；镜像负责安装。
 - **自行配置**：真实 Director、Kling、可选 ASR/H3 服务及其访问权限。私有模型权重不在本资产集。
+
+素材库下载完成后，本机独立入口为 `http://localhost:30080/creative/library`。该入口与工作室使用同一后端，但没有放入首页创作导航；若需要独立域名，可用反向代理映射该路径及 `/creative/api/library`。公开部署时需另外配置访问控制。
 
 ## 本地是否“一模一样”
 

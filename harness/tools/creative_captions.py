@@ -2,14 +2,14 @@
 import math
 
 DEFAULT_APPEARANCE = {'preset':'box','size':'medium','motion':'none'}
-OPTIONS = {'preset':{'plain','box','accent'},'size':{'small','medium','large'},'motion':{'none','fade','rise'}}
+OPTIONS = {'preset':{'plain','box','accent'},'size':{'small','medium','large'},'motion':{'none','fade','rise'},'align':{'left','center','right'}}
 
 
 def appearance(value=None):
     if value is None:return dict(DEFAULT_APPEARANCE)
     if not isinstance(value,dict) or set(value)-set(OPTIONS):raise ValueError('字幕样式字段无效')
     result=dict(DEFAULT_APPEARANCE,**value)
-    if any(not isinstance(result[k],str) or result[k] not in values for k,values in OPTIONS.items()):
+    if any(k in result and (not isinstance(result[k],str) or result[k] not in values) for k,values in OPTIONS.items()):
         raise ValueError('请选择支持的字幕样式、字号和入场方式')
     return result
 

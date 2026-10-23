@@ -67,7 +67,7 @@ def test_video_reference_is_decoded_to_real_frames(client,tmp_path,monkeypatch):
     response=client.post(url+'/canvas/assets',params={'kind':'video','revision':p['revision']},content=clip.read_bytes())
     assert response.status_code==200,response.text
     asset=response.json()['asset'];assert asset['frames']==3 and asset['duration']==1
-    assert client.get(url+'/canvas/assets/'+asset['id']+'/metadata').json()=={'kind':'video','width':320,'height':180,'duration':1.0}
+    assert client.get(url+'/canvas/assets/'+asset['id']+'/metadata').json()=={'kind':'video','width':320,'height':180,'duration':1.0,'has_audio':False,'can_extract_frame':True,'frame_positions':['current','first','last']}
     preview=client.get(url+'/canvas/assets/'+asset['id']+'/preview')
     assert preview.status_code==200 and Image.open(io.BytesIO(preview.content)).width>0
     assert client.post(url+'/canvas/assets',params={'kind':'video','revision':response.json()['project']['revision']},content=b'not a video').status_code==422
@@ -209,7 +209,7 @@ def test_source_metadata_uses_preserved_pixels_and_is_owned_read_only(client):
     aid=uploaded['asset']['id'];endpoint=url+'/canvas/assets/'+aid
     before=store.load(p['id'],1)
     assert Image.open(io.BytesIO(client.get(endpoint+'/preview').content)).size==(640,960)
-    assert client.get(endpoint+'/metadata').json()=={'kind':'image','width':1200,'height':1800}
+    assert client.get(endpoint+'/metadata').json()=={'kind':'image','width':1200,'height':1800,'can_extract_frame':False,'frame_positions':[]}
     assert client.get(endpoint+'/metadata',headers={'Authorization':'Bearer two'}).status_code==404
     assert client.get(url+'/canvas/assets/'+'a'*32+'/metadata').status_code==404
     assert store.load(p['id'],1)==before

@@ -13,4 +13,16 @@ JSON 格式：{"reply":"简短总结","brief":{"product":"主体或故事名称"
 def director_system(project, advertising_system):
     # Use the frozen recipe identity, not a caller-supplied prompt or display title.
     skill = project.get('skill') or {}
-    return GENERAL_SYSTEM if skill.get('id') in GENERAL_SKILLS else advertising_system
+    system = GENERAL_SYSTEM if skill.get('id') in GENERAL_SKILLS else advertising_system
+    reference_task = project.get('image_task', {})
+    if (reference_task.get('director_reference') and reference_task.get('state') == 'completed'
+            and any(r.get('asset') == reference_task.get('asset')
+                    for r in project.get('video_inputs', {}).get('references', []))):
+        system += '''
+用户已明确选择由 Agent 创建概念参考，图片已生成并绑定在 video_input_selection 中。沿用用户已回答的信息继续创作，不要再次以缺少 Logo、品牌色或真实应用截图为由要求上传。概念图只能证明视觉方向，不代表真实应用功能、界面或品牌标识；没有真实界面的部分用人物行为、物理场景与概念表达，已确认的可读文字由后期代码完成。保留现有 brief.product 名称，除非用户明确更换产品。其他真正未回答且影响方案的问题仍可询问；信息足够时直接给出方案。'''
+    if project.get('generation_mode') == 'chaptered_native':
+        system = system.replace('能力：生成一部至少15秒的有声广告，当前完整生成支持15秒。时间轴分成三个5秒叙事节拍，但所有节拍的带时间提示词会在同一次模型请求中生成整部音视频，不独立生成镜头、不拼接镜头。', '')
+        system = system.replace('完整短片使用一次所选视频模型请求。', '')
+        system += f'''
+当前任务采用多章节自动制作合同：总时长 {project['duration']} 秒，每 15 秒为一章，每章三个 5 秒节拍。shots 仍严格等于 shot_count。一次规划完整故事，不要在每章重复开场或提前收尾；章节交界描述匹配的商品形态、位置、光色和运动方向。后台顺序生成各章，自动将上一章尾帧与商品参考共同绑定到下一章，再保留原音轨剪辑并添加 caption，完成后素材、衔接帧与成片自动上画布。尾帧是软参考，不保证精确连续性；不要声称已执行或已审阅。用户批准总预算后才执行，失败停止、不自动重试。'''
+    return system

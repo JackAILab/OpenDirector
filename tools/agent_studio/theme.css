@@ -48,7 +48,7 @@
 .image-transforms select{display:block;width:100%;margin:5px 0 10px;padding:7px;border:1px solid var(--line);border-radius:7px;background:var(--paper);color:var(--ink)}
 
 /* Studio shell v2: neutral surfaces, one canvas, contextual tools. */
-:root[data-theme=dark]{--ink:#ededed;--muted:#939393;--line:#353535;--paper:#121212;--green:#12c8e8;--studio-bg:#121212;--studio-panel:#202020;--studio-raised:#292929;--studio-border:#363636;--studio-accent:#12c8e8;--studio-text:#ededed;--studio-muted:#969696;--studio-shadow:0 12px 36px #0005}
+:root[data-theme=dark]{--ink:#ededed;--muted:#939393;--line:#353535;--paper:#121212;--green:#13d5ff;--studio-bg:#121212;--studio-side:#161616;--studio-panel:#212121;--studio-raised:#282828;--studio-border:#ffffff14;--studio-accent:#13d5ff;--studio-text:#f7f7f7;--studio-muted:#a8a8a8;--studio-shadow:0 12px 36px #0008}
 :root[data-theme=light]{--studio-bg:#f3f5ef;--studio-panel:#fafbf7;--studio-raised:#edf1e7;--studio-border:#d4dccd;--studio-accent:#3e6848;--studio-text:#25392e;--studio-muted:#71806c;--studio-shadow:0 10px 30px #25392e15}
 :is(.studio-home,.studio-workspace){background:var(--studio-bg);color:var(--studio-text);font-size:13px}
 :is(.studio-home,.studio-workspace) :is(button,a,summary,input,select,textarea):focus-visible{outline:2px solid var(--studio-accent);outline-offset:3px}
@@ -171,6 +171,9 @@
 .studio-workspace.canvas-expanded .canvas-card-head strong{font-size:12px;font-weight:400;color:var(--studio-muted)}
 .studio-workspace .reference-node.asset-selected{outline-color:var(--studio-accent)}
 .studio-workspace.canvas-expanded :is(.canvas-entry h3,.product-reference-state,.reference-needs,.canvas-card p,.prompt-state,.canvas-entry p){color:var(--studio-muted)}
+.studio-workspace.canvas-expanded .canvas-world.canvas-dense .media-reference :is(img,video){max-height:240px}
+.studio-workspace.canvas-expanded .canvas-world.canvas-dense .canvas-card-head{padding-top:7px;padding-bottom:7px}
+.studio-workspace.canvas-expanded .canvas-world.canvas-dense .canvas-card-body{padding-bottom:8px}
 .studio-workspace.canvas-expanded .canvas-output .previewarea{background:transparent;padding:10px 12px 12px!important}
 .studio-workspace.canvas-expanded .canvas-output .preview{background:#090909;border:0;border-radius:8px}
 .studio-workspace .canvas-output .placeholder{color:#dedede}
@@ -619,13 +622,18 @@
 .studio-workspace .conversation-execution-row time{font-size:10px;color:var(--studio-muted);font-variant-numeric:tabular-nums;white-space:nowrap}
 .studio-workspace .conversation-execution-row p{margin:0 0 9px 24px;padding:10px 12px;border:1px solid var(--studio-border);border-radius:10px;line-height:1.7;background:var(--studio-raised);color:var(--studio-muted)}
 .studio-workspace .execution-icon{font-size:17px;width:16px;flex-shrink:0}
-.studio-workspace .conversation-execution-live{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:12px 0;line-height:1.6}
+.studio-workspace .conversation-execution-live{position:sticky;top:0;display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:12px 14px;line-height:1.6;background:color-mix(in srgb,var(--studio-panel) 94%,transparent);border:1px solid transparent;border-radius:12px;z-index:3;backdrop-filter:blur(10px)}
+.studio-workspace .conversation-execution-live.is-running{border-color:color-mix(in srgb,var(--studio-accent) 38%,var(--studio-border))}
 .studio-workspace .conversation-execution-live>span:first-child{flex:1;color:var(--studio-text)}
 .studio-workspace .conversation-execution-live.is-running>span:first-child:before{content:'';display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--studio-accent);margin-right:8px}
 .studio-workspace .conversation-execution-live small{flex-basis:100%;font-size:11px}
-.studio-workspace .conversation-execution-live progress{width:100%;height:3px;accent-color:var(--studio-accent);border:0;border-radius:3px;overflow:hidden;background:var(--studio-border)}
+.studio-workspace .conversation-execution-live progress{width:100%;height:5px;accent-color:var(--studio-accent);border:0;border-radius:3px;overflow:hidden;background:var(--studio-border)}
 .studio-workspace .conversation-execution-live progress::-webkit-progress-bar{background:var(--studio-border)}
 .studio-workspace .conversation-execution-live progress::-webkit-progress-value{background:var(--studio-accent)}
+.studio-workspace .conversation-execution-live progress:indeterminate::-webkit-progress-value{width:34%;background:var(--studio-accent);animation:execution-progress-travel 1.8s ease-in-out infinite alternate}
+.studio-workspace .conversation-execution-live progress:indeterminate::-moz-progress-bar{background:var(--studio-accent);animation:execution-progress-pulse 1.4s ease-in-out infinite alternate}
+@keyframes execution-progress-travel{from{transform:translateX(-110%)}to{transform:translateX(210%)}}
+@keyframes execution-progress-pulse{from{opacity:.35}to{opacity:1}}
 .studio-workspace .conversation-execution [hidden],.studio-workspace .conversation-execution[hidden]{display:none!important}
 
 /* Account actions share the same popover on the portal and creation canvas. */
@@ -685,6 +693,7 @@
 .studio-workspace .studio-entry-compose #initialBrief{height:124px;min-height:80px;padding:0 3px;border:0;background:transparent;box-shadow:none;font-size:13px;resize:vertical;outline-offset:3px}
 .studio-entry-config{display:flex;flex-wrap:wrap;gap:3px;margin:8px 0 4px}
 .studio-workspace .studio-entry-setting{display:inline-flex;align-items:center;gap:6px;min-height:32px;font-size:13px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:5px 7px;background:transparent;border:0;border-radius:7px;color:var(--studio-muted)}
+.studio-workspace .studio-entry-setting .studio-provider-logo{width:18px;height:18px;flex:none}
 .studio-workspace .studio-entry-setting:hover{background:var(--studio-raised);color:var(--studio-text)}
 .studio-entry-setting::after{content:"";width:5px;height:5px;flex:none;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:rotate(45deg);margin:0 2px 3px;opacity:.7}
 .studio-entry-setting:focus-visible{outline:2px solid #44c9e7;outline-offset:2px}
@@ -817,11 +826,18 @@
 .studio-workspace.studio-agent-session .director .bubble.user{max-width:75%;width:fit-content;margin-left:auto;padding:14px 18px;border-radius:15px}
 .studio-workspace.studio-agent-session .director .compose,.studio-workspace.studio-agent-session .director .studio-entry-compose{width:min(880px,calc(100% - 32px));margin:0 auto 12px!important;border:1px solid #363636;border-radius:18px;background:#222;padding:14px;min-height:170px}
 .studio-workspace.studio-agent-session .studio-entry-compose{margin-top:auto!important}.studio-agent-session .studio-entry-note,.studio-agent-session .studio-entry-exit{display:none}.studio-agent-session .studio-entry-config{margin:0}.studio-agent-session .director #initialBrief{height:100px;resize:none}
-.studio-workspace.studio-agent-session .canvas-toolbar,.studio-workspace.studio-agent-session .canvas-navigation-bar,.studio-agent-session .studio-agent-orb{display:none!important}
+.studio-workspace.studio-agent-session .canvas-navigation-bar,.studio-agent-session .studio-agent-orb{display:none!important}
+/* LibTV keeps canvas affordances available while the Director occupies the
+   center.  Keep the same compact control island above the conversation and
+   clear of the fixed project-material shelf. */
+.studio-workspace.studio-agent-session .canvas-toolbar{display:flex!important;position:fixed;top:58px;right:316px;left:auto;bottom:auto;transform:none;z-index:82;max-width:calc(100vw - 340px);}
 .studio-workspace.studio-agent-session #studioProductionActions{width:min(880px,calc(100% - 32px));margin:0 auto}
 .studio-workspace .canvas-toolbar{border-radius:16px!important;gap:5px!important;padding:7px!important;min-height:48px!important}
 .studio-workspace .canvas-toolbar .studio-dock-symbol{font-size:0!important;padding:7px!important;width:34px!important;height:34px!important;min-height:34px!important;color:#bbb;background:transparent;border:0}
 .studio-dock-symbol svg{width:22px;height:22px}.studio-workspace .canvas-toolbar #studioCanvasShortcuts{order:7}
+.studio-workspace .canvas-toolbar #studioCanvasLibrary{order:8}.studio-workspace .canvas-toolbar #studioCanvasHistory{order:9}.studio-workspace .canvas-toolbar #studioCanvasDirector{order:10}.studio-workspace .canvas-toolbar #studioCanvasCharacters{order:11}
+.studio-workspace .canvas-toolbar #studioCanvasCharacters:disabled{opacity:.34;cursor:not-allowed;filter:saturate(.15)}
+.studio-workspace .canvas-toolbar #studioCanvasCharacters:disabled:hover{background:transparent;color:var(--studio-muted)}
 .studio-workspace .studio-agent-orb{position:fixed;bottom:12px;left:calc(50% + 161px);width:50px;height:50px;padding:9px;border:1px solid #333;border-radius:50%;background:#222;z-index:48;display:grid;place-items:center}
 .studio-agent-orb span{width:30px;height:30px;border-radius:50%;background:radial-gradient(circle at 65% 25%,#9afff5 0,transparent 40%),radial-gradient(circle at 40% 65%,#3389f5 0,#13d8ef 47%,#8bfff1 70%,#1893ab 100%);box-shadow:0 0 4px #41c8df inset}
 .studio-workspace .canvas-legend{display:none!important}
@@ -834,10 +850,11 @@
 .studio-workspace.studio-agent-session.studio-new-entry .director .studio-entry-compose{margin-top:auto!important}
 .studio-director-confirm::backdrop{backdrop-filter:none!important}
 .studio-workspace .studio-free-node #initialBrief:focus,.studio-workspace.studio-agent-session #initialBrief:focus{outline:none!important;box-shadow:none!important}
+.studio-workspace.canvas-expanded:has(.agent-materials) .canvas-toolbar{display:flex!important;position:fixed;top:58px;right:316px;left:auto;bottom:auto;transform:none;z-index:82;max-width:calc(100vw - 340px)}
 .studio-workspace .studio-free-node .studio-entry-config{display:flex;align-items:center}.studio-free-node #entry-initialSkill,.studio-free-node #entry-initialApproval{display:none}
 /* Manual media owns its canvas; the Director is entered through a new Agent project. */
 .studio-workspace[data-creation-mode="image"] #entry-provider{display:none!important}
-.studio-workspace.studio-manual-project .director,.studio-workspace.studio-manual-project .canvas-entry,.studio-workspace.studio-manual-project .canvas-prompt-node,.studio-workspace.studio-manual-project .canvas-legend{display:none!important}
+.studio-workspace.studio-manual-project:not(.studio-agent-session) .director,.studio-workspace.studio-manual-project .canvas-entry,.studio-workspace.studio-manual-project .canvas-prompt-node,.studio-workspace.studio-manual-project .canvas-legend{display:none!important}
 .studio-workspace.studio-manual-project[data-creation-mode="image"] .canvas-output{display:none!important}
 .studio-workspace.studio-manual-project .canvas-viewport{right:0!important;width:100%!important}
 .studio-image-model-toggle{border:0!important;background:transparent!important;color:#ddd;display:flex;align-items:center;gap:8px}
@@ -863,6 +880,13 @@
 @media(max-height:800px){.studio-manual-empty-node:not([hidden])~.studio-manual-image-compose{top:auto;bottom:84px}.studio-manual-project .studio-manual-empty-node{top:32%;width:480px;max-width:90vw}}
 .studio-image-model-menu strong{display:block;font-weight:500;font-size:15px}.studio-image-model-menu small{display:block;font-size:11px;line-height:1.5;margin-top:5px;color:#999}
 .canvas-media-toolbar button:disabled{opacity:.35;cursor:not-allowed}
+.studio-workspace .canvas-media-model-badge{display:inline-flex;align-items:center;gap:6px;min-height:36px;padding:5px 10px;border:1px solid color-mix(in srgb,var(--studio-accent) 38%,var(--studio-border));border-radius:10px;background:color-mix(in srgb,var(--studio-accent) 10%,var(--studio-panel));color:var(--studio-text);white-space:nowrap}
+.studio-workspace .canvas-media-model-badge .studio-provider-logo{font-size:18px;color:var(--studio-accent)}
+.studio-workspace .canvas-media-model-name{font-size:12px;font-weight:600;max-width:150px;overflow:hidden;text-overflow:ellipsis}
+.studio-workspace .canvas-media-model-kind{font-size:10px;color:var(--studio-muted)}
+.studio-workspace .video-input-model-control{display:flex;align-items:center;gap:7px;padding:7px 9px;border:1px solid var(--studio-border);border-radius:10px;background:var(--studio-panel);color:var(--studio-text)}
+.studio-workspace .video-input-model-control .studio-provider-logo{font-size:18px;color:var(--studio-accent)}
+.studio-workspace .video-input-model-control select{border:0;background:transparent;color:inherit;min-width:180px}
 /* A manual send is a model request; its tariff stays beside the action. */
 body[data-creation-mode=image] #entry-duration{display:none!important}
 .studio-manual-price{font-size:11px;color:var(--studio-muted);margin-left:auto;white-space:nowrap}
@@ -888,18 +912,24 @@ body[data-creation-mode=agent] .studio-manual-price{display:none}
 .canvas-film-task{min-height:180px}
 .canvas-film-task[aria-busy=true],.manual-generation-node[aria-busy=true]{border-color:#45d5ef}
 .canvas-film-task .manual-progress-meter{bottom:16px}
-.workspace-generating .canvas-edges>path{stroke-dasharray:8 7!important;animation:edge-flow 1s linear infinite}
+
 @keyframes edge-flow{to{stroke-dashoffset:-30}}
 @media(prefers-reduced-motion:reduce){.workspace-generating .canvas-edges>path{animation:none!important}}
 .studio-workspace .projectbar .workspace-view-switch{flex:0 0 auto;width:auto;order:-2;margin:0;align-self:center}
 .studio-workspace .projectbar #chatToggle[hidden]{display:none!important}
 .workspace-view-switch button[aria-pressed=true]{background:#3b3b3b}
-.workspace-child-generating .canvas-edges>path{stroke-dasharray:8 7;animation:edge-flow 1s linear infinite}
+
 
 .workspace-embedded-director>header{display:none!important}
 .workspace-director-open:not(.workspace-director-story) .studio-manual-empty-node,
 .workspace-director-open:not(.workspace-director-story) .studio-manual-image-compose{left:calc((100vw - min(430px,40vw))/2)!important;max-width:calc(100vw - min(430px,40vw) - 60px)}
 @media(prefers-reduced-motion:reduce){.workspace-child-generating .canvas-edges>path{animation:none!important}}
+
+/* The Director orb is the explicit show/hide control in the expanded canvas.
+   Keep this rule after all responsive Director placements so hiding it cannot
+   be overridden by the canvas layout rules above. */
+.studio-workspace.canvas-expanded.chat-collapsed .director{display:none!important}
+.studio-workspace.canvas-expanded.chat-collapsed .studio-agent-orb{display:grid!important}
 
 /* Manual generation is one world-space node, including its composer and status. */
 .manual-root-node{position:absolute;width:560px;padding:0!important;background:transparent!important;border:0!important;overflow:visible!important}
@@ -915,9 +945,9 @@ body[data-creation-mode=agent] .studio-manual-price{display:none}
 @media(prefers-reduced-motion:reduce){.studio-free-node-preview[aria-busy=true]{animation:none}}
 
 /* Preserve the manual generation preview's footprint after delivery. */
-.studio-workspace.canvas-expanded :is(.manual-primary-result,.generated-primary-result){width:560px}
-.studio-workspace.canvas-expanded :is(.manual-primary-result,.generated-primary-result)>.canvas-card-body>img{height:315px;max-height:none;aspect-ratio:16/9;margin:0}
-.studio-workspace.canvas-expanded :is(.manual-primary-result,.generated-primary-result)>.canvas-card-body>video{height:315px;max-height:none}
+.studio-workspace.canvas-expanded :is(.manual-primary-result,.generated-primary-result,.edited-video-result){width:560px}
+.studio-workspace.canvas-expanded :is(.manual-primary-result,.generated-primary-result,.edited-video-result)>.canvas-card-body>img{height:315px;max-height:none;aspect-ratio:16/9;margin:0}
+.studio-workspace.canvas-expanded :is(.manual-primary-result,.generated-primary-result,.edited-video-result)>.canvas-card-body>video{height:315px;max-height:none}
 
 .director-reference-strip{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 10px;max-height:96px;overflow:auto}.director-reference-strip[hidden]{display:none!important}.studio-workspace .director-reference-chip{display:inline-flex;align-items:center;gap:6px;border:1px solid #414141;background:#292929;color:#ccc;padding:4px 8px;border-radius:8px;font-size:12px;max-width:220px}.director-reference-chip span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.director-reference-chip svg{width:15px;height:15px;flex-shrink:0}
 /* Full-screen storyboard owns the workspace; canvas controls return in workflow. */
@@ -936,7 +966,33 @@ body[data-creation-mode=agent] .studio-manual-price{display:none}
 .studio-workspace .canvas-media-toolbar{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:thin}
 .studio-workspace .canvas-media-toolbar button{flex-shrink:0;white-space:nowrap}
 .studio-workspace .canvas-media-toolbar [data-media-action=close]{position:sticky;right:0;background:var(--studio-panel)}
+.canvas-media-overflow{inset:auto;margin:0;width:300px;max-width:calc(100vw - 24px);max-height:calc(100vh - 24px);overflow:auto;padding:8px;border:1px solid var(--studio-border,#444);border-radius:14px;background:var(--studio-panel,#222);color:var(--studio-text,#eee);box-shadow:0 12px 36px #0006}
+.canvas-media-overflow-group{display:grid;grid-template-columns:1fr 1fr;gap:4px}
+.canvas-media-overflow-group+ .canvas-media-overflow-group{margin-top:8px;padding-top:8px;border-top:1px solid var(--studio-border,#444)}
+.canvas-media-overflow-group>strong{grid-column:1/-1;padding:5px 8px;color:var(--studio-muted,#999);font-size:11px;font-weight:400}
+.studio-workspace .canvas-media-overflow button{justify-content:flex-start;min-width:0;white-space:normal;text-align:left}
+.studio-workspace .canvas-media-toolbar .canvas-media-more{border-left:1px solid var(--studio-border);border-radius:0}
 .image-adjustment-diagram:focus-visible{outline:2px solid #22c8e4;outline-offset:3px}
+
+/* Final canvas polish: keep the PenStudio hierarchy visible at a distance. */
+.studio-workspace.canvas-expanded .canvas-world{isolation:isolate}
+.studio-workspace.canvas-expanded :is(.reference-node,.canvas-output,.manual-generation-node,.manual-root-node){filter:drop-shadow(0 14px 24px #0008)}
+.studio-workspace.canvas-expanded :is(.reference-node,.canvas-output)>.canvas-card-head{min-height:30px;padding:5px 8px;border-radius:10px 10px 0 0;background:#202628cc;border:1px solid #394447;color:#dce8e6}
+.studio-workspace.canvas-expanded :is(.reference-node,.canvas-output)>.canvas-card-head strong{font-size:12px;font-weight:500;letter-spacing:.01em}
+.studio-workspace.canvas-expanded :is(.reference-node,.canvas-output)>.canvas-card-body{border:1px solid #3b474a;border-top:0;border-radius:0 0 14px 14px;background:#202425}
+.studio-workspace.canvas-expanded :is(.reference-node,.canvas-output)>.canvas-card-body>img,
+.studio-workspace.canvas-expanded :is(.reference-node,.canvas-output)>.canvas-card-body>video{border-radius:0 0 13px 13px}
+.studio-workspace .canvas-image-edit-actions{display:flex;gap:8px;padding:10px 12px;border-top:1px solid rgba(255,255,255,.06);background:#202425}
+.studio-workspace .canvas-image-edit-actions button{flex:1;min-height:32px;border:1px solid rgba(255,255,255,.12);border-radius:8px;background:#2a3031;color:#e8eeee;font-size:12px;cursor:pointer}
+.studio-workspace .canvas-image-edit-actions button:hover{border-color:var(--studio-accent);color:#fff}
+.studio-workspace.canvas-expanded .manual-generation-node .manual-node-head{font-size:12px;color:#c0cecc;letter-spacing:.02em}
+.studio-workspace.canvas-expanded .manual-generation-node .manual-node-preview{border-color:#465457;background:#202526;box-shadow:inset 0 0 0 1px #ffffff08}
+.studio-workspace.canvas-expanded .manual-generation-node .manual-node-editor{border-color:#3d494b;background:#202526;box-shadow:0 10px 24px #0006}
+.studio-workspace.canvas-expanded .director{border:1px solid #3b4749;box-shadow:0 18px 50px #0009,0 0 0 1px #ffffff05 inset}
+.studio-workspace.canvas-expanded .director .compose{border:1px solid #3b4749;border-radius:18px;background:#1b2021;padding:12px 14px 10px}
+.studio-workspace.canvas-expanded .canvas-toolbar{border:1px solid #394447;box-shadow:0 10px 28px #0009,0 0 0 1px #ffffff05 inset}
+.studio-workspace.canvas-expanded .canvas-launch-rail{border-color:#ffffff14;box-shadow:0 16px 38px #0009,0 0 0 1px #ffffff05 inset}
+.studio-workspace.canvas-expanded .canvas-live-progress{border-color:#4b7880;box-shadow:0 14px 36px #000a,0 0 20px #54dcf522}.studio-workspace .canvas-live-progress[hidden]{display:none!important}
 
 .manual-node-preview{position:relative}
 .manual-node-preview>.manual-node-status{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);max-width:85%;text-align:center}
@@ -945,10 +1001,11 @@ body[data-creation-mode=agent] .studio-manual-price{display:none}
 .manual-node-editor textarea[readonly]{color:#999}
 
 /* Provider percentages are determinate; unknown progress stays indeterminate. */
-.manual-progress-meter{position:absolute;left:16px;right:16px;bottom:12px;height:3px;border-radius:3px;overflow:hidden;background:#444;pointer-events:none;z-index:4}
+.manual-progress-meter{position:absolute;left:16px;right:16px;bottom:10px;height:7px;border-radius:999px;overflow:hidden;background:#343e43;border:1px solid #69808b;box-shadow:0 0 0 2px #1118;pointer-events:none;z-index:4}
 .manual-progress-meter>span{display:block;height:100%;background:#69d9ec;border-radius:inherit;transition:width .3s ease}
-.manual-progress-meter[data-determinate=false]>span{width:28%;animation:manual-progress-travel 1.8s ease-in-out infinite}
-@keyframes manual-progress-travel{from{transform:translateX(-100%)}to{transform:translateX(460%)}}
+.manual-progress-caption{position:absolute;left:16px;bottom:23px;color:#d8f9ff;font-size:11px;font-weight:600;line-height:1;white-space:nowrap;text-shadow:0 1px 3px #000;opacity:1;z-index:5}
+.manual-progress-meter[data-determinate=false]>span{width:28%;animation:manual-progress-travel 1.8s ease-in-out infinite alternate}
+@keyframes manual-progress-travel{from{transform:translateX(0)}to{transform:translateX(230%)}}
 @media(prefers-reduced-motion:reduce){.manual-progress-meter>span{transition:none;animation:none!important}.manual-progress-meter[data-determinate=false]>span{width:100%;opacity:.5}.manual-generation-node[aria-busy=true] .manual-node-status:before{animation:none}}
 
 .manual-node-options .manual-node-reference{margin:0;background:#343434;color:#ccc;font-size:12px;white-space:nowrap;padding:7px 9px}
@@ -963,7 +1020,7 @@ body[data-creation-mode=agent] .studio-manual-price{display:none}
 .manual-reference-edges{position:absolute;inset:0;overflow:visible;pointer-events:none}
 .manual-reference-edges path{fill:none;stroke:#7899ad;stroke-width:2;opacity:.8}
 .manual-reference-edges circle{fill:#222;stroke:#8caabb;stroke-width:1.5}
-.manual-reference-edges path.is-running{stroke:#66cfe7;stroke-dasharray:8 7;animation:edge-flow 1s linear infinite}
+.manual-reference-edges path.is-running{stroke:#66cfe7}
 .canvas-focus .manual-reference-edges{display:none}
 @media(prefers-reduced-motion:reduce){.manual-reference-edges path.is-running{animation:none}}
 
@@ -1061,3 +1118,201 @@ body[data-creation-mode=agent] .studio-manual-price{display:none}
 
 /* Generated image handles remain fully inside the clipped media preview. */
 .manual-node-preview>.manual-result-reference-port{right:8px;transform:translateY(-50%);width:28px;height:28px;line-height:24px}
+
+/* Progress remains legible when the canvas is zoomed out. Unknown progress is animated, never a fabricated percentage. */
+.manual-progress-meter{height:7px;background:#343e43;border:1px solid #69808b;box-shadow:0 0 0 2px #1118}
+.manual-progress-meter>span{background:#54dcf5;box-shadow:0 0 8px #54dcf5}
+
+.studio-provider-logo{display:inline-flex;width:24px;height:24px;flex:none;align-items:center;justify-content:center;vertical-align:middle}.studio-provider-logo svg{width:100%;height:100%}.studio-provider-logo-monogram{border-radius:7px;background:#303438;color:#f1f4ef;font-size:11px;font-weight:700;letter-spacing:-.02em;box-shadow:inset 0 0 0 1px #ffffff18}.studio-provider-seedance{background:#34344b;color:#c9b8ff}.studio-provider-wan{background:#243d46;color:#8fe5ef}.studio-provider-vidu{background:#3d3026;color:#ffd08c}.studio-provider-qwen{background:#263e35;color:#a6efcb}.studio-provider-gpt,.studio-provider-openai{background:#29443e;color:#b8f5df}.studio-provider-zimage{background:#3b3044;color:#e8c6ff}.studio-provider-happyhorse{background:#443327;color:#ffd6a1}.studio-model-picker-trigger .studio-provider-logo{width:18px;height:18px;margin-right:6px}
+.manual-model-control{display:inline-flex;align-items:center;gap:6px;min-width:0}.manual-model-control .studio-provider-logo{width:20px;height:20px}.manual-model-control select{min-width:0}
+
+.manual-reference-edges path.is-draft{stroke-dasharray:5 5;opacity:.65}
+.model-card-title{display:flex;align-items:center;gap:8px}.model-card-title .studio-provider-logo{width:22px;height:22px;color:#d9d9d9}.model-unavailable{opacity:.55}.model-unavailable .model-health{color:#a88}.image-adjustment-model-control{display:inline-flex;align-items:center;gap:6px}.image-adjustment-model-control .studio-provider-logo{width:20px;height:20px;color:#ddd}.image-adjustment-model-control select{min-width:0}
+
+/* PenStudio-style creation rail: a persistent, non-generating navigation layer. */
+.canvas-launch-rail{display:flex;position:fixed;z-index:46;left:16px;top:116px;width:64px;padding:8px 7px;flex-direction:column;gap:7px;border:1px solid #ffffff14;border-radius:18px;background:#161616e8;backdrop-filter:blur(16px);box-shadow:0 18px 48px #0008;color:#f7f7f7}
+.canvas-launch-home{display:grid;place-items:center;width:48px;height:42px;padding:0;border-radius:11px;color:#eff4ef;font-size:0;text-decoration:none}
+.canvas-launch-home::before{content:attr(data-icon);font-size:20px;line-height:1}
+.canvas-launch-home:hover{background:#282828}
+.canvas-launch-toggle{display:grid!important;place-items:center;width:48px!important;height:34px;min-height:34px;padding:0!important;text-align:center;background:#212121!important;border:1px solid #ffffff14!important;border-radius:10px!important;color:#f7f7f7!important;font-size:0}
+.canvas-launch-toggle::before{content:attr(data-icon);font-size:18px;line-height:1}
+.canvas-launch-toggle:hover{background:#282828!important;border-color:#13d5ff!important;color:#f1ffff!important}
+.canvas-launch-title{height:1px;margin:1px 5px 2px;background:#ffffff14;font-size:0;overflow:hidden}
+.canvas-launch-tool{display:grid!important;place-items:center;width:48px!important;height:42px;min-height:42px;padding:0!important;text-align:center;background:#212121!important;border:1px solid #ffffff14!important;border-radius:12px!important;color:#f7f7f7!important;font-size:0}
+.canvas-launch-tool::before{content:attr(data-icon);font-size:19px;line-height:1}
+.canvas-launch-tool:hover,.canvas-launch-tool[aria-pressed="true"]{background:#282828!important;border-color:#13d5ff!important;color:#f1ffff!important}
+.canvas-launch-action{display:grid!important;place-items:center;width:48px!important;height:48px;min-height:48px;padding:0!important;text-align:center;background:#282828!important;border:1px solid #ffffff14!important;border-radius:12px!important;color:#f7f7f7!important;font-size:0}
+.canvas-launch-action::before{content:attr(data-icon);font-size:20px;line-height:1}
+.canvas-launch-action:hover{background:#303030!important;border-color:#13d5ff!important}
+.canvas-launch-action small{display:none}
+.canvas-launch-action:disabled{background:#202020!important;color:#777!important;border-style:dashed!important;opacity:.62}
+.canvas-launch-action:disabled::before{opacity:.7}
+.canvas-launch-rail.is-expanded{width:202px;align-items:stretch;padding:10px 9px;gap:8px}
+.canvas-launch-rail.is-expanded .canvas-launch-home{display:flex;align-items:center;justify-content:flex-start;width:auto;height:42px;padding:0 12px;gap:10px;font-size:13px;font-weight:600}
+.canvas-launch-rail.is-expanded .canvas-launch-home::before{font-size:19px}
+.canvas-launch-rail.is-expanded .canvas-launch-title{height:auto;margin:3px 7px 1px;padding-top:8px;background:none;color:#a8a8a8;font-size:10px;letter-spacing:.08em;line-height:1;text-transform:uppercase;border-top:1px solid #ffffff14;overflow:visible}
+.canvas-launch-rail.is-expanded .canvas-launch-tool{display:flex!important;align-items:center;justify-content:flex-start;gap:10px;width:100%!important;height:44px;min-height:44px;padding:0 11px!important;text-align:left;font-size:13px;font-weight:600}
+.canvas-launch-rail.is-expanded .canvas-launch-tool::before{flex:none;font-size:18px}
+.canvas-launch-rail.is-expanded .canvas-launch-action{display:flex!important;align-items:center;justify-content:flex-start;gap:10px;width:100%!important;height:44px;min-height:44px;padding:0 11px!important;text-align:left;font-size:13px;font-weight:600}
+.canvas-launch-rail.is-expanded .canvas-launch-action::before{flex:none;font-size:18px}
+.canvas-launch-rail.is-expanded .canvas-launch-action small{display:block;overflow:hidden;color:#a8a8a8;font-size:9px;font-weight:400;line-height:1.1;text-overflow:ellipsis;white-space:nowrap}
+.canvas-launch-rail.is-expanded .canvas-launch-action:disabled{opacity:.48}
+.canvas-live-progress{position:fixed;left:50%;bottom:86px;z-index:48;width:min(420px,calc(100vw - 360px));min-width:260px;padding:10px 14px 11px;border:1px solid #3d555b;border-radius:14px;background:#1d2527ed;backdrop-filter:blur(14px);box-shadow:0 12px 32px #0009;color:#e8faff;transform:translateX(-50%);pointer-events:none}
+.canvas-live-progress[hidden]{display:none}
+.canvas-live-progress-head{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:11px;line-height:1.3}
+.canvas-live-progress-head strong{color:#8eeafd;font-weight:600;letter-spacing:.03em}
+.canvas-live-progress-head span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#edfaff}
+.canvas-live-progress-list{display:grid;gap:3px;margin-top:6px;max-height:108px;overflow:auto}
+.canvas-live-progress-item{display:flex;align-items:center;justify-content:space-between;gap:10px;color:#c8d9dc;font-size:10px;line-height:1.35}
+.canvas-live-progress-item span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.canvas-live-progress-item b{color:#8eeafd;font-weight:600;white-space:nowrap}
+.canvas-live-progress-caption{display:block;margin-top:4px;color:#9fb7bd;font-size:10px;line-height:1.3}
+.canvas-live-progress-track{position:relative;margin-top:8px;height:6px;border:1px solid #6b9aa5;border-radius:99px;background:#26373b;overflow:hidden;box-shadow:0 0 0 2px #1118}
+.canvas-live-progress-track>span{display:block;width:0;height:100%;border-radius:inherit;background:#54dcf5;box-shadow:0 0 10px #54dcf5;transition:width .35s ease}
+.canvas-live-progress-track[data-determinate=false]>span{width:30%;animation:manual-progress-travel 1.8s ease-in-out infinite alternate}
+.studio-workspace.studio-agent-session .canvas-live-progress{left:auto;right:18px;top:60px;bottom:auto;transform:none;z-index:90;width:min(360px,calc(100vw - 36px));min-width:240px}
+/* Keep the global progress layer visible while a canvas task is busy. The node meter
+   remains useful for local context; this layer keeps progress readable when the node
+   is off-screen or the canvas is zoomed out. */
+.studio-workspace.canvas-expanded .canvas-live-progress[hidden]{display:none!important}
+@media(max-width:900px){.canvas-live-progress{left:50%;bottom:82px;width:min(390px,calc(100vw - 170px));min-width:220px}}
+@media(max-width:650px){.canvas-live-progress{left:50%;bottom:90px;width:calc(100vw - 30px);min-width:0}}
+@media(max-width:900px){.canvas-launch-rail{left:10px;top:108px;width:58px;padding:6px}.canvas-launch-home,.canvas-launch-action,.canvas-launch-tool{width:44px!important}.canvas-launch-action,.canvas-launch-tool{height:44px;min-height:44px}}
+@media(max-width:650px){.canvas-expanded .canvas-launch-rail{display:none}}
+
+/* Expand the compact rail into PenStudio's labeled workspace navigation on intent. */
+.canvas-expanded .canvas-launch-rail:hover,
+.canvas-expanded .canvas-launch-rail:focus-within{width:202px;align-items:stretch;padding:10px 9px;gap:8px}
+.canvas-expanded .canvas-launch-rail:hover .canvas-launch-home,
+.canvas-expanded .canvas-launch-rail:focus-within .canvas-launch-home{display:flex;align-items:center;justify-content:flex-start;width:auto;height:42px;padding:0 12px;gap:10px;font-size:13px;font-weight:600}
+.canvas-expanded .canvas-launch-rail:hover .canvas-launch-home::before,
+.canvas-expanded .canvas-launch-rail:focus-within .canvas-launch-home::before{font-size:19px}
+.canvas-expanded .canvas-launch-rail:hover .canvas-launch-title,
+.canvas-expanded .canvas-launch-rail:focus-within .canvas-launch-title{height:auto;margin:3px 7px 1px;padding-top:8px;background:none;color:#a8a8a8;font-size:10px;letter-spacing:.08em;line-height:1;text-transform:uppercase;border-top:1px solid #ffffff14;overflow:visible}
+.canvas-expanded .canvas-launch-rail:hover .canvas-launch-tool,
+.canvas-expanded .canvas-launch-rail:focus-within .canvas-launch-tool{display:flex!important;align-items:center;justify-content:flex-start;gap:10px;width:100%!important;height:44px;min-height:44px;padding:0 11px!important;text-align:left;font-size:13px;font-weight:600}
+.canvas-expanded .canvas-launch-rail:hover .canvas-launch-tool::before,
+.canvas-expanded .canvas-launch-rail:focus-within .canvas-launch-tool::before{flex:none;font-size:18px}
+.canvas-expanded .canvas-launch-rail:hover .canvas-launch-action,
+.canvas-expanded .canvas-launch-rail:focus-within .canvas-launch-action{display:flex!important;align-items:center;justify-content:flex-start;gap:10px;width:100%!important;height:44px;min-height:44px;padding:0 11px!important;text-align:left;font-size:13px;font-weight:600}
+.canvas-expanded .canvas-launch-rail:hover .canvas-launch-action::before,
+.canvas-expanded .canvas-launch-rail:focus-within .canvas-launch-action::before{flex:none;font-size:18px}
+.canvas-expanded .canvas-launch-rail:hover .canvas-launch-action small,
+.canvas-expanded .canvas-launch-rail:focus-within .canvas-launch-action small{display:block;overflow:hidden;color:#a8a8a8;font-size:9px;font-weight:400;line-height:1.1;text-overflow:ellipsis;white-space:nowrap}
+.canvas-expanded .canvas-launch-rail:hover .canvas-launch-action:disabled,
+.canvas-expanded .canvas-launch-rail:focus-within .canvas-launch-action:disabled{opacity:.48}
+@media(max-width:650px){.canvas-expanded .canvas-launch-rail:hover,.canvas-expanded .canvas-launch-rail:focus-within{width:58px}.canvas-expanded .canvas-launch-rail:hover .canvas-launch-action,.canvas-expanded .canvas-launch-rail:focus-within .canvas-launch-action{width:44px!important;padding:0!important;font-size:0}.canvas-expanded .canvas-launch-rail:hover .canvas-launch-action small,.canvas-expanded .canvas-launch-rail:focus-within .canvas-launch-action small{display:none}}
+
+.studio-image-model-option{display:flex!important;align-items:center;gap:10px;text-align:left!important}
+.studio-image-model-option>.studio-provider-logo{width:24px;height:24px;flex:none}
+.studio-image-model-option>span:last-child{display:grid;gap:2px;min-width:0}
+.studio-image-model-option small{color:#99aaa4;font-size:10px;line-height:1.2}
+.studio-image-model-toggle>.studio-provider-logo{width:20px;height:20px;margin-right:6px}
+.manual-image-edit-action{margin:10px 8px 0 0;padding:7px 12px;border:1px solid #454545;border-radius:8px;background:#2b2b2b;color:#ddd;cursor:pointer}.manual-image-edit-action:disabled{opacity:.45;cursor:not-allowed}
+
+/* Prompt tools share the reference row in both root and child composers. */
+.manual-reference-bar{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.composer-preset-tools{display:inline-flex;flex-wrap:wrap;gap:6px}
+.composer-preset-tools button{border:0;border-radius:999px;background:#ffffff08;color:#ccc;font-size:12px;padding:6px 10px}
+.composer-preset-tools button:disabled{opacity:.35;cursor:not-allowed}
+.composer-preset-dialog{width:min(540px,calc(100vw - 40px));max-height:85vh;overflow:auto;border:1px solid #484848;border-radius:18px;padding:22px;background:#242424;color:#eee}
+.composer-preset-dialog::backdrop{background:#0008}
+.composer-preset-heading{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.composer-preset-dialog p{font-size:13px;color:#aaa;line-height:1.6}
+.composer-preset-dialog input,.composer-preset-dialog textarea{box-sizing:border-box;width:100%;background:#191919;color:#eee;border:1px solid #444;border-radius:9px;padding:10px}
+.composer-preset-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:16px 0}
+.composer-preset-grid button{padding:15px 8px;background:#303030;border:1px solid #444;border-radius:10px;color:#eee}
+.composer-preset-grid button[aria-pressed=true]{border-color:#54dcf5;background:#203b40}
+@media(max-width:480px){.composer-preset-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* Flow indicates a connected relationship, independently of task progress. */
+.studio-workspace.canvas-expanded .canvas-edges>path.wire-signal,.manual-reference-edges path.wire-signal{fill:none;stroke:#78c6ff;stroke-width:2.5;stroke-linecap:round;stroke-dasharray:3 22;vector-effect:non-scaling-stroke;marker-end:none;opacity:.95;filter:drop-shadow(0 0 3px #6bbcff);animation:canvas-wire-signal 3s linear infinite;pointer-events:none}
+.studio-workspace.canvas-expanded .canvas-edges>path.wire-signal.lineage-dim{opacity:.08}
+@keyframes canvas-wire-signal{to{stroke-dashoffset:-100}}
+@media(prefers-reduced-motion:reduce){.studio-workspace.canvas-expanded .canvas-edges>path.wire-signal,.manual-reference-edges path.wire-signal{animation:none!important;filter:none}}
+
+.manual-result-actions{display:flex;gap:8px;flex-wrap:wrap;padding:0 4px 8px}.manual-result-actions[hidden]{display:none}.manual-result-actions .manual-result-edit:disabled{opacity:.45;cursor:not-allowed}
+
+.manual-node-preview>.manual-preview-play{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);border:1px solid #666;border-radius:10px;background:#151515e8;color:#eee;padding:10px 16px;font-size:14px;cursor:pointer}.manual-preview-play[hidden]{display:none!important}.manual-preview-play:disabled{opacity:.7;cursor:wait}
+.composer-preset-grid{max-height:min(38vh,360px);overflow-y:auto;padding:2px;align-content:start;scrollbar-color:#555 transparent}.composer-preset-grid button{min-height:48px}
+
+.manual-reference-edges path.reference-edge-hit{stroke:transparent;stroke-width:18;vector-effect:non-scaling-stroke;pointer-events:stroke;cursor:pointer}
+.manual-reference-edges path.reference-edge-hit:hover,.manual-reference-edges path.reference-edge-hit:focus{stroke:rgba(124,225,244,.22);outline:none}
+.manual-reference-edges path.reference-edge-hit[aria-disabled=true]{cursor:not-allowed}
+
+/* Draft wires show the selected input path without implying an active job. */
+.manual-reference-edges path.wire-signal.is-draft{opacity:.55;animation-duration:5s;stroke-dasharray:2 31}
+
+/* Agent workbench: conversation and inspectable project media share the viewport. */
+.agent-materials{display:none}
+.studio-workspace.canvas-expanded .director{right:300px!important;width:calc(100% - 300px)!important}
+/* The project shelf belongs to the canvas workspace, not only to the storyboard
+   route. Keeping it visible on view=canvas makes the Director and the material
+   evidence share the same LibTV-like frame. */
+.studio-workspace:not(.studio-new-entry) .agent-materials{display:flex;position:fixed;right:0;top:48px;bottom:0;width:300px;flex-direction:column;background:var(--studio-panel,#202020);border-left:1px solid var(--studio-border,#333);padding:0 16px 16px;z-index:80;color:var(--studio-text,#eee);gap:14px;overflow:auto}
+.agent-materials-head{display:flex;align-items:center;justify-content:space-between;min-height:56px;border-bottom:1px solid var(--studio-border,#333)}
+.agent-materials-head h2{font-size:14px;font-weight:550;margin:0}.agent-materials-head button{font-size:23px;padding:4px 8px;background:transparent;border:0;color:inherit}
+.agent-materials input{width:100%;background:var(--studio-field,#272727);border:1px solid var(--studio-border,#383838);color:inherit;font-size:12px}
+.agent-material-tabs{display:flex;gap:5px}.agent-material-tabs button{font-size:12px;padding:5px 9px;border:0;background:transparent;color:var(--studio-muted,#999)}.agent-material-tabs button[aria-pressed=true]{background:var(--studio-raised,#383838);color:var(--studio-text,#eee)}
+.agent-material-info{font-size:11px;margin:0;color:var(--studio-muted,#999)}.agent-material-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-content:start;gap:14px 10px}
+.agent-material-tile{display:flex;flex-direction:column;gap:7px;min-width:0;padding:0;border:0;background:transparent;color:inherit;text-align:left}
+.agent-material-tile img{display:block;aspect-ratio:1;width:100%;object-fit:contain;background:var(--studio-raised,#292929);border:1px solid var(--studio-border,#444);border-radius:11px;font-size:10px;color:var(--studio-muted,#999)}
+.agent-material-tile img[data-unavailable],.agent-approval-refs img[data-unavailable]{object-fit:contain;padding:18px;background:linear-gradient(135deg,#292f31,#202426);border-color:#53666a;color:#a9bec2}
+.agent-material-tile strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%;font-size:12px;font-weight:400}.agent-material-tile small{font-size:10px;color:var(--studio-muted,#999)}.agent-material-tile:hover{background:transparent}.agent-material-tile:hover img{border-color:#8ed9e5}
+.agent-material-empty{grid-column:1/-1;font-size:12px;color:var(--studio-muted,#999);line-height:1.8;padding:28px 4px}
+.agent-material-pending{border:1px solid var(--studio-border,#444);border-radius:12px;aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;padding:10px;background:var(--studio-raised,#2b2b2b);font-size:12px}.agent-material-pending small{font-size:10px;color:var(--studio-muted,#999)}
+.agent-spinner{height:18px;width:18px;border:2px solid #555;border-top-color:#b9ecf6;border-radius:50%;animation:video-load-spin 1s linear infinite}
+.studio-workspace.studio-agent-session .director .conversation{width:min(900px,calc(100% - 72px));padding:24px 0 30px}
+.studio-workspace.studio-agent-session .director .compose{width:min(900px,calc(100% - 72px));min-height:0;max-height:38dvh;overflow:auto;padding:12px 16px;background:var(--studio-panel);margin-bottom:16px!important}
+.studio-agent-session .director .compose #message{height:70px;min-height:58px}.studio-agent-session .compose #studioComposerReferences{display:none!important}
+.studio-agent-session .director .compose .director-reference-actions{padding:6px 0;margin:0;gap:6px;border:0}.studio-agent-session .director .compose .director-reference-actions button,.studio-agent-session .director .compose .director-reference-actions select{font-size:11px;padding:5px 8px}.studio-agent-session .director .compose .director-reference-actions small{font-size:10px}
+.studio-agent-session .director .creative-status{max-height:30px;overflow:hidden;font-size:11px}
+.studio-workspace.studio-agent-session #studioProductionActions{width:min(900px,calc(100% - 72px));padding:4px 0}
+/* Keep the live production surface visible in Agent mode. The Director conversation
+   and materials drawer can coexist with this compact status layer; hiding it made
+   long-running generations look idle even when the backend was polling. */
+.studio-workspace.studio-agent-session .canvas-live-progress{display:block}
+.studio-workspace .agent-activity{margin:24px 0;padding:18px 20px;background:var(--studio-panel,#202020);border:1px solid var(--studio-border,#363636);border-radius:14px;font-size:13px;line-height:1.7;color:var(--studio-text)}
+.agent-activity-head{display:flex;justify-content:space-between;gap:12px}.agent-activity-head strong{font-weight:550}.agent-activity-head>span{font-size:11px;color:var(--studio-muted)}
+.agent-activity[data-running=true] .agent-activity-head strong:before{content:'';display:inline-block;width:7px;height:7px;border-radius:50%;background:#6edcec;margin-right:9px;animation:agent-live 1.8s infinite}
+.agent-activity-steps{list-style:none;padding:0;margin:14px 0;color:var(--studio-muted);font-size:12px;display:flex;flex-wrap:wrap;gap:10px 20px}.agent-activity-steps [data-active=true]{color:#83dce9}
+.agent-public-decisions details{border-top:1px solid var(--studio-border);padding-top:8px;margin-top:8px}.agent-public-decisions summary{font-size:13px;margin:3px 0;color:var(--studio-text)}.agent-public-decisions p{color:var(--studio-muted);font-size:12px;line-height:1.9;margin:10px 0}.agent-activity-wait{font-size:12px;color:var(--studio-muted)}
+.studio-workspace.canvas-expanded .director .question[data-compact-question]{padding:18px 20px;margin:14px 0;border:1px solid #526368;border-radius:14px;background:var(--studio-panel);box-shadow:inset 3px 0 0 #83dce9}
+.studio-workspace.canvas-expanded .director .question[data-compact-question]:before{content:none}
+.studio-workspace.canvas-expanded .director .question[data-compact-question]>strong{font-size:14px;font-weight:550}
+.studio-workspace.canvas-expanded .director .question-answer-toggle{margin:8px 0;padding:6px 10px;border-radius:7px;background:var(--studio-raised);color:var(--studio-text)}
+.studio-workspace.canvas-expanded .director .director-question-editor{padding:0;margin:10px 0 0;border:0;background:transparent}
+.studio-workspace.canvas-expanded .director .choices{display:grid;grid-template-columns:1fr;gap:7px;counter-reset:choice}.studio-workspace.canvas-expanded .director .choices button{counter-increment:choice;display:flex;align-items:center;gap:10px;padding:10px 12px;text-align:left;border:1px solid var(--studio-border);border-radius:8px;background:var(--studio-field);font-size:12px;line-height:1.6}.studio-workspace.canvas-expanded .director .choices button:before{content:counter(choice);background:var(--studio-raised);border-radius:4px;padding:0 5px;font-size:10px}.studio-workspace.canvas-expanded .director .choices button.chosen{border-color:#83dce9;background:color-mix(in srgb,#83dce9 8%,var(--studio-field))}
+.studio-workspace .agent-plan-card{padding:20px;margin:20px 0;border:1px solid var(--studio-border);border-radius:14px;background:var(--studio-panel);color:var(--studio-text)}.agent-plan-top{display:flex;justify-content:space-between;gap:10px}.agent-plan-top span{font-size:11px;color:var(--studio-muted)}.agent-plan-card>p{font-size:13px;line-height:1.8;color:var(--studio-muted)}.agent-caption-strip{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:14px 0}.agent-caption-strip button{display:flex;flex-direction:column;gap:5px;padding:10px;text-align:left;background:var(--studio-raised);color:var(--studio-text);border-color:var(--studio-border);font-size:12px;line-height:1.6}.agent-caption-strip small{color:var(--studio-muted);font-size:10px}
+.studio-workspace #approveDialog,.studio-workspace #filmPromptDialog{width:min(1100px,94vw);max-height:90dvh;padding:24px 30px;overflow:auto}.studio-workspace #approveDialog>.row{position:sticky;bottom:-24px;padding:16px 0;margin-bottom:-24px;background:var(--studio-panel);border-top:1px solid var(--studio-border);z-index:2}
+.agent-shot-table{width:100%;border-collapse:collapse;table-layout:fixed;font-size:12px;margin:16px 0;color:var(--studio-text)}.agent-shot-table th{text-align:left;padding:12px;background:var(--studio-raised);font-size:12px;font-weight:500}.agent-shot-table th:first-child{width:18%}.agent-shot-table th:last-child{width:24%}.agent-shot-table td{padding:14px 12px;border-bottom:1px solid var(--studio-border);vertical-align:top;overflow-wrap:anywhere;line-height:1.8}.agent-shot-table td>strong{display:block;margin-top:8px;font-weight:500}.agent-shot-table td>span,.agent-shot-table small{color:var(--studio-muted);font-size:11px}.agent-shot-table p{margin:4px 0 12px;line-height:1.8;color:var(--studio-text)}.agent-shot-table summary{margin:0 0 6px;color:var(--studio-muted)}
+.agent-approval-refs{display:flex;gap:10px;flex-wrap:wrap}.agent-approval-refs button{max-width:180px;display:flex;flex-direction:column;gap:6px;background:var(--studio-raised);border-color:var(--studio-border);color:var(--studio-text);font-size:11px;text-align:left}.agent-approval-refs img{width:135px;height:80px;object-fit:contain;border-radius:6px}.agent-raw-prompt{margin:16px 0}.agent-raw-prompt textarea{font-size:11px;line-height:1.7}
+.agent-media-preview{width:min(1000px,92vw);max-height:92dvh;overflow:auto;background:var(--studio-panel,#202020);color:var(--studio-text,#eee);border:1px solid var(--studio-border,#444)}.agent-media-preview h2{font-size:17px}.agent-preview-body{min-height:220px;display:grid;place-items:center}.agent-preview-body img,.agent-preview-body video{max-width:100%;max-height:65dvh;object-fit:contain}.agent-media-preview>p{font-size:12px;color:var(--studio-muted)}
+@keyframes agent-live{50%{opacity:.35}}@media(prefers-reduced-motion:reduce){.agent-spinner,.agent-activity[data-running=true] .agent-activity-head strong:before{animation:none}}
+@media(max-width:1100px){.studio-workspace.canvas-expanded .director{right:240px!important;width:calc(100% - 240px)!important}.studio-workspace:not(.studio-new-entry) .agent-materials{width:240px;padding-inline:12px}.studio-workspace.studio-agent-session .director .conversation,.studio-workspace.studio-agent-session .director .compose,.studio-workspace.studio-agent-session #studioProductionActions{width:calc(100% - 32px)}.agent-caption-strip{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:760px){.studio-workspace.canvas-expanded .director{right:0!important;width:100%!important;bottom:138px!important}.studio-workspace:not(.studio-new-entry) .agent-materials{top:auto;bottom:0;width:100%;height:138px;gap:6px;display:grid;grid-template-columns:100px 1fr;border-top:1px solid var(--studio-border);padding:8px 12px}.agent-materials-head{min-height:25px;border:0}.agent-materials input,.agent-material-tabs,.agent-material-info{display:none}.agent-material-grid{display:flex;overflow:auto;grid-column:2;grid-row:1/3}.agent-material-tile{min-width:80px;width:80px}.agent-material-tile img{height:70px}.agent-material-tile small{display:none}.agent-materials-head h2{font-size:12px}.agent-activity-head,.agent-plan-top{flex-direction:column;gap:5px}.agent-shot-table th:first-child{width:22%}.studio-workspace #approveDialog{padding:16px}.agent-shot-table td{padding:8px 6px}.studio-workspace #approveDialog>.row{bottom:-16px;margin-bottom:-16px}}
+
+/* Keep the prompt compact; creation controls expand on request. */
+.agent-settings-toggle{display:none}
+.studio-agent-session .agent-settings-toggle{display:block!important;background:transparent;border:0;color:var(--studio-muted);padding:0 0 8px;font-size:11px;text-align:left}
+.studio-agent-session .compose .director-reference-strip{display:none!important}
+.studio-agent-session .compose:not(.agent-settings-open)>.campaign-status,.studio-agent-session .compose:not(.agent-settings-open)>.director-reference-actions{display:none!important}
+.agent-production{display:none}
+.studio-agent-session .agent-production{display:block;padding:20px;margin:20px 0;border:1px solid var(--studio-border);border-radius:14px;background:var(--studio-panel);font-size:13px;line-height:1.8;color:var(--studio-text)}
+.agent-production ol{padding-left:22px;color:var(--studio-muted)}.agent-production progress{width:100%;accent-color:#83dce9}
+.agent-result-previews{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.agent-result-previews button{display:flex;flex-direction:column;gap:8px;background:var(--studio-raised);color:var(--studio-text);border-color:var(--studio-border);font-size:12px}.agent-result-previews img{width:100%;aspect-ratio:16/9;object-fit:contain}
+
+.agent-material-manage{font-size:11px;background:transparent;color:var(--studio-muted);border:1px solid var(--studio-border);padding:7px;text-align:left}
+@media(max-width:760px){.agent-material-manage{display:none}}
+
+.manual-result-actions .manual-result-sync{flex-basis:100%;margin:4px 0 8px}
+
+/* Workflow keeps the canvas available; the full conversation shelf is for storyboard. */
+.studio-workspace.canvas-expanded:not(.studio-agent-session) .director{right:12px!important;width:400px!important;bottom:12px!important}
+.studio-workspace.canvas-expanded:not(.studio-agent-session) .agent-materials{display:none!important}
+@media(max-width:900px){.studio-workspace.canvas-expanded:not(.studio-agent-session) .director{right:10px!important;width:380px!important;bottom:74px!important}}
+@media(max-width:620px){.studio-workspace.canvas-expanded:not(.studio-agent-session) .director{width:calc(100vw - 20px)!important}}
+
+/* Keep workflow controls in the bottom dock even when a hidden shelf exists. */
+.studio-workspace.canvas-expanded:not(.studio-agent-session) .canvas-toolbar{top:auto;right:auto;left:50%;bottom:12px;transform:translateX(-50%);max-width:calc(100vw - 32px)}
+.studio-workspace.canvas-expanded .canvas-toolbar>.canvas-cleanup-old{width:auto;flex:none;white-space:nowrap;padding-inline:10px}

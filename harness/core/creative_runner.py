@@ -41,6 +41,9 @@ def _save(p, owner):
     store_save(p, owner)
 
 async def production(app, p, owner, authorization):
+    if p.get('generation_mode')=='chaptered_native':
+        from harness.core.creative_campaign_runner import production_campaign
+        return await production_campaign(app, p, owner, authorization)
     if p.get('generation_mode')=='single_native':
         return await production_film(app, p, owner, authorization)
     tool = CreativeVideoTool(app, authorization)

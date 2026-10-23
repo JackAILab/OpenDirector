@@ -332,6 +332,15 @@ def test_progress_snapshot_drops_provider_details_and_invalid_numbers():
     assert progress_snapshot({'progress':float('nan'),'stage':'private arbitrary text','steps_completed':99,'steps_total':1})=={}
 
 
+def test_progress_snapshot_normalizes_known_provider_percent_fields_only():
+    from harness.tools.creative_video import progress_snapshot
+    assert progress_snapshot({'progress_percent':'42.4','stage':'generating'})=={'percent':42,'stage':'generating'}
+    assert progress_snapshot({'result':{'progressPercent':67},'signed_url':'private'})=={'percent':67}
+    assert progress_snapshot({'output':{'progress':'81'},'raw_payload':'private'})=={'percent':81}
+    assert progress_snapshot({'progress':True})=={}
+    assert progress_snapshot({'result':{'progress_percent':'101'}})=={}
+
+
 def test_uncertain_provider_receipt_pauses_without_next_shot(client,monkeypatch,tmp_path):
     from harness.core import creative_runner as runner
     p=ready(client);p.pop('generation_mode');p['run_id']='uncertain_run';p['state']='running'
@@ -601,3 +610,12 @@ def test_poll_still_reports_persisted_task_without_runtime_worker(client, kind):
     # Presentation does not rewrite durable state or create a replacement job.
     assert store.load(current['id'], 1)['state'] == current['state']
     assert current['id'] not in store.RUNNING
+
+
+def test_progress_keeps_real_provider_check_time_without_private_fields():
+    from harness.tools.creative_video import progress_snapshot
+    import time
+    stamp=int(time.time())
+    assert progress_snapshot({'checked_at':stamp,'stage':'generating','token':'private'})=={'stage':'generating','checked_at':stamp}
+    for invalid in (True, -1, 0, '123', float('nan'), float('inf'), stamp+3600):
+        assert progress_snapshot({'checked_at':invalid})=={}

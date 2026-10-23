@@ -5,9 +5,13 @@ import hashlib
 from harness.tools.creative_canvas import save_asset
 from harness.studio import store
 
+MAX_GENERATED_VIDEO_BYTES = 256 * 1024 * 1024
+
 
 def attach_result(project, owner, path: Path):
     artifact = str(path.resolve().relative_to(store.DATA.resolve()))
+    if path.stat().st_size > MAX_GENERATED_VIDEO_BYTES:
+        raise RuntimeError('生成视频超过 256 MB，源视频已保留，画布导入待处理')
     raw = path.read_bytes()
     digest = hashlib.sha256(raw).hexdigest()
     latest = store.load(project['id'], owner)
@@ -17,11 +21,12 @@ def attach_result(project, owner, path: Path):
                      and a.get('provenance', {}).get('kind') == 'video_generated'
                      and a.get('sha256') == digest), None)
     graph = latest.setdefault('canvas', {'nodes': [], 'edges': []})
-    asset = existing or save_asset(project, raw, 'video', max_duration=180)
+    asset = existing or save_asset(project, raw, 'video',
+                                   max_bytes=MAX_GENERATED_VIDEO_BYTES, max_duration=180)
     if not existing:
         asset['provenance'] = {'kind': 'video_generated', 'run_id': project['run_id'],
                                'model': project['model'], 'training_eligible': False,
-                               'sources': [r['asset'] for r in project.get('video_inputs', {}).get('references', []) if r.get('asset')]}
+                               'sources': [r['asset'] for r in (project.get('video_inputs') or {}).get('references', []) if r.get('asset')]}
         assets[asset['id']] = asset
     if not any(n.get('asset') == asset['id'] for n in graph['nodes']):
         nid = 'n' + secrets.token_hex(12)

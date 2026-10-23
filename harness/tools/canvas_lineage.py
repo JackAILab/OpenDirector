@@ -66,8 +66,14 @@ def lineage(project):
         kind = p.get('kind', 'uploaded')
         sources = [s for s in p.get('sources', []) if s in assets and s != aid]
         records[aid] = {'kind': kind, 'sources': sources}
+        if kind == 'video_frame' and p.get('source_position') in ('first','last','current'):
+            records[aid]['source_position'] = p['source_position']
+        if kind == 'video_frame' and isinstance(p.get('source_time'), (int, float)):
+            records[aid]['source_time'] = p['source_time']
         if isinstance(p.get('reframe'), dict):
             records[aid]['reframe'] = {k:p['reframe'][k] for k in ('crop','rotation','mirror','source_dimensions','result_dimensions') if k in p['reframe']}
+        if isinstance(p.get('grid'), dict):
+            records[aid]['grid'] = {k:p['grid'][k] for k in ('rows','columns','row','column','pixel_box','source_dimensions') if k in p['grid']}
         if p.get('region_edit'):records[aid]['region_edit']=p['region_edit']
         if p.get('control_parameters'):
             from harness.tools.creative_image_inputs import normalize_control_parameters

@@ -19,6 +19,11 @@ def connection():
     c = sqlite3.connect(DATA/'projects.sqlite3', timeout=20)
     c.execute('CREATE TABLE IF NOT EXISTS projects(id TEXT PRIMARY KEY, owner INTEGER, data TEXT)')
     c.execute('CREATE TABLE IF NOT EXISTS events(seq INTEGER PRIMARY KEY AUTOINCREMENT, project TEXT, time REAL, stage TEXT, code TEXT, shot TEXT)')
+    c.execute('''CREATE TABLE IF NOT EXISTS workspace_deliveries(
+        owner INTEGER, project TEXT, parent TEXT, asset TEXT,
+        state TEXT NOT NULL DEFAULT 'pending', code TEXT NOT NULL DEFAULT '',
+        next_attempt REAL NOT NULL DEFAULT 0, updated_at REAL NOT NULL,
+        PRIMARY KEY(owner,project,asset))''')
     c.execute('''CREATE TABLE IF NOT EXISTS provider_callback_events(
         seq INTEGER PRIMARY KEY AUTOINCREMENT,
         project TEXT NOT NULL,
@@ -54,12 +59,36 @@ def save(p, owner):
     p['updated_at'] = time.time()
     with connection() as c:
         c.execute('INSERT INTO projects VALUES(?,?,?) ON CONFLICT(id) DO UPDATE SET data=excluded.data', (p['id'],owner,json.dumps(p,ensure_ascii=False)))
+        # Durable outbox: output and delivery intent commit together. No browser
+        # or paid model authorization is needed to copy already-owned media.
+        if p.get('creation_mode')=='agent' and p.get('manual_parent'):
+            ready=set()
+            task=p.get('image_task',{})
+            if task.get('state')=='completed':ready.add(task.get('asset'))
+            if p.get('state')=='completed' and p.get('artifact') and p.get('result_artifact')==p['artifact']:
+                ready.add(p.get('result_asset'))
+            for chapter in p.get('campaign',{}).get('chapters',[]):
+                if chapter.get('state')=='completed':ready.update((chapter.get('asset'),chapter.get('tail_asset')))
+            for aid in ready:
+                if aid and aid in p.get('canvas_assets',{}):
+                    c.execute('INSERT OR IGNORE INTO workspace_deliveries(owner,project,parent,asset,updated_at) VALUES(?,?,?,?,?)',
+                              (owner,p['id'],p['manual_parent'],aid,p['updated_at']))
+
+
+def remove(pid, owner):
+    """Remove an unreferenced child project after its canvas node is deleted."""
+    with connection() as c:
+        c.execute('DELETE FROM projects WHERE id=? AND owner=?', (pid, owner))
+        c.execute('DELETE FROM workspace_deliveries WHERE owner=? AND (project=? OR parent=?)',(owner,pid,pid))
 
 
 def _provider_target(p, job_id):
     film = p.get('film') if isinstance(p.get('film'), dict) else None
     if film and film.get('job_id') == job_id:
         return film, 'film'
+    for chapter in p.get('campaign', {}).get('chapters', []):
+        if chapter.get('job_id') == job_id:
+            return chapter, chapter['id']
     for shot in p.get('shots', []):
         if isinstance(shot, dict) and shot.get('job_id') == job_id:
             return shot, str(shot.get('id', 'shot'))[:48]
@@ -253,6 +282,8 @@ def production_recovery_queue(p, limit=16):
     for shot in p.get('shots', []) if isinstance(p.get('shots'), list) else []:
         if isinstance(shot, dict):
             add('shot', shot.get('id', 'shot'), shot, shot.get('state', ''))
+    for chapter in p.get('campaign', {}).get('chapters', []):
+        add('chapter', chapter['id'], chapter, chapter.get('state',''))
     retakes = p.get('edit_retakes', {})
     if isinstance(retakes, dict):
         for jid, retake in retakes.items():
@@ -277,9 +308,11 @@ def present(p, *, runtime_active=None):
     # A worker may finish while expensive UI projections are being assembled.
     active = p['id'] in RUNNING if runtime_active is None else runtime_active
     p = dict(p)
-    p['canvas_capabilities'] = {'groups': True}
+    p['canvas_capabilities'] = {'groups': True, 'audio_split': True, 'image_grid': True}
     with connection() as c:
         rows = c.execute('SELECT seq,time,stage,code,shot FROM events WHERE project=? ORDER BY seq', (p['id'],)).fetchall()
+        deliveries=c.execute('SELECT asset,state,code FROM workspace_deliveries WHERE project=? ORDER BY updated_at DESC LIMIT 32',(p['id'],)).fetchall()
+    p['workspace_deliveries']=[dict(asset=aid,state=state,code=code) for aid,state,code in deliveries]
     p['events'] = [dict(zip(('seq','time','stage','code','shot'), row)) for row in rows]
     p['provider_callback_audit'] = provider_callback_audit(p['id'])
     p['quote'] = project_quote(p)
@@ -290,7 +323,7 @@ def present(p, *, runtime_active=None):
     p['input_manifest']=input_manifest(p)
     p['video_inputs_needs_review']=bool(p.get('video_inputs',{}).get('references') and p.get('video_inputs_product')!=p.get('brief',{}).get('product',''))
     p['reference_needs_review']=bool(not p.get('video_inputs') and p.get('reference') and (p.get('reference_needs_review') or p.get('reference_product')!=p.get('brief',{}).get('product','')))
-    if p.get('generation_mode')=='single_native' and p.get('shots'):
+    if p.get('generation_mode') in ('single_native','chaptered_native') and p.get('shots'):
         from harness.tools.creative_video import film_prompt
         try: p['production_prompt']=film_prompt(p)
         except RuntimeError: p['production_prompt']=''

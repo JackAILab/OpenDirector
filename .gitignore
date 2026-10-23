@@ -13,3 +13,19 @@ outputs/
 .venv/
 *.egg-info/
 .pytest_cache/
+.opendirector-downloads/
+# Heavy assets belong in the private ModelScope release.
+*.mp4
+*.mov
+*.webm
+*.wav
+*.mp3
+*.m4a
+*.safetensors
+*.ckpt
+*.pt
+*.pth
+*.tar
+*.tar.gz
+*.zip
+*.ttf

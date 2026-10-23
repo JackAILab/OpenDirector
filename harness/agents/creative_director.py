@@ -17,7 +17,8 @@ JSON 格式：{"reply":"简短总结","brief":{"product":"产品","audience":"�
 在 interview 模式，信息不足时 shots 为空，先追问；plan 模式一定 questions 为空，shots 严格按 shot_count 数量，每段 5 秒，有吸引注意、呈现价值、行动号召的完整叙事。不要输出 timing，时间由系统统一计算。'''
 
 
-async def direct(project: dict, mode: str) -> dict:
+async def direct(project: dict, mode: str, on_activity=None) -> dict:
+    if on_activity: on_activity('references', None)
     notes, canvas_images = director_inputs(project)
     evidence_playbook = compact()
     from harness.library.mechanism_report import build_mechanism_report
@@ -56,8 +57,11 @@ async def direct(project: dict, mode: str) -> dict:
     if canvas_images:
         if isinstance(content,str): content=[{'type':'text','text':content}]
         content.extend(canvas_images)
+    if on_activity: on_activity('composing', None)
+    options = {'on_decision': lambda d: on_activity('decision', d)} if on_activity else {}
     result = await CreativeDirectorModel().complete([
-        {'role': 'system', 'content': director_system(project, SYSTEM)}, {'role': 'user', 'content': content}])
+        {'role': 'system', 'content': director_system(project, SYSTEM)}, {'role': 'user', 'content': content}], **options)
+    if on_activity: on_activity('validating', None)
     if not isinstance(result, dict): raise ValueError('invalid director response')
     for key in ('reply',):
         if not isinstance(result.get(key), str): raise ValueError('invalid summary')

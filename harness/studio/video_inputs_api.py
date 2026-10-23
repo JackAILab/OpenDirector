@@ -37,6 +37,8 @@ def install(gateway):
             raise HTTPException(409,'项目已变化或正在制作，请重新核对')
         if p.get('film') and p['film'].get('state') not in ('planned','completed','failed'):
             raise HTTPException(409,'原任务尚未结束，请恢复查询后再修改输入')
+        if p.get('campaign') and p['state']!='completed':raise HTTPException(409,'已有章节任务，请恢复查询或新建项目；不能修改已批准的输入')
+        if p.get('generation_mode')=='chaptered_native' and (body.model not in ('kling-video-v4_0','kling-video-v3_0_omni') or len(body.references)>6):raise HTTPException(422,'多章节需多图参考模型，并保留一个尾帧输入位置')
         if body.manual and p.get('creation_mode')!='video':raise HTTPException(422,'仅手动视频可保存节点草稿')
         from harness.models.video_catalog import model_spec
         spec=model_spec('kling',body.model)
@@ -63,9 +65,9 @@ def install(gateway):
             if body.input_hash!=review_hash(inputs,body):raise HTTPException(409,'输入与核对版本不一致，请重新预览')
             if p.get('video_inputs')!=inputs or (body.manual and (body.manual.duration!=p['duration'] or body.manual.prompt!=p.get('direct_prompt'))):
                 store.archive_render(p)
-                p.update(state='intake',shots=[],questions=[],error='',provider='kling',model=body.model,generation_mode='single_native',duration=(body.manual.duration if body.manual else p['duration']) if p.get('creation_mode')=='video' else 15)
+                p.update(state='intake',shots=[],questions=[],error='',provider='kling',model=body.model,generation_mode='chaptered_native' if p.get('generation_mode')=='chaptered_native' else 'single_native',duration=(body.manual.duration if body.manual else p['duration']) if p.get('creation_mode')=='video' or p.get('generation_mode')=='chaptered_native' else 15)
                 if body.manual:p['direct_prompt']=body.manual.prompt
-                for key in ('run_id','artifact','qa','film','stop_requested','auto_approval'):p.pop(key,None)
+                for key in ('run_id','artifact','qa','film','stop_requested','auto_approval','campaign'):p.pop(key,None)
                 if p.get('creation_mode')=='video' and p.get('direct_prompt'):
                     p.update(state='ready',shots=[{'id':'shot_1','start':0,'duration':p['duration'],'title':'视频节点 1',
                         'prompt':p['direct_prompt'],'audio_prompt':'按用户描述生成同步声音',

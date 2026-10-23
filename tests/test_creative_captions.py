@@ -56,3 +56,22 @@ def test_caption_pose_is_time_based_and_relative_to_frame_size():
     assert result['a']['y']==pytest.approx(result['b']['y']*2)
     assert result['repeat']==result['a'] and result['end']['opacity']==0 and result['hidden'] is False
     assert result['short']['opacity']==pytest.approx(.75)
+
+
+def test_caption_side_layout_survives_validation_and_shared_renderer():
+    raw=document();raw['captions'][0]['appearance']={'align':'left','preset':'plain'}
+    clean=validate_edit(raw,4,'hash')
+    assert clean['captions'][0]['appearance']['align']=='left'
+    raw['captions'][0]['appearance']['align']='url(external)'
+    with pytest.raises(ValueError):validate_edit(raw,4,'hash')
+    script="""global.window={};require('./tools/agent_studio/editor-captions.js');
+    const e=window.EditCaptions,out={};
+    for(const align of ['left','right','center']){const slot={style:{}},effect={style:{}};
+      e.style(slot,effect,{track:2,appearance:{align,preset:'plain'}},1280,720);
+      out[align]=slot.style;}
+    console.log(JSON.stringify(out));"""
+    rendered=json.loads(subprocess.check_output(['node','-e',script],text=True))
+    assert rendered['left']['left']=='6%' and rendered['left']['width']=='40%'
+    assert rendered['right']['left']=='54%' and rendered['right']['width']=='40%'
+    assert rendered['center']['left']=='8%' and rendered['center']['width']=='84%'
+    assert all(v['bottom']=='33%' for v in rendered.values())

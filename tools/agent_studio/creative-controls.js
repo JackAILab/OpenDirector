@@ -102,3 +102,68 @@
  document.addEventListener('creative-reload-skills',()=>{if(!loaded)load()});
  load();sync();
 })();
+
+/* Composer presets are editable prompt text, never an implicit paid action. */
+(()=>{
+ const cameras=[
+  ['固定镜头','镜头固定，构图稳定，让主体在画面内自然运动。'],
+  ['跟随拍摄','镜头平稳跟随主体移动，保持主体大小和画面位置稳定。'],
+  ['盘旋抬升','镜头围绕主体平稳盘旋并逐渐抬升，始终朝向主体，连续展示主体与环境的空间关系。'],
+  ['盘旋下降','镜头从高处围绕主体平稳盘旋并逐渐下降，始终朝向主体，保持运动连续。'],
+  ['镜头左摇','机位保持不动，镜头水平向左摇，连续展示画面左侧环境，保持地平线稳定。'],
+  ['镜头右摇','机位保持不动，镜头水平向右摇，连续展示画面右侧环境，保持地平线稳定。'],
+  ['镜头上升','摄影机垂直平稳上升，保持朝向稳定，逐渐展示更高视点下的主体与环境。'],
+  ['镜头下降','摄影机垂直平稳下降，保持朝向稳定，从高处逐渐接近主体所在高度。'],
+  ['变焦推进','摄影机位置固定，镜头缓慢变焦拉近，主体逐渐充满画面，不产生机位前移的视差。'],
+  ['变焦拉远','摄影机位置固定，镜头缓慢变焦拉远，逐渐扩大可见环境，不产生机位后移的视差。'],
+  ['柯克变焦','希区柯克变焦：摄影机向主体推进，同时镜头反向变焦拉远，保持主体在画面中的大小基本不变，让背景透视连续变化。'],
+  ['滚筒旋转','镜头绕光轴缓慢旋转，主体保持画面中心，连续呈现画面倾斜与旋转，不绕主体移动。'],
+  ['无人机','无人机低空平稳飞行，沿场景前进并轻微调整高度，保持主体可辨识和空间运动连续。'],
+  ['镜头前推','镜头缓慢向主体推进，从环境过渡到主体细节，运动连贯。'],
+  ['镜头后移','镜头缓慢后移，逐渐展示主体周围的空间环境。'],
+  ['镜头左移','镜头水平向左平移，保持地平线稳定，呈现自然视差。'],
+  ['镜头右移','镜头水平向右平移，保持地平线稳定，呈现自然视差。'],
+  ['镜头上摇','机位保持不动，镜头缓慢向上摇，从下部细节揭示主体全貌。'],
+  ['镜头下摇','机位保持不动，镜头缓慢向下摇，从主体上部落到下部细节。'],
+  ['环绕拍摄','镜头围绕主体缓慢移动，始终朝向主体，保持主体外观一致。'],
+  ['高空航拍','高空俯视拍摄，镜头平稳前行，展示空间的纵深和整体布局。'],
+  ['手持拍摄','轻微自然的手持镜头运动，跟随现场动作，避免剧烈晃动。'],
+  ['第一视角','第一人称视角，镜头随观察者自然移动，保持空间关系连贯。']
+ ];
+ const styles=[
+  ['电影写实','电影写实风格，自然材质，细腻光影，有层次的前景、中景与背景。'],
+  ['商业摄影','商业产品摄影，清晰主体，精致材质，受控反射和有层次的布光。'],
+  ['胶片质感','胶片摄影质感，柔和高光，细微颗粒，克制的暖色调。'],
+  ['水彩插画','水彩插画风格，纸张肌理，透明色层和自然晕染。'],
+  ['三维动画','精致三维动画风格，柔和材质，清晰轮廓和丰富的环境层次。'],
+  ['黑白摄影','黑白摄影，高低调层次丰富，突出轮廓、纹理与光影关系。']
+ ];
+ const create=(tag,text)=>{const e=document.createElement(tag);if(text)e.textContent=text;return e};
+ function choose(panel,kind,trigger){
+  const prompt=panel.querySelector('textarea');if(!prompt||prompt.readOnly||prompt.disabled)return;
+  const original=prompt.value,dialog=create('dialog'),head=create('div'),title=create('strong',kind==='camera'?'运镜预设':'风格预设'),close=create('button','关闭');
+  head.className='composer-preset-heading';dialog.className='composer-preset-dialog';dialog.setAttribute('aria-label',title.textContent);close.type='button';close.onclick=()=>dialog.close();head.append(title,close);
+  const note=create('p','选用后会将描述加入提示词，可继续修改。实际效果由所选模型生成。'),search=create('input');search.type='search';search.placeholder='搜索预设';search.setAttribute('aria-label','搜索预设');
+  const grid=create('div');grid.className='composer-preset-grid';const preview=create('textarea');preview.setAttribute('aria-label','预设描述');preview.rows=3;
+  const message=create('p');message.setAttribute('role','status');const apply=create('button','加入提示词');apply.type='button';apply.className='primary';apply.disabled=true;
+  let selected='';const rows=kind==='camera'?cameras:styles;
+  function draw(){grid.replaceChildren();const matches=rows.filter(row=>row.join(' ').includes(search.value.trim()));for(const [name,text]of matches){const b=create('button',name);b.type='button';b.setAttribute('aria-pressed',String(name===selected));b.onclick=()=>{selected=name;preview.value=text;apply.disabled=false;draw()};grid.append(b)}if(!matches.length)grid.append(create('p','没有匹配的预设'));}
+  search.oninput=draw;preview.oninput=()=>{apply.disabled=!preview.value.trim()};
+  apply.onclick=()=>{if(!panel.isConnected||prompt.readOnly||prompt.disabled){message.textContent='节点已开始处理或已移除，请关闭后重新选择。';return}if(prompt.value!==original){message.textContent='提示词已变化，请关闭后重新选择，避免覆盖修改。';return}const value=[original.trimEnd(),preview.value.trim()].filter(Boolean).join('\n');if(prompt.maxLength>0&&value.length>prompt.maxLength){message.textContent='加入后超出提示词长度限制，请缩短描述。';return}prompt.value=value;prompt.dispatchEvent(new Event('input',{bubbles:true}));dialog.close();prompt.focus();};
+  dialog.append(head,note,search,grid,preview,message,apply);document.body.append(dialog);dialog.addEventListener('close',()=>{dialog.remove();if(document.activeElement===document.body)trigger.focus()},{once:true});draw();dialog.showModal();search.focus();
+ }
+ function sync(){
+  for(const panel of document.querySelectorAll('.manual-node-editor,.studio-manual-image-compose')){
+   const bar=panel.querySelector('.manual-reference-bar'),prompt=panel.querySelector('textarea');if(!bar||!prompt||bar.hidden)continue;
+   let controls=bar.querySelector('.composer-preset-tools');
+   if(!controls){controls=create('span');controls.className='composer-preset-tools';bar.append(controls)}
+   const video=!!panel.querySelector('.manual-video-mode:not([hidden])'),kind=video?'camera':'style';
+   if(controls.dataset.kind!==kind){controls.dataset.kind=kind;controls.replaceChildren();for(const label of (video?['标记','特效','主体','角色库']:['标记'])){const b=create('button',label);b.type='button';b.disabled=true;b.title=label+' · 尚未接入';b.setAttribute('aria-label',label+' · 尚未接入');controls.append(b)}const b=create('button',video?'运镜':'风格');b.type='button';b.dataset.preset=kind;b.setAttribute('aria-label',video?'选择运镜预设':'选择风格预设');b.onclick=()=>choose(panel,kind,b);controls.append(b)}
+   controls.querySelector('[data-preset]').disabled=prompt.readOnly||prompt.disabled;
+  }
+ }
+ let frame=0;function schedule(){if(frame)return;frame=requestAnimationFrame(()=>{frame=0;sync()})}
+ const observer=new MutationObserver(schedule);observer.observe(document.querySelector('.canvas-world')||document.body,{childList:true,subtree:true});
+ for(const event of ['creative-state-change','creative-manual-view-ready'])document.addEventListener(event,schedule);
+ sync();
+})();

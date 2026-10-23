@@ -81,15 +81,18 @@ def test_director_reuses_linked_run_without_changing_manual_job(client):
     assert node.status_code==200
 
 
-def test_generated_result_is_idempotent_and_preserves_canvas(client, monkeypatch, tmp_path):
+@pytest.mark.parametrize('video_inputs', [None, {}])
+def test_generated_result_is_idempotent_and_preserves_canvas(client, monkeypatch, tmp_path, video_inputs):
     from harness.tools import creative_video_result
     p=client.post('/creative/api/projects',json={'message':'cat video','creation_mode':'video'}).json()
     p['run_id']='fixture-run'
+    p['video_inputs']=video_inputs
     latest=store.load(p['id'],1)
     latest['canvas']={'nodes':[{'id':'note','kind':'text','text':'keep me','x':10,'y':10}], 'edges':[]}
     store.save(latest,1)
     calls=[]
     def asset(*a,**kw):
+        assert kw['max_bytes']==256*1024*1024
         calls.append(True)
         return {'id':('a' if len(calls)==1 else 'b')*32,'kind':'video','filename':'source.mp4','sha256':__import__('hashlib').sha256(a[1]).hexdigest()}
     monkeypatch.setattr(creative_video_result,'save_asset',asset)
@@ -176,11 +179,45 @@ def test_director_context_preview_is_current_read_only_and_owned(client):
     before=store.load(child['id'],1)
     url='/creative/api/projects/'+child['id']+'/director-context'
     result=client.get(url);assert result.status_code==200
-    assert result.json()=={'project':p['id'],'references':[{'id':'visible','kind':'text','label':'sunset'}]}
+    assert result.json()=={'project':p['id'],'live_inputs':None,'references':[{'id':'visible','kind':'text','label':'sunset'}]}
     assert store.load(child['id'],1)==before
     assert client.get(url,headers={'Authorization':'Bearer two'}).status_code==404
     p['canvas']['edges']=[];store.save(p,1)
     assert client.get(url).json()['references']==[]
+
+
+def test_workspace_delivery_retry_is_owned_versioned_and_does_not_generate(client):
+    parent=client.post('/creative/api/projects',json={'message':'workspace','creation_mode':'video'}).json()
+    child=client.post('/creative/api/projects/'+parent['id']+'/director').json()
+    with store.connection() as c:
+        c.execute("INSERT INTO workspace_deliveries(owner,project,parent,asset,state,code,next_attempt,updated_at) VALUES(?,?,?,?,?,?,?,?)",
+                  (1,child['id'],parent['id'],'a'*32,'needs_review','workspace_inputs_or_capacity',9999999999,1))
+    before=store.load(child['id'],1);url='/creative/api/projects/'+child['id']+'/workspace-delivery/retry'
+    assert client.post(url,json={'revision':child['revision']},headers={'Authorization':'Bearer two'}).status_code==404
+    assert client.post(url,json={'revision':child['revision']+1}).status_code==409
+    result=client.post(url,json={'revision':child['revision']})
+    assert result.status_code==200,result.text
+    assert result.json()['workspace_deliveries']==[{'asset':'a'*32,'state':'pending','code':''}]
+    assert store.load(child['id'],1)==before and not store.RUNNING
+
+
+def test_director_input_summary_never_borrows_nearby_video_inputs(client):
+    parent=client.post('/creative/api/projects',json={'message':'workspace','creation_mode':'video'}).json()
+    director=client.post('/creative/api/projects/'+parent['id']+'/director').json()
+    video=client.post('/creative/api/projects/'+parent['id']+'/manual-nodes',json={'message':'unrelated video','creation_mode':'video'}).json()['project']
+    unrelated=store.load(video['id'],1)
+    unrelated['video_inputs']={'mode':'references','references':[{'asset':'a'*32,'role':'product','instruction':'different product'}]}
+    store.save(unrelated,1)
+    url='/creative/api/projects/'+director['id']+'/director-context'
+    assert client.get(url).json()['live_inputs'] is None
+    own=store.load(director['id'],1);own['video_inputs']={'mode':'text','references':[]};store.save(own,1)
+    assert client.get(url).json()['live_inputs']==own['video_inputs']
+    assert client.get(url,headers={'Authorization':'Bearer two'}).status_code==404
+    child=client.post('/creative/api/projects/'+director['id']+'/manual-nodes',json={'message':'another video','creation_mode':'video'}).json()['project']
+    saved=store.load(child['id'],1);saved['video_inputs']=unrelated['video_inputs'];store.save(saved,1)
+    own=store.load(director['id'],1);own.pop('video_inputs');store.save(own,1)
+    view=client.get('/creative/api/projects/'+director['id']).json()
+    assert 'director_inputs' not in view and view['input_manifest']['mode']=='text'
 
 
 def test_manual_node_position_is_owned_bounded_and_independent_of_generation(client):

@@ -1,57 +1,132 @@
-"""Download a pinned private asset bundle, verify hashes, and safely restore files."""
-import argparse,hashlib,json,os,shutil,tarfile,tempfile
+"""Restore versioned private assets without overwriting local edits or databases."""
+from __future__ import annotations
+
+import argparse
+from concurrent.futures import ThreadPoolExecutor
+import hashlib
+import json
+import os
 from pathlib import Path
-from modelscope_hub.api import HubApi
-p=argparse.ArgumentParser();p.add_argument('--bundle',choices=['showcase','library','all'],default='showcase');p.add_argument('--revision',default=None);p.add_argument('--destination',default=str(Path(__file__).resolve().parents[1]));args=p.parse_args()
-lock=json.loads((Path(__file__).resolve().parents[1]/'assets.lock.json').read_text());revision=args.revision or lock['revision'];api=HubApi(token=os.environ.get('MODELSCOPE_API_TOKEN'))
-def sha(path):
- h=hashlib.sha256()
- with open(path,'rb') as f:
-  for b in iter(lambda:f.read(8*1024*1024),b''):h.update(b)
- return h.hexdigest()
-bundles=[b for b in lock['bundles'] if args.bundle=='all' or b['name']==args.bundle]
-if not bundles:raise SystemExit('This release has no matching bundle.')
-root=Path(args.destination).resolve();root.mkdir(parents=True,exist_ok=True)
-for bundle in bundles:
- if bundle.get('kind')=='library-tree':
-  prefix=bundle['prefix'];cache=api.download_repo(lock['dataset'],'dataset',revision=bundle.get('revision',revision),allow_patterns=[prefix+'files.json',prefix+'library.sqlite3'])
-  index=cache/(prefix+'files.json');database=cache/(prefix+'library.sqlite3')
-  if sha(index)!=bundle['index_sha256'] or sha(database)!=bundle['database_sha256']:raise SystemExit('Library metadata checksum mismatch')
-  entries=json.loads(index.read_text());target=root/'assets/library';target.mkdir(parents=True,exist_ok=True)
-  for entry in entries:
-   rel=Path(entry['path'])
-   if rel.is_absolute() or '..' in rel.parts:raise SystemExit('Unsafe library path')
-   dest=target/rel
-   if not dest.resolve().is_relative_to(target.resolve()):raise SystemExit('Unsafe destination')
-   if dest.exists() and sha(dest)!=entry['sha256']:raise SystemExit('Existing library file differs: '+str(dest))
-  with tempfile.TemporaryDirectory(dir=root,prefix='.library-download-') as tmp:
-   downloaded=api.download_repo(lock['dataset'],'dataset',revision=bundle.get('revision',revision),local_dir=tmp,allow_patterns=[prefix+e['path'] for e in entries])
-   for entry in entries:
-    source=downloaded/(prefix+entry['path']);dest=target/entry['path']
-    if sha(source)!=entry['sha256']:raise SystemExit('Library media checksum mismatch: '+entry['path'])
-    dest.parent.mkdir(parents=True,exist_ok=True)
-    if not dest.exists():shutil.move(source,dest)
-  dest=target/'library.sqlite3'
-  if dest.exists() and sha(dest)!=bundle['database_sha256']:raise SystemExit('Existing library DB differs; restore into a fresh destination')
-  if not dest.exists():shutil.copy2(database,dest)
-  print('Restored library',len(entries),'media files');continue
- cache=api.download_repo(lock['dataset'],'dataset',revision=revision,allow_patterns=[bundle['file']])
- archive=cache/bundle['file']
- if sha(archive)!=bundle['sha256']:raise SystemExit('Archive checksum mismatch: '+bundle['file'])
- with tempfile.TemporaryDirectory(dir=root,prefix='.asset-restore-') as temp:
-  staging=Path(temp)
-  with tarfile.open(archive) as tar:
-   members=tar.getmembers();regular={m.name for m in members if m.isfile()}
-   for m in members:
-    rel=Path(m.name)
-    if rel.is_absolute() or '..' in rel.parts or not (m.isfile() or m.isdir() or (m.islnk() and m.linkname in regular)):raise SystemExit('Unsafe archive member')
-   tar.extractall(staging,filter='data')
-  files=[f for f in staging.rglob('*') if f.is_file()]
-  for f in files:
-   dest=root/f.relative_to(staging)
-   if not dest.resolve().is_relative_to(root):raise SystemExit('Destination escapes restore root')
-   if dest.exists() and (not dest.is_file() or sha(dest)!=sha(f)):raise SystemExit('Existing file differs; restore to a new directory: '+str(dest))
-  for f in files:
-   dest=root/f.relative_to(staging);dest.parent.mkdir(parents=True,exist_ok=True)
-   if not dest.exists():shutil.move(f,dest)
- print('Restored',bundle['name'],len(files),'files')
+import shutil
+import tarfile
+import tempfile
+
+ROOT = Path(__file__).resolve().parents[1]
+
+
+def sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open('rb') as stream:
+        for block in iter(lambda: stream.read(8 * 1024 * 1024), b''):
+            digest.update(block)
+    return digest.hexdigest()
+
+
+def contained(root: Path, relative: str) -> Path:
+    path = Path(relative)
+    target = root / path
+    if path.is_absolute() or '..' in path.parts or not target.resolve().is_relative_to(root.resolve()):
+        raise ValueError(f'Unsafe asset path: {relative}')
+    return target
+
+
+def download(api, dataset, remote, revision, digest, **kwargs) -> Path:
+    path = Path(api.download_file(dataset, 'dataset', remote, revision=revision,
+                                 expected_sha256=digest, **kwargs))
+    if sha256(path) != digest:
+        raise ValueError(f'Checksum mismatch: {remote}')
+    return path
+
+
+def restore_library(api, dataset, bundle, revision, root, workers):
+    prefix = bundle['prefix']
+    index = download(api, dataset, prefix + 'files.json', revision, bundle['index_sha256'])
+    database = download(api, dataset, prefix + 'library.sqlite3', revision, bundle['database_sha256'])
+    entries = json.loads(index.read_text())
+    target = contained(root, 'assets/library')
+    target.mkdir(parents=True, exist_ok=True)
+    dbtarget = contained(target, 'library.sqlite3')
+    if dbtarget.exists() and sha256(dbtarget) != bundle['database_sha256']:
+        raise ValueError('Existing library DB differs; restore into a fresh destination')
+    needed, seen = [], set()
+    for entry in entries:
+        if entry['path'] in seen:
+            raise ValueError('Duplicate path in library manifest')
+        seen.add(entry['path'])
+        dest = contained(target, entry['path'])
+        if dest.exists():
+            if not dest.is_file() or sha256(dest) != entry['sha256']:
+                raise ValueError(f'Existing library file differs: {dest}')
+        else:
+            needed.append(entry)
+    temporary = contained(root, '.opendirector-downloads')
+
+    def restore(entry):
+        source = download(api, dataset, prefix + entry['path'], revision, entry['sha256'],
+                          local_dir=temporary)
+        if source.stat().st_size != entry['bytes']:
+            raise ValueError('Media size mismatch: ' + entry['path'])
+        dest = contained(target, entry['path'])
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        shutil.move(source, dest)
+
+    with ThreadPoolExecutor(max_workers=workers) as pool:
+        for count, _ in enumerate(pool.map(restore, needed), 1):
+            if count % 20 == 0 or count == len(needed):
+                print(f'Library files restored: {count}/{len(needed)}', flush=True)
+    if not dbtarget.exists():
+        shutil.copy2(database, dbtarget)
+    print(f'Restored library: {len(entries)} media files')
+
+
+def restore_archive(api, dataset, bundle, revision, root):
+    archive = download(api, dataset, bundle['file'], revision, bundle['sha256'])
+    with tempfile.TemporaryDirectory(dir=root, prefix='.asset-restore-') as temp:
+        staging = Path(temp)
+        with tarfile.open(archive) as tar:
+            members = tar.getmembers()
+            regular = {member.name for member in members if member.isfile()}
+            for member in members:
+                contained(staging, member.name)
+                if not (member.isfile() or member.isdir() or
+                        (member.islnk() and member.linkname in regular)):
+                    raise ValueError('Unsafe archive member')
+            tar.extractall(staging, filter='data')
+        files = [path for path in staging.rglob('*') if path.is_file()]
+        for path in files:
+            dest = contained(root, str(path.relative_to(staging)))
+            if dest.exists() and (not dest.is_file() or sha256(dest) != sha256(path)):
+                raise ValueError(f'Existing file differs; restore to a fresh directory: {dest}')
+        for path in files:
+            dest = contained(root, str(path.relative_to(staging)))
+            dest.parent.mkdir(parents=True, exist_ok=True)
+            if not dest.exists():
+                shutil.move(path, dest)
+    print(f'Restored {bundle["name"]}: {len(files)} files')
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--bundle', choices=['showcase', 'library', 'learning', 'all'], default='showcase')
+    parser.add_argument('--revision', help='Explicit override; hashes are still verified')
+    parser.add_argument('--destination', type=Path, default=ROOT)
+    parser.add_argument('--workers', type=int, choices=range(1, 9), default=4)
+    args = parser.parse_args()
+    lock = json.loads((ROOT / 'assets.lock.json').read_text())
+    bundles = [b for b in lock['bundles'] if args.bundle == 'all' or b['name'] == args.bundle]
+    if not bundles:
+        parser.error('This release has no matching bundle')
+    from modelscope_hub.api import HubApi
+    api = HubApi(token=os.environ.get('MODELSCOPE_API_TOKEN'))
+    root = args.destination.resolve()
+    root.mkdir(parents=True, exist_ok=True)
+    for bundle in bundles:
+        revision = args.revision or bundle.get('revision') or lock['revision']
+        if bundle.get('kind') == 'library-tree':
+            restore_library(api, lock['dataset'], bundle, revision, root, args.workers)
+        else:
+            restore_archive(api, lock['dataset'], bundle, revision, root)
+
+
+if __name__ == '__main__':
+    main()

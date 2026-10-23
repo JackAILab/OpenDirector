@@ -1,0 +1,13 @@
+{
+  "release": "2026-10-23",
+  "source_head": "2b9a3e98dc904a50bbee0dcf6110253a1e8e0ad7",
+  "includes_uncommitted_source": true,
+  "source_sessions": [
+    "OverView",
+    "PolishReal"
+  ],
+  "asset_dataset": "JackAILab/AdvertiseAgent_Assests",
+  "asset_visibility": "private",
+  "personal_runtime_data_included": false,
+  "note": "Source snapshot exported into an independent release repository; source history is not mirrored."
+}

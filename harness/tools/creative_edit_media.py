@@ -52,7 +52,7 @@ def source_path(project,sid='primary'):
     family,aid=sid.split('_',1)
     if family=='canvas':
         meta=project.get('canvas_assets',{}).get(aid)
-        if not meta or meta.get('kind')!='video': raise ValueError('视频素材不属于此项目')
+        if not meta or meta.get('kind') not in ('video','audio'): raise ValueError('媒体素材不属于此项目')
         return checked_path(store.DATA/'canvas'/project['id']/aid/meta['filename'])
     meta=project.get('edit_assets',{}).get(aid)
     if not meta: raise ValueError('剪辑素材不属于此项目')
@@ -79,13 +79,18 @@ def source_catalog(project):
     try: choices.append(('primary','生成原片',primary_path(project)))
     except ValueError: pass
     for aid,asset in project.get('canvas_assets',{}).items():
-        if asset.get('kind')=='video':
-            choices.append(('canvas_'+aid,'画布视频 '+aid[:6],source_path(project,'canvas_'+aid)))
+        if asset.get('kind') in ('video','audio'):
+            choices.append(('canvas_'+aid,('画布音轨 ' if asset['kind']=='audio' else '画布视频 ')+aid[:6],source_path(project,'canvas_'+aid)))
     for aid,asset in project.get('edit_assets',{}).items():
         choices.append(('edit_'+aid,asset['label'],source_path(project,'edit_'+aid)))
     result={}
     for sid,title,path in choices:
         result[sid]=dict(describe(path),id=sid,title=title)
+        if sid.startswith('canvas_'):
+            origin = project.get('canvas_assets', {}).get(sid[7:], {}).get('provenance', {})
+            export_id = origin.get('export_id')
+            if origin.get('kind') == 'video_edit' and isinstance(export_id, str) and re.fullmatch('[a-f0-9]{32}', export_id):
+                result[sid]['edit_export_id'] = export_id
     return result
 
 

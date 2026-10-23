@@ -59,6 +59,11 @@ def quote(provider, model, duration):
 
 def project_quote(project):
     spec=model_spec(project['provider'],project.get('model'))
+    if project.get('generation_mode')=='chaptered_native':
+        chapters = project.get('campaign', {}).get('chapters') or [dict(state='planned') for _ in range(project['duration']//15)]
+        count = sum(not c.get('job_id') and c.get('state') != 'submitting' for c in chapters) if project.get('shots') else 0
+        return dict(model=spec['id'], label=spec['label'], audio=True, credits_per_5s=spec['credits_per_5s'],
+                    new_shots=count, new_jobs=count, credits=count*spec['credits_per_5s']*3, policy='chaptered-native-v1')
     if project.get('generation_mode')=='single_native':
         credits=0 if not project.get('shots') or project.get('film',{}).get('job_id') else quote(project['provider'],spec['id'],project['duration'])
         return {'model':spec['id'],'label':spec['label'],'audio':spec['audio'],'credits_per_5s':spec['credits_per_5s'],'new_shots':int(credits>0),'new_jobs':int(credits>0),'credits':credits,'policy':'single-native-v1'}

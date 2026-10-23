@@ -115,3 +115,46 @@ def test_actual_agent_passes_sparse_observations_to_model_once(monkeypatch):
     assert result=={'fixture':True} and len(calls)==1
     assert calls[0][1]['content'][-1]['image_url']['url'].startswith('data:image/jpeg')
     assert '未听到音频' in calls[0][0]['content']
+
+
+def test_boundary_samples_cover_trimmed_repeated_sources_and_overlap_clock():
+    from harness.tools.creative_edit_observe import sample_plan, observation_metadata
+    clips=[dict(source='primary',start=2,end=5,transition=dict(kind='dissolve',duration=1)),
+           dict(source='primary',start=8,end=10,transition=dict(kind='cut',duration=0)),
+           dict(source='second',start=0,end=.2,transition=dict(kind='cut',duration=0))]
+    frames=[f for f in sample_plan({'clips':clips}) if 'boundary' in f]
+    assert [(f['boundary'],f['side'],f['time'],f['timeline_time']) for f in frames]==[
+        (1,'outgoing',4.875,2.875),(1,'incoming',8.125,2.125),
+        (2,'outgoing',9.875,3.875),(2,'incoming',.05,4.05)]
+    for frame in frames:
+        clip=clips[frame['clip_index']]
+        assert clip['start'] < frame['time'] < clip['end']
+    assert 'image' not in observation_metadata(dict(frames[0],image='private-bytes',provider_payload='secret'))
+    assert 'provider_payload' not in observation_metadata(dict(frames[0],provider_payload='secret'))
+
+
+def test_boundary_sampling_is_bounded_and_retains_pairs_at_both_ends():
+    from harness.tools.creative_edit_observe import sample_plan
+    clips=[dict(source='source_'+str(i%6),start=0,end=1,transition=dict(kind='cut',duration=0)) for i in range(32)]
+    frames=sample_plan({'clips':clips})
+    assert len(frames)<=40
+    pairs=[f for f in frames if 'boundary' in f]
+    assert len(pairs)==16 and pairs[0]['boundary']==1 and pairs[-1]['boundary']==31
+    for i in range(0,len(pairs),2):
+        assert pairs[i]['boundary']==pairs[i+1]['boundary']
+        assert [pairs[i]['side'],pairs[i+1]['side']]==['outgoing','incoming']
+
+
+def test_model_and_result_keep_boundary_evidence_but_not_image_bytes(monkeypatch):
+    from harness.agents.creative_editor import propose_edit, CreativeDirectorModel
+    calls=[]
+    async def complete(self,messages):calls.append(messages);return response(original)
+    monkeypatch.setattr(CreativeDirectorModel,'complete',complete)
+    original=validate_edit(base_spec(),15,'hash')
+    frame=dict(id='frame_1',source='primary',time=4.875,boundary=1,side='outgoing',clip_index=0,timeline_time=3.875,transition=original['clips'][0]['transition'],image='data:image/jpeg;base64,fixture')
+    raw=asyncio.run(propose_edit(original,[frame],'检查切点',{}))
+    metadata=json.loads(calls[0][1]['content'][1]['text'])
+    assert metadata['boundary']==1 and metadata['timeline_time']==3.875
+    result=evaluate_edit_proposal(raw,original,{'primary':dict(sha256='hash',duration=15,kind='video',has_audio=True)},[frame])
+    assert result['observations'][0]==metadata and 'image' not in metadata
+    assert result['qa']['training_eligible'] is False
