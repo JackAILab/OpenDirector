@@ -8,7 +8,27 @@
       "bytes": 339360918,
       "sha256": "2dd5269d6ca6e0437ac6155c0c82758d16448a5530b9da7b7cc5c473184aa97d",
       "target": "."
+    },
+    {
+      "name": "library",
+      "kind": "library-tree",
+      "prefix": "releases/2026-10-23/library/",
+      "revision": "45fb9fd5fcbe8f009eaaee57247c8998a97d9965",
+      "index_sha256": "7b24f2ed28b5ec03d2ee96bbac82592a95ddc0d04fddfaf25edeffbc1a1faae3",
+      "database_sha256": "d61451592063e8f203695a18383f6a63494b1800babb6dd41d2c5a398e402adc",
+      "files": 6353,
+      "bytes": 186561184854
+    },
+    {
+      "name": "learning",
+      "file": "releases/2026-10-23/learning-assets.tar.gz",
+      "bytes": 441882435,
+      "sha256": "91b3be5507f44708924b5a307ac0ae6c5f3e197998d344ccf0b1a8aef9609c47",
+      "files": 29301,
+      "target": ".",
+      "revision": "5fe610e2d47e089f2b0d7a23035310f57f11e2ac"
     }
   ],
-  "revision": "7562085e88bd76b3e72d2fda9d6191b565521d2f"
+  "revision": "7562085e88bd76b3e72d2fda9d6191b565521d2f",
+  "release": "2026-10-23"
 }
