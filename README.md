@@ -6,6 +6,10 @@ VisualAgent / AdvertiseAgent 创作系统的独立部署版本。提供统一画
 
 当前同步版本：**2026-10-23**。更新与验证边界见 [本次发布说明](docs/RELEASE_2026-10-23.md)。
 
+## Video2Skill：参考视频 → 可复用 Skill
+
+独立的 [Video2Skill 服务](packages/video2skill/README.md) 将视频采样证据提炼为可审核的方法卡，提供 CLI、HTTP API 和 Docker，支持离线编译与产物校验。无需启动工作室，不包含私有素材与凭证。
+
 ## 快速部署（Docker Compose）
 
 要求：Docker Engine/Desktop + Compose v2、Python 3.11+（初始化脚本）、可访问 Python/npm/Docker 镜像源；预留至少 15 GB 空间，完整素材库另计。Linux 与 macOS 使用同一 Compose；本次 Linux 构建/验证结果见 [部署验证](docs/DEPLOYMENT_VERIFICATION.md)，macOS 尚未实机验证。

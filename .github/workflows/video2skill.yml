@@ -1,0 +1,22 @@
+name: Video2Skill
+on:
+  push:
+    paths: ['packages/video2skill/**', '.github/workflows/video2skill.yml']
+  pull_request:
+    paths: ['packages/video2skill/**', '.github/workflows/video2skill.yml']
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: ['3.11', '3.12']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - run: sudo apt-get update && sudo apt-get install -y ffmpeg
+      - run: pip install './packages/video2skill[test]'
+      - run: pytest packages/video2skill/tests -q

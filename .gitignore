@@ -29,3 +29,5 @@ outputs/
 *.tar.gz
 *.zip
 *.ttf
+video2skill-data/
+**/video2skill-data/

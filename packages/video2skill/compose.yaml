@@ -1,0 +1,14 @@
+services:
+  video2skill:
+    build: .
+    ports: ["127.0.0.1:8088:8088"]
+    environment:
+      V2S_SERVICE_TOKEN: ${V2S_SERVICE_TOKEN:?set a random service token}
+      V2S_API_KEY: ${V2S_API_KEY:-}
+      V2S_MODEL: ${V2S_MODEL:-}
+      V2S_BASE_URL: ${V2S_BASE_URL:-}
+    volumes: ["evidence:/data"]
+    stop_grace_period: 240s
+    security_opt: ["no-new-privileges:true"]
+volumes:
+  evidence:

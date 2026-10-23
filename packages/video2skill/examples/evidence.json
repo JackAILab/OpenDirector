@@ -1,0 +1,53 @@
+{
+  "source": {
+    "title": "Synthetic block demonstration",
+    "source_name": "synthetic",
+    "rights": "owned"
+  },
+  "media_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "duration": 10,
+  "frame_times": [
+    1,
+    4,
+    7,
+    9
+  ],
+  "has_audio": false,
+  "analysis": {
+    "media_role": "tutorial",
+    "confidence": "medium",
+    "principle": "Show a visible change through a concrete action",
+    "mechanism": "Establish an initial state, then show the changed state so the audience can compare.",
+    "beats": [
+      {
+        "start": 0,
+        "end": 5,
+        "frames": [
+          0,
+          1
+        ],
+        "observation": "A blue block is visible on a plain surface.",
+        "purpose": "Establish the object and initial state."
+      },
+      {
+        "start": 5,
+        "end": 10,
+        "frames": [
+          2,
+          3
+        ],
+        "observation": "The block is now beside a contrasting marker.",
+        "purpose": "Make the changed position visible."
+      }
+    ],
+    "questions": [
+      "What observable change can the new subject demonstrate?"
+    ],
+    "transfer_rules": [
+      "Choose a new subject and a visible before-and-after action."
+    ],
+    "avoid": [
+      "Do not infer motion or sound from these still frames."
+    ]
+  }
+}
